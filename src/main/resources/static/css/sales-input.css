@@ -1,0 +1,202 @@
+/* Google FontsはHTMLで直接読み込むのでここでは不要 */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #fffef9;
+    height: 100vh;
+    /* overflow: hidden;  外側のwrapperで制御するため、ここでhiddenは避ける */
+}
+
+/* fragments/header.html と fragments/sidebar.html がBootstrapを使っている想定 */
+/* Bootstrapが全体的なレイアウトを制御するため、wrapperではなくmain-content-wrapperで調整 */
+.main-content-wrapper {
+    flex-grow: 1; /* sidebarの隣で残りの幅を全て使う */
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto; /* コンテンツがはみ出た場合にスクロール可能にする */
+    position: relative; /* weather-iconの配置基準 */
+}
+
+.weather-icon {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #fb8500; /* アイコンの色 */
+}
+
+.weather-popup {
+    position: absolute;
+    top: 60px;
+    right: 30px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border-radius: 8px;
+    display: none;
+    z-index: 10;
+    width: 220px;
+    font-size: 0.9rem;
+    color: #2c2c2c;
+}
+
+.weather-popup .controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.weather-popup button {
+    background-color: #fb8500;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background-color 0.3s;
+}
+
+.weather-popup button:hover {
+    background-color: #d95d0c;
+}
+
+.box {
+    background-color: #ffffff;
+    border-left: 6px solid #ffb703;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px 30px;
+    border-radius: 8px;
+    width: 100%; /* 親要素(main-content-wrapper)に合わせて調整 */
+    max-width: 1000px; /* 必要に応じて最大幅を設定 */
+    margin: 0 auto; /* 中央寄せ */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* overflow-y: auto; 親要素で制御 */
+}
+
+h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #fb8500;
+}
+
+label {
+    font-weight: bold;
+    margin-right: 10px;
+    color: #2c2c2c;
+}
+
+input[type="date"],
+input[type="number"],
+input[type="text"] {
+    padding: 6px;
+    font-size: 0.9rem;
+    width: 220px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[disabled] {
+    background-color: #e0e0e0;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.input-row {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    flex-wrap: wrap; /* 小さい画面で折り返す */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table th,
+table td {
+    border: 1px solid #ccc;
+    padding: 6px;
+}
+
+table th {
+    background-color: #ffb703;
+    color: white;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+table td {
+    text-align: center;
+}
+
+table td input[type="number"] {
+    width: 80px; /* テーブル内のinputの幅を調整 */
+    text-align: center;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    text-decoration: none; /* aタグの場合 */
+    display: inline-block; /* aタグの場合 */
+    text-align: center; /* aタグの場合 */
+}
+
+.button.primary-button {
+    background-color: #fb8500;
+    color: #fff;
+}
+
+.button.primary-button:hover {
+    background-color: #d95d0c;
+}
+
+.button.secondary-button {
+    background-color: #e0e0e0;
+    color: #888;
+}
+
+.button.secondary-button:hover {
+    background-color: #c0c0c0;
+    color: #666;
+}
+
+/* メッセージ表示用のスタイル (login.cssと共通だが、あえて分離) */
+.success-message {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+}
+.error-message {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+}

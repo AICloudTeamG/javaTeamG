@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/header :: header(~{::title}, ~{::body/content()})}">
+<head>
+    <title>🍺 販売実績入力 | H&C ビール発注システム</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/sales-input.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+    <div class="main-content-wrapper"> <div class="weather-icon" onclick="toggleWeatherPopup()">
+            <i class="fa-solid fa-cloud-sun"></i>
+        </div>
+        <div class="weather-popup" id="weatherPopup">
+            <div id="weatherContent"></div>
+            <div class="controls">
+                <button onclick="changeWeather(-1)"><i class="fas fa-arrow-left"></i></button>
+                <button onclick="changeWeather(1)"><i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <div class="box">
+            <h2>🍺 販売実績入力</h2>
+
+            <div th:if="${message}" class="success-message" role="alert">
+                <p th:text="${message}"></p>
+            </div>
+            <div th:if="${errorMessage}" class="error-message" role="alert">
+                <p th:text="${errorMessage}"></p>
+            </div>
+
+            <form th:action="@{/sales/input}" th:object="${salesPerformance}" method="post">
+                <div class="input-row">
+                    <div>
+                        <label for="recordDate">販売日付：</label>
+                        <input type="date" id="recordDate" th:field="*{recordDate}" required>
+                    </div>
+                    <div>
+                        <label>記録者（社員名）：</label>
+                        <span id="recorder-display" th:text="${session.loggedInStaffName}"></span>
+                        <input type="hidden" name="recordedByStaff.id" th:value="${session.loggedInStaffId}" />
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商品名</th>
+                            <th>JANコード</th>
+                            <th>販売本数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${products}">
+                            <td th:text="${product.name}"></td>
+                            <td th:text="${product.janCode}"></td>
+                            <td>
+                                <input type="number"
+                                       th:name="|salesCounts[${product.id}]|"
+                                       min="0" step="1" />
+                            </td>
+                        </tr>
+                        </tbody>
+                </table>
+
+                <div class="button-group">
+                    <button type="submit" class="button primary-button">登録する</button>
+                    <a th:href="@{/dashboard}" class="button secondary-button">キャンセル</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/sales-input.js}"></script>
+</body>
+</html>

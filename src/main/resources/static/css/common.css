@@ -1,0 +1,140 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #fffef9; /* login.htmlと統一 */
+    color: #2c2c2c;
+    min-height: 100vh; /* フッターをページ下部に固定するため */
+    display: flex;
+    flex-direction: column; /* 垂直方向のflexコンテナ */
+}
+
+/* ヘッダーのカスタムスタイル */
+.custom-navbar {
+    background-color: #2c2c2c !important; /* ダークグレー */
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+}
+
+.custom-navbar .navbar-brand {
+    color: #ffb703; /* ブランドロゴの色 */
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+}
+
+.custom-navbar .navbar-brand .navbar-logo-text {
+    font-size: 1.8rem; /* H&C部分を少し大きく */
+    color: #fb8500;
+}
+
+.custom-navbar .nav-link {
+    color: #ffffff; /* リンク色 */
+    transition: color 0.3s ease;
+}
+
+.custom-navbar .nav-link:hover {
+    color: #ffb703; /* ホバー時のリンク色 */
+}
+
+.custom-navbar .navbar-text {
+    color: #e0e0e0;
+}
+
+/* メインコンテンツラッパーとサイドバーのためのスタイル */
+#wrapper {
+    flex-grow: 1; /* 残りの高さを全て使用 */
+}
+
+#page-content-wrapper {
+    padding-left: 20px; /* sidebarとの隙間を確保 */
+    padding-right: 20px;
+    padding-bottom: 50px; /* footerとの重なり防止 */
+    flex-grow: 1; /* sidebarの隣で残りの幅を全て使う */
+    overflow-y: auto; /* コンテンツがはみ出た場合にスクロール可能にする */
+}
+
+/* 各ページのH1タグの共通スタイル */
+h1 {
+    font-size: 2rem;
+    color: #fb8500;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #ffb703;
+    padding-bottom: 0.5rem;
+}
+
+/* 共通のボタン基本スタイル */
+.btn-custom-primary {
+    background-color: #fb8500;
+    color: #fff;
+    border: none;
+    transition: background-color 0.3s;
+}
+.btn-custom-primary:hover {
+    background-color: #d95d0c;
+    color: #fff;
+}
+
+.btn-custom-secondary {
+    background-color: #e0e0e0;
+    color: #2c2c2c;
+    border: 1px solid #ccc;
+    transition: background-color 0.3s;
+}
+.btn-custom-secondary:hover {
+    background-color: #c0c0c0;
+    color: #2c2c2c;
+}
+
+/* ... (既存の common.css の内容) ... */
+
+/* サイドバーのカスタムスタイル */
+#sidebar-wrapper {
+    min-height: 100vh; /* 親要素の高さに合わせる */
+    width: 250px; /* サイドバーの固定幅 */
+    background-color: #2c2c2c !important; /* headerと統一 */
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.custom-sidebar-heading {
+    background-color: #fb8500; /* ヘッダーと統一 */
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #d95d0c;
+}
+
+.custom-list-item {
+    color: #e0e0e0;
+    transition: background-color 0.3s, color 0.3s;
+    border-bottom: 1px solid rgba(255,255,255,0.1); /* 区切り線 */
+}
+
+.custom-list-item:hover {
+    background-color: #4a4a4a; /* ホバー時の背景色 */
+    color: #ffb703; /* ホバー時の文字色 */
+}
+
+.custom-list-item.active { /* 現在表示中のページを示すスタイル */
+    background-color: #fb8500;
+    color: white;
+    font-weight: bold;
+}
+
+.list-group-item-dark { /* Bootstrapのデフォルトを上書き */
+    background-color: transparent !important;
+}
+
+/* ... (既存の common.css の内容) ... */
+
+/* フッターのスタイル */
+.footer {
+    background-color: #2c2c2c !important; /* ヘッダー・サイドバーと統一 */
+    color: #e0e0e0;
+    padding: 1rem 0;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: auto; /* flexboxでフッターを最下部に固定 */
+}
+
+.footer .text-muted {
+    color: #a0a0a0 !important;
+    font-size: 0.9rem;
+}
