@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/header :: header(~{::title}, ~{::body/content()})}">
+<head>
+    <title>🍺 発注予測 | H&C ビール発注システム</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/prediction.css}">
+</head>
+<body>
+    <div class="main-content-wrapper"> <h1>🍺 発注予測</h1>
+
+        <div class="range-selector">
+            <label for="range">表示期間を選択：</label>
+            <select id="range" name="range">
+                <option th:each="period : ${predictionPeriods}" th:value="${period.id}" th:text="${period.label}">5/6〜5/19（第1・第2週）</option>
+                </select>
+        </div>
+
+        <table class="forecast-table">
+            <thead>
+                <tr>
+                    <td class="diagonal-cell">
+                        <div class="bottom-left">日付・天気</div>
+                        <div class="top-right">ビール種類</div>
+                    </td>
+                    <th th:each="productType : ${productTypes}" th:text="${productType.name}">クラフト</th>
+                    </tr>
+            </thead>
+            <tbody>
+                <tr th:each="forecast : ${forecasts}">
+                    <td class="weather-cell">
+                        <div class="weather-info" th:text="${#temporals.format(forecast.date, 'M/d（EE）')}">5/6（月）</div>
+                        </td>
+                    <td th:each="count : ${forecast.predictedCounts}" th:text="${count}">34</td>
+                </tr>
+                </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+        // 必要であれば、期間選択のJavaScriptなどをここに記述
+        // または prediction.js として外部ファイル化
+    </script>
+</body>
+</html>

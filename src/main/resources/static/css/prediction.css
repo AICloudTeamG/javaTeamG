@@ -1,0 +1,102 @@
+/* Google FontsはHTMLで直接読み込むのでここでは不要 */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #fffef9;
+    color: #2c2c2c;
+    height: 100vh; /* Bootstrapのレイアウトが適用される前提 */
+}
+
+/* fragments/header.html と fragments/sidebar.html がBootstrapを使っている想定 */
+/* Bootstrapのd-flexとid="wrapper"構造に対応させる */
+/* .main-content-wrapper は sales-input.css と同じ役割 */
+.main-content-wrapper {
+    flex-grow: 1; /* sidebarの隣で残りの幅を全て使う */
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto; /* コンテンツがはみ出た場合にスクロール可能にする */
+}
+
+h1 {
+    font-size: 1.8rem; /* sales-input.htmlと統一 */
+    color: #fb8500;
+    margin-bottom: 20px; /* 見出しの下に少し余白 */
+}
+
+.summary-table, .forecast-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+    margin-top: 20px; /* 見出しや期間選択からの余白 */
+}
+
+.summary-table th, .summary-table td,
+.forecast-table th, .forecast-table td {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 4px;
+}
+
+.summary-table th, .forecast-table th {
+    background-color: #ffb703;
+    color: white;
+}
+
+.weather-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.65rem;
+    gap: 2px;
+}
+
+.diagonal-cell {
+    position: relative;
+    width: 80px;
+    height: 60px;
+}
+
+.diagonal-cell::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 49.5%, #ddd 49.5%, #ddd 50.5%, transparent 50.5%);
+    z-index: 0;
+}
+
+.diagonal-cell .bottom-left {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    font-size: 0.65rem;
+}
+
+.diagonal-cell .top-right {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 0.65rem;
+}
+
+.range-selector {
+    margin: 10px 0;
+    font-size: 0.9rem;
+    color: #2c2c2c;
+}
+
+.range-selector label {
+    margin-right: 8px;
+    font-weight: bold;
+}
+
+.range-selector select {
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
