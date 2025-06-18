@@ -56,5 +56,11 @@ public class AuthController {
         return "redirect:/login?logout"; // ログインページにリダイレクトしてログアウトメッセージを表示
     }
 
+    @GetMapping("/access-denied")
+    public String AccessDenied(HttpSession session) {
+        authService.logout(session); // セッションを無効化
+        return "redirect:/access-denied"; // アクセス拒否ページへ
+    }
+
 
 }

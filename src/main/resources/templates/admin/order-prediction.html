@@ -114,10 +114,11 @@
         <div class="sidebar">
             <h1>メニュー</h1>
             <ul>
-                <li class="active">発注予測</li>
+                <li class="active"><a href="/admin/prediction" style="text-decoration: none; color: inherit;">実績入力</a>発注予測</li>
                 <li><a href="/sales/input" style="text-decoration: none; color: inherit;">実績入力</a></li>
-                <li><a href="/dashboard" style="text-decoration: none; color: inherit;">実績・天気データ可視化</a></li>
-                <li><a href="/account/list" style="text-decoration: none; color: inherit;">アカウント管理</a></li>
+                <li><a href="/admin/dashboard" style="text-decoration: none; color: inherit;">実績・天気データ可視化</a></li>
+                <li><a href="/admin/account/list" style="text-decoration: none; color: inherit;">アカウント管理</a></li>
+                <li><a href="/logout" style="text-decoration: none; color: inherit;">ログアウト</a></li>
             </ul>
         </div>
         <div class="main">
@@ -160,7 +161,6 @@
     </div>
 
     <script th:inline="javascript">
-        // Sidebar active state (変更なし)
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarItems = document.querySelectorAll('.sidebar li');
             const currentPath = window.location.pathname;
@@ -169,11 +169,7 @@
                 const link = item.querySelector('a');
                 if (link && link.getAttribute('href') === currentPath) {
                     item.classList.add('active');
-                } else if (!link && currentPath.includes('/admin/order-prediction')) {
-                    if (item.textContent.trim() === '発注予測') {
-                        item.classList.add('active');
-                    }
-                }
+                } 
             });
         });
     </script>

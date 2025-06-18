@@ -31,7 +31,7 @@ public class OrderPredictionController {
         this.orderPredictionService = orderPredictionService;
     }
 
-    @GetMapping("/prediction")
+    @GetMapping("/admin/prediction")
     public String showPrediction(Model model) { 
         List<OrderPredictionData> allPredictions;
         try {
