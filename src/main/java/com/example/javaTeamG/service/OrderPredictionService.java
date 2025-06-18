@@ -1,49 +1,56 @@
-// package com.example.javaTeamG.service;
+package com.example.javaTeamG.service;
 
-// import com.example.javaTeamG.model.OrderPrediction; // OrderPredictionモデルはまだ定義していませんが、後で追加します
-// import com.example.javaTeamG.repository.ProductRepository;
-// import org.springframework.stereotype.Service;
-// import org.springframework.web.client.RestTemplate; // Pythonサービスとの連携に利用
+import com.example.javaTeamG.model.OrderPredictionData; // OrderPredictionData に変更
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-// import java.time.LocalDate;
-// import java.util.List;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
-// @Service
-// public class OrderPredictionService {
+@Service
+public class OrderPredictionService { // クラス名を OrderPredictionService に変更
 
-//     private final ProductRepository productRepository;
-//     private final RestTemplate restTemplate; // Pythonサービスとの通信用
+    private final WebClient webClient;
+    private final ObjectMapper objectMapper;
 
-//     // Python予測モデルのAPIエンドポイント (例)
-//     private static final String PYTHON_PREDICTION_API_URL = "http://localhost:5000/predict";
+    public OrderPredictionService(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8080").build(); // ベースURLは適宜変更
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule()); // LocalDate を処理できるように登録
+    }
 
-//     public OrderPredictionService(ProductRepository productRepository) {
-//         this.productRepository = productRepository;
-//         this.restTemplate = new RestTemplate(); // RestTemplateを初期化
-//     }
+    // 外部APIから予測データを取得するメソッド (WebClientの代わりにダミーAPIを呼び出す例)
+    public List<OrderPredictionData> fetchPredictionDataFromExternalApi(String apiUrl) throws IOException {
+        try {
+            String jsonResponse = webClient.get()
+                    .uri(apiUrl) // コントローラーのダミーデータエンドポイントを呼び出す
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block(); // 同期的にレスポンスを待つ (本番では非同期処理を検討)
 
-//     /**
-//      * 指定された週のビール発注予測を取得します。
-//      * 実際には、販売実績や天気情報などをPython予測モデルに渡し、結果を受け取ります。
-//      * @param weekStartDate 週の開始日（例: 月曜日）
-//      * @return 予測結果のリスト（仮のデータ構造）
-//      */
-//     public List<OrderPrediction> getWeeklyOrderPrediction(LocalDate weekStartDate) {
-//         // ここにPython予測モデルとの連携ロジックを実装します。
-//         // 例: RestTemplateを使ってPythonサービスにHTTPリクエストを送信
-//         // Map<String, Object> requestData = new HashMap<>();
-//         // requestData.put("start_date", weekStartDate.toString());
-//         // requestData.put("sales_data", salesService.getSalesDataForPrediction(weekStartDate)); // 仮のメソッド
-//         // requestData.put("weather_data", salesWeatherService.getWeatherDataForPrediction(weekStartDate)); // 仮のメソッド
+            return parsePredictionData(jsonResponse);
+        } catch (Exception e) {
+            // エラーログ出力
+            System.err.println("Error fetching prediction data from external API: " + e.getMessage());
+            // 例外を再度スローするか、空リストを返すか、ビジネスロジックによる
+            throw new IOException("Failed to fetch prediction data from external API", e);
+        }
+    }
 
-//         // OrderPrediction[] predictions = restTemplate.postForObject(PYTHON_PREDICTION_API_URL, requestData, OrderPrediction[].class);
-//         // return Arrays.asList(predictions);
-
-//         // 今はダミーデータを返します。
-//         System.out.println("Calling Python model for prediction for week starting: " + weekStartDate);
-//         return List.of(
-//             new OrderPrediction(1, weekStartDate, productRepository.findById(1).orElse(null), 100),
-//             new OrderPrediction(2, weekStartDate, productRepository.findById(2).orElse(null), 150)
-//         );
-//     }
-// }
+    // JSON文字列をPredictionDataオブジェクトのリストにパースするメソッド
+    public List<OrderPredictionData> parsePredictionData(String jsonData) throws IOException {
+        if (jsonData == null || jsonData.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        try {
+            return objectMapper.readValue(jsonData, new TypeReference<List<OrderPredictionData>>() {});
+        } catch (IOException e) {
+            System.err.println("Error parsing JSON data: " + e.getMessage());
+            throw e;
+        }
+    }
+}
