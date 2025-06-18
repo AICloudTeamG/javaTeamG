@@ -1,9 +1,8 @@
 package com.example.javaTeamG.controller;
 
-import com.example.javaTeamG.model.OrderPredictionData; // OrderPredictionData に変更
-import com.example.javaTeamG.service.OrderPredictionService; // OrderPredictionService に変更
+import com.example.javaTeamG.model.OrderPredictionData; 
+import com.example.javaTeamG.service.OrderPredictionService;
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,15 +21,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
-public class OrderPredictionController { // クラス名を OrderPredictionController に変更
+public class OrderPredictionController {
 
-    private final OrderPredictionService orderPredictionService; // OrderPredictionService に変更
+    private final OrderPredictionService orderPredictionService; 
 
     // 外部APIのURL (TODO: 実際のURLに置き換える)
     private static final String EXTERNAL_PREDICTION_API_URL = "/dummy-order-prediction-data"; // ダミーAPIのパスも変更
 
     @Autowired
-    public OrderPredictionController(OrderPredictionService orderPredictionService) { // コンストラクタ引数も変更
+    public OrderPredictionController(OrderPredictionService orderPredictionService) { 
         this.orderPredictionService = orderPredictionService;
     }
 
@@ -57,7 +56,7 @@ public class OrderPredictionController { // クラス名を OrderPredictionContr
             model.addAttribute("orderDateRanges", new ArrayList<>());
             model.addAttribute("selectedOrderDate", "");
             model.addAttribute("pageTitle", "発注予測");
-            return "prediction"; // テンプレートパスも変更
+            return "order-prediction"; // テンプレートパスも変更
         }
 
         allPredictions.sort(Comparator.comparing(OrderPredictionData::getDate));
@@ -99,7 +98,7 @@ public class OrderPredictionController { // クラス名を OrderPredictionContr
         model.addAttribute("predictionList", displayPredictions);
         model.addAttribute("pageTitle", "発注予測");
 
-        return "prediction"; // テンプレートパスも変更
+        return "order-prediction"; // テンプレートパスも変更
     }
 
     public static class OrderDateRange {
@@ -244,7 +243,7 @@ public class OrderPredictionController { // クラス名を OrderPredictionContr
 
     private String getDummyPredictionDataString() {
         return """
-            [{"date": "2025-06-18", "pale_ale": 5.59, "lager": 8.06, "ipa": 4.82, "white": 5.01, "dark": 3.11, "fruit": 3.72, "temperature_2m_mean": 27.4, "precipitation_sum": 0.0, "wind_speed_10m_mean": 4.7, "weekday": 2.0, "temp_diff": 4.56, "temp_10d_avg": 22.84, "weather_code": 1.0, "shortwave_radiation_sum": 25.11}, {"date": "2025-06-19", "pale_ale": 6.38, "lager": 8.55, "ipa": 5.25, "white": 5.32, "dark": 3.33, "fruit": 4.14, "temperature_2m_mean": 26.5, "precipitation_sum": 0.0, "wind_speed_10m_mean": 3.8, "weekday": 3.0, "temp_diff": 3.06, "temp_10d_avg": 23.44, "weather_code": 3.0, "shortwave_radiation_sum": 24.74}, {"date": "2025-06-20", "pale_ale": 8.88, "lager": 10.28, "ipa": 6.87, "white": 6.32, "dark": 4.69, "fruit": 3.75, "temperature_2m_mean": 25.0, "precipitation_sum": 0.0, "wind_speed_10m_mean": 4.1, "weekday": 4.0, "temp_diff": 0.98, "temp_10d_avg": 24.02, "weather_code": 3.0, "shortwave_radiation_sum": 19.1}, {"date": "2025-06-21", "pale_ale": 5.89, "lager": 7.62, "ipa": 4.58, "white": 5.01, "dark": 3.11, "fruit": 4.03, "temperature_2m_mean": 25.7, "precipitation_sum": 0.0, "wind_speed_10m_mean": 11.1, "weekday": 5.0, "temp_diff": 1.15, "temp_10d_avg": 24.55, "weather_code": 3.0, "shortwave_radiation_sum": 24.24}, {"date": "2025-06-22", "pale_ale": 6.21, "lager": 7.32, "ipa": 4.55, "white": 4.46, "dark": 2.85, "fruit": 3.89, "temperature_2m_mean": 26.3, "precipitation_sum": 0.0, "wind_speed_10m_mean": 16.3, "weekday": 6.0, "temp_diff": 1.31, "temp_10d_avg": 24.99, "weather_code": 3.0, "shortwave_radiation_sum": 28.42}, {"date": "2025-06-23", "pale_ale": 5.7, "lager": 6.05, "ipa": 3.72, "white": 3.49, "dark": 2.47, "fruit": 2.62, "temperature_2m_mean": 24.8, "precipitation_sum": 4.8, "wind_speed_10m_mean": 12.4, "weekday": 0.0, "temp_diff": -0.56, "temp_10d_avg": 25.36, "weather_code": 61.0, "shortwave_radiation_sum": 8.93}, {"date": "2025-06-24", "pale_ale": 5.3, "lager": 6.68, "ipa": 4.23, "white": 4.37, "dark": 2.79, "fruit": 3.09, "temperature_2m_mean": 26.4, "precipitation_sum": 0.0, "wind_speed_10m_mean": 11.1, "weekday": 1.0, "temp_diff": 0.45, "temp_10d_avg": 25.95, "weather_code": 3.0, "shortwave_radiation_sum": 19.93}, {"date": "2025-06-25", "pale_ale": 5.42, "lager": 6.49, "ipa": 3.44, "white": 4.37, "dark": 2.74, "fruit": 3.06, "temperature_2m_mean": 26.7, "precipitation_sum": 0.6, "wind_speed_10m_mean": 11.8, "weekday": 2.0, "temp_diff": 0.6, "temp_10d_avg": 26.1, "weather_code": 3.0, "shortwave_radiation_sum": 18.64}, {"date": "2025-06-26", "pale_ale": 5.27, "lager": 7.15, "ipa": 3.79, "white": 4.59, "dark": 2.39, "fruit": 2.66, "temperature_2m_mean": 27.9, "precipitation_sum": 3.3, "wind_speed_10m_mean": 13.8, "weekday": 3.0, "temp_diff": 1.6, "temp_10d_avg": 26.3, "weather_code": 51.0, "shortwave_radiation_sum": 16.59}, {"date": "2025-06-27", "pale_ale": 9.81, "lager": 10.49, "ipa": 6.69, "white": 5.88, "dark": 3.78, "fruit": 4.1, "temperature_2m_mean": 27.4, "precipitation_sum": 0.0, "wind_speed_10m_mean": 16.3, "weekday": 4.0, "temp_diff": 0.99, "temp_10d_avg": 26.41, "weather_code": 3.0, "shortwave_radiation_sum": 28.39}, {"date": "2025-06-28", "pale_ale": 5.17, "lager": 7.24, "ipa": 4.31, "white": 4.26, "dark": 2.71, "fruit": 3.89, "temperature_2m_mean": 26.9, "precipitation_sum": 0.0, "wind_speed_10m_mean": 17.4, "weekday": 5.0, "temp_diff": 0.54, "temp_10d_avg": 26.36, "weather_code": 3.0, "shortwave_radiation_sum": 29.46}, {"date": "2025-06-29", "pale_ale": 5.13, "lager": 5.53, "ipa": 3.82, "white": 3.96, "dark": 3.25, "fruit": 3.05, "temperature_2m_mean": 25.8, "precipitation_sum": 2.3, "wind_speed_10m_mean": 17.1, "weekday": 6.0, "temp_diff": -0.49, "temp_10d_avg": 26.29, "weather_code": 53.0, "shortwave_radiation_sum": 19.36}, {"date": "2025-06-30", "pale_ale": 5.94, "lager": 6.28, "ipa": 4.18, "white": 3.72, "dark": 3.13, "fruit": 2.91, "temperature_2m_mean": 26.3, "precipitation_sum": 3.4, "wind_speed_10m_mean": 16.2, "weekday": 0.0, "temp_diff": -0.12, "temp_10d_avg": 26.42, "weather_code": 53.0, "shortwave_radiation_sum": 17.63}, {"date": "2025-07-01", "pale_ale": 6.02, "lager": 7.39, "ipa": 4.41, "white": 4.58, "dark": 2.83, "fruit": 2.75, "temperature_2m_mean": 27.1, "precipitation_sum": 0.2, "wind_speed_10m_mean": 13.7, "weekday": 1.0, "temp_diff": 0.54, "temp_10d_avg": 26.56, "weather_code": 51.0, "shortwave_radiation_sum": 27.28}, {"date": "2025-07-02", "pale_ale": 5.45, "lager": 7.75, "ipa": 3.8, "white": 4.97, "dark": 2.92, "fruit": 3.19, "temperature_2m_mean": 28.4, "precipitation_sum": 0.1, "wind_speed_10m_mean": 17.4, "weekday": 2.0, "temp_diff": 1.63, "temp_10d_avg": 26.77, "weather_code": 51.0, "shortwave_radiation_sum": 25.42}, {"date": "2025-07-03", "pale_ale": 5.73, "lager": 6.94, "ipa": 3.35, "white": 3.9, "dark": 2.49, "fruit": 3.43, "temperature_2m_mean": 27.5, "precipitation_sum": 0.0, "wind_speed_10m_mean": 20.7, "weekday": 3.0, "temp_diff": 0.46, "temp_10d_avg": 27.04, "weather_code": 3.0, "shortwave_radiation_sum": 15.94}]
+            [{"date": "2025-06-18", "pale_ale": 5.59, "lager": 8.06, "ipa": 4.82, "white": 5.01, "dark": 3.11, "fruit": 3.72, "temperature_2m_mean": 27.5, "weather_code": 1.0, "temperature_2m_max": 33.0, "temperature_2m_min": 23.0, "wind_speed_10m_max": 7.1, "relative_humidity_2m_max": 93.0, "relative_humidity_2m_min": 50.0, "weekday": 2.0}, {"date": "2025-06-19", "pale_ale": 6.5, "lager": 8.55, "ipa": 5.25, "white": 5.32, "dark": 3.33, "fruit": 4.14, "temperature_2m_mean": 26.4, "weather_code": 3.0, "temperature_2m_max": 30.8, "temperature_2m_min": 23.4, "wind_speed_10m_max": 7.1, "relative_humidity_2m_max": 98.0, "relative_humidity_2m_min": 60.0, "weekday": 3.0}, {"date": "2025-06-20", "pale_ale": 10.65, "lager": 11.23, "ipa": 7.49, "white": 6.7, "dark": 4.73, "fruit": 4.35, "temperature_2m_mean": 25.5, "weather_code": 2.0, "temperature_2m_max": 29.6, "temperature_2m_min": 21.9, "wind_speed_10m_max": 7.4, "relative_humidity_2m_max": 97.0, "relative_humidity_2m_min": 65.0, "weekday": 4.0}, {"date": "2025-06-21", "pale_ale": 5.76, "lager": 7.38, "ipa": 4.58, "white": 5.13, "dark": 2.67, "fruit": 4.03, "temperature_2m_mean": 25.4, "weather_code": 3.0, "temperature_2m_max": 29.4, "temperature_2m_min": 22.2, "wind_speed_10m_max": 18.7, "relative_humidity_2m_max": 95.0, "relative_humidity_2m_min": 55.0, "weekday": 5.0}, {"date": "2025-06-22", "pale_ale": 6.21, "lager": 7.32, "ipa": 4.55, "white": 4.46, "dark": 2.85, "fruit": 3.89, "temperature_2m_mean": 26.3, "weather_code": 3.0, "temperature_2m_max": 30.9, "temperature_2m_min": 22.5, "wind_speed_10m_max": 24.3, "relative_humidity_2m_max": 88.0, "relative_humidity_2m_min": 53.0, "weekday": 6.0}, {"date": "2025-06-23", "pale_ale": 5.7, "lager": 6.05, "ipa": 3.72, "white": 3.49, "dark": 2.47, "fruit": 2.62, "temperature_2m_mean": 24.8, "weather_code": 61.0, "temperature_2m_max": 26.6, "temperature_2m_min": 23.7, "wind_speed_10m_max": 14.8, "relative_humidity_2m_max": 89.0, "relative_humidity_2m_min": 71.0, "weekday": 0.0}, {"date": "2025-06-24", "pale_ale": 5.3, "lager": 6.68, "ipa": 4.23, "white": 4.37, "dark": 2.79, "fruit": 3.09, "temperature_2m_mean": 26.4, "weather_code": 3.0, "temperature_2m_max": 30.7, "temperature_2m_min": 23.1, "wind_speed_10m_max": 17.7, "relative_humidity_2m_max": 92.0, "relative_humidity_2m_min": 59.0, "weekday": 1.0}, {"date": "2025-06-25", "pale_ale": 5.47, "lager": 6.49, "ipa": 3.44, "white": 4.37, "dark": 2.74, "fruit": 3.06, "temperature_2m_mean": 26.7, "weather_code": 3.0, "temperature_2m_max": 29.5, "temperature_2m_min": 24.3, "wind_speed_10m_max": 16.5, "relative_humidity_2m_max": 92.0, "relative_humidity_2m_min": 64.0, "weekday": 2.0}, {"date": "2025-06-26", "pale_ale": 5.27, "lager": 7.15, "ipa": 3.79, "white": 4.59, "dark": 2.39, "fruit": 2.66, "temperature_2m_mean": 27.9, "weather_code": 51.0, "temperature_2m_max": 31.9, "temperature_2m_min": 24.7, "wind_speed_10m_max": 21.2, "relative_humidity_2m_max": 77.0, "relative_humidity_2m_min": 47.0, "weekday": 3.0}]
             """;
     }
 }
