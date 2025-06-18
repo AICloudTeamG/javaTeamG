@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Products") // DBテーブル名と一致させる
+@Table(name = "products") // DBテーブル名と一致させる
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "SalesPerformance") // DBテーブル名と一致させる
+@Table(name = "sales_performance") // DBテーブル名と一致させる
 public class SalesPerformance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
