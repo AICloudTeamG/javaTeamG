@@ -22,7 +22,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/admin/order-prediction") // パスを /admin/order-prediction に変更
 public class OrderPredictionController { // クラス名を OrderPredictionController に変更
 
     private final OrderPredictionService orderPredictionService; // OrderPredictionService に変更
@@ -35,7 +34,7 @@ public class OrderPredictionController { // クラス名を OrderPredictionContr
         this.orderPredictionService = orderPredictionService;
     }
 
-    @GetMapping("/weekly")
+    @GetMapping("/prediction")
     // @PreAuthorize("hasRole('ADMIN')")
     public String showWeeklyPrediction(Model model,
                                        @RequestParam(name = "selectedOrderDate", required = false) String selectedOrderDateStr) {
@@ -58,7 +57,7 @@ public class OrderPredictionController { // クラス名を OrderPredictionContr
             model.addAttribute("orderDateRanges", new ArrayList<>());
             model.addAttribute("selectedOrderDate", "");
             model.addAttribute("pageTitle", "発注予測");
-            return "order-prediction/order_prediction"; // テンプレートパスも変更
+            return "prediction"; // テンプレートパスも変更
         }
 
         allPredictions.sort(Comparator.comparing(OrderPredictionData::getDate));
@@ -100,7 +99,7 @@ public class OrderPredictionController { // クラス名を OrderPredictionContr
         model.addAttribute("predictionList", displayPredictions);
         model.addAttribute("pageTitle", "発注予測");
 
-        return "order-prediction/order_prediction"; // テンプレートパスも変更
+        return "prediction"; // テンプレートパスも変更
     }
 
     public static class OrderDateRange {

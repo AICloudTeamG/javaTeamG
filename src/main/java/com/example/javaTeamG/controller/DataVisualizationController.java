@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/data") // 管理者専用パス
 public class DataVisualizationController {
 
     // private final SalesPerformanceService salesPerformanceService;
