@@ -40,9 +40,9 @@ public class AuthController {
         Staff staff = authService.login(email, password, session);
         if (staff != null) {
             if(staff.isAdmin()){
-                return "redirect:/prediction"; // ログイン成功、管理者は予測ページへ
+                return "redirect:/admin/prediction"; // ログイン成功、管理者は予測ページへ
             }else{
-                return "redirect:/sales/input";//ログイン成功、従業員は、入力ページへ
+                return "redirect:sales/input";//ログイン成功、従業員は、入力ページへ
             }
         } else {
             return "redirect:/login?error"; // ログイン失敗
