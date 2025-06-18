@@ -3,7 +3,6 @@ package com.example.javaTeamG.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 
-// モデルクラスを PredictionData から OrderPredictionData に変更
 public class OrderPredictionData {
     private LocalDate date;
     @JsonProperty("pale_ale")
@@ -15,25 +14,29 @@ public class OrderPredictionData {
     private Double fruit;
     @JsonProperty("temperature_2m_mean")
     private Double temperature2mMean;
-    @JsonProperty("precipitation_sum")
-    private Double precipitationSum;
-    @JsonProperty("wind_speed_10m_mean")
-    private Double windSpeed10mMean;
-    private Double weekday;
-    @JsonProperty("temp_diff")
-    private Double tempDiff;
-    @JsonProperty("temp_10d_avg")
-    private Double temp10dAvg;
     @JsonProperty("weather_code")
     private Double weatherCode;
-    @JsonProperty("shortwave_radiation_sum")
-    private Double shortwaveRadiationSum;
+    @JsonProperty("temperature_2m_max")
+    private Double temperature2mMax;
+    @JsonProperty("temperature_2m_min")
+    private Double temperature2mMin;
+    @JsonProperty("wind_speed_10m_max")
+    private Double windSpeed10mMax; 
+    @JsonProperty("relative_humidity_2m_max")
+    private Double relativeHumidity2mMax;
+    @JsonProperty("relative_humidity_2m_min")
+    private Double relativeHumidity2mMin;
+    private Double weekday;
 
     // デフォルトコンストラクタ (JSONパースに必要)
     public OrderPredictionData() {}
 
-    // コンストラクタ (テストや手動生成用)
-    public OrderPredictionData(LocalDate date, Double paleAle, Double lager, Double ipa, Double white, Double dark, Double fruit, Double temperature2mMean, Double precipitationSum, Double windSpeed10mMean, Double weekday, Double tempDiff, Double temp10dAvg, Double weatherCode, Double shortwaveRadiationSum) {
+    // コンストラクタ 
+    public OrderPredictionData(LocalDate date, Double paleAle, Double lager, Double ipa, Double white, Double dark, Double fruit,
+                               Double temperature2mMean, Double weatherCode,
+                               Double temperature2mMax, Double temperature2mMin, Double windSpeed10mMax,
+                               Double relativeHumidity2mMax, Double relativeHumidity2mMin,
+                               Double weekday) {
         this.date = date;
         this.paleAle = paleAle;
         this.lager = lager;
@@ -42,16 +45,17 @@ public class OrderPredictionData {
         this.dark = dark;
         this.fruit = fruit;
         this.temperature2mMean = temperature2mMean;
-        this.precipitationSum = precipitationSum;
-        this.windSpeed10mMean = windSpeed10mMean;
-        this.weekday = weekday;
-        this.tempDiff = tempDiff;
-        this.temp10dAvg = temp10dAvg;
         this.weatherCode = weatherCode;
-        this.shortwaveRadiationSum = shortwaveRadiationSum;
+        this.temperature2mMax = temperature2mMax;
+        this.temperature2mMin = temperature2mMin;
+        this.windSpeed10mMax = windSpeed10mMax;
+        this.relativeHumidity2mMax = relativeHumidity2mMax;
+        this.relativeHumidity2mMin = relativeHumidity2mMin;
+        this.weekday = weekday;
     }
 
     // Getters and Setters
+
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
 
@@ -76,24 +80,25 @@ public class OrderPredictionData {
     public Double getTemperature2mMean() { return temperature2mMean; }
     public void setTemperature2mMean(Double temperature2mMean) { this.temperature2mMean = temperature2mMean; }
 
-    public Double getPrecipitationSum() { return precipitationSum; }
-    public void setPrecipitationSum(Double precipitationSum) { this.precipitationSum = precipitationSum; }
-
-    public Double getWindSpeed10mMean() { return windSpeed10mMean; }
-    public void setWindSpeed10mMean(Double windSpeed10mMean) { this.windSpeed10mMean = windSpeed10mMean; }
-
-    public Double getWeekday() { return weekday; }
-    public void setWeekday(Double weekday) { this.weekday = weekday; }
-
-    public Double getTempDiff() { return tempDiff; }
-    public void setTempDiff(Double tempDiff) { this.tempDiff = tempDiff; }
-
-    public Double getTemp10dAvg() { return temp10dAvg; }
-    public void setTemp10dAvg(Double temp10dAvg) { this.temp10dAvg = temp10dAvg; }
 
     public Double getWeatherCode() { return weatherCode; }
     public void setWeatherCode(Double weatherCode) { this.weatherCode = weatherCode; }
 
-    public Double getShortwaveRadiationSum() { return shortwaveRadiationSum; }
-    public void setShortwaveRadiationSum(Double shortwaveRadiationSum) { this.shortwaveRadiationSum = shortwaveRadiationSum; }
+    public Double getTemperature2mMax() { return temperature2mMax; }
+    public void setTemperature2mMax(Double temperature2mMax) { this.temperature2mMax = temperature2mMax; }
+
+    public Double getTemperature2mMin() { return temperature2mMin; }
+    public void setTemperature2mMin(Double temperature2mMin) { this.temperature2mMin = temperature2mMin; }
+
+    public Double getWindSpeed10mMax() { return windSpeed10mMax; }
+    public void setWindSpeed10mMax(Double windSpeed10mMax) { this.windSpeed10mMax = windSpeed10mMax; }
+
+    public Double getRelativeHumidity2mMax() { return relativeHumidity2mMax; }
+    public void setRelativeHumidity2mMax(Double relativeHumidity2mMax) { this.relativeHumidity2mMax = relativeHumidity2mMax; }
+
+    public Double getRelativeHumidity2mMin() { return relativeHumidity2mMin; }
+    public void setRelativeHumidity2mMin(Double relativeHumidity2mMin) { this.relativeHumidity2mMin = relativeHumidity2mMin; }
+
+    public Double getWeekday() { return weekday; }
+    public void setWeekday(Double weekday) { this.weekday = weekday; }
 }
