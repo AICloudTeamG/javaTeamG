@@ -53,7 +53,7 @@ public class AuthController {
                         Model model) {
         Staff staff = authService.login(email, password, session);
         if (staff != null) {
-            return "redirect:/dashboard"; // ログイン成功、ダッシュボードへ
+            return "redirect:/prediction"; // ログイン成功、ダッシュボードへ
         } else {
             return "redirect:/login?error"; // ログイン失敗
         }

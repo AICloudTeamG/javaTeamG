@@ -3,7 +3,7 @@ package com.example.javaTeamG.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "WeatherCodes") // DBテーブル名と一致させる
+@Table(name = "weather_codes") // DBテーブル名と一致させる
 public class WeatherCode {
     @Id
     private Integer id; // WMO準拠コードをそのままIDとして使用
