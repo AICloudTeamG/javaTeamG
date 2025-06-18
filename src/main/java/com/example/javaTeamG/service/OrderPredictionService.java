@@ -1,6 +1,6 @@
 package com.example.javaTeamG.service;
 
-import com.example.javaTeamG.model.OrderPredictionData; // OrderPredictionData に変更
+import com.example.javaTeamG.model.OrderPredictionData; 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -12,13 +12,14 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class OrderPredictionService { // クラス名を OrderPredictionService に変更
+public class OrderPredictionService { 
 
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
 
     public OrderPredictionService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8080").build(); // ベースURLは適宜変更
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8080").build(); // 開発用
+        // this.webClient = webClientBuilder.build(); // 本番用ただし、fetchPredictionDataFromExternalApiにフルパスを渡す。
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule()); // LocalDate を処理できるように登録
     }

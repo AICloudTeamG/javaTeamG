@@ -39,7 +39,11 @@ public class AuthController {
                         Model model) {
         Staff staff = authService.login(email, password, session);
         if (staff != null) {
-            return "redirect:/prediction"; // ログイン成功、ダッシュボードへ
+            if(staff.isAdmin()){
+                return "redirect:/prediction"; // ログイン成功、管理者は予測ページへ
+            }else{
+                return "redirect:/sales/input";//ログイン成功、従業員は、入力ページへ
+            }
         } else {
             return "redirect:/login?error"; // ログイン失敗
         }

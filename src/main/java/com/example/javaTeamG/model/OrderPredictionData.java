@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public class OrderPredictionData {
     private LocalDate date;
-    @JsonProperty("pale_ale")
+    @JsonProperty("pale_ale")//表記が違うものだけアノテーション
     private Double paleAle;
     private Double lager;
     private Double ipa;
@@ -28,7 +28,7 @@ public class OrderPredictionData {
     private Double relativeHumidity2mMin;
     private Double weekday;
 
-    // デフォルトコンストラクタ (JSONパースに必要)
+    // デフォルトコンストラクタ 
     public OrderPredictionData() {}
 
     // コンストラクタ 
@@ -79,7 +79,6 @@ public class OrderPredictionData {
 
     public Double getTemperature2mMean() { return temperature2mMean; }
     public void setTemperature2mMean(Double temperature2mMean) { this.temperature2mMean = temperature2mMean; }
-
 
     public Double getWeatherCode() { return weatherCode; }
     public void setWeatherCode(Double weatherCode) { this.weatherCode = weatherCode; }

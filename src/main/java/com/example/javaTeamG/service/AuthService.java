@@ -44,7 +44,6 @@ public class AuthService {
 
     /**
      * ログアウト処理を実行し、セッションを無効化します。
-     * @param session HTTPセッション
      */
     public void logout(HttpSession session) {
         session.invalidate();

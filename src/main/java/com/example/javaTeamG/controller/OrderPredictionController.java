@@ -7,13 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.stream.Collectors;
 public class OrderPredictionController {
 
     private final OrderPredictionService orderPredictionService;
-
+    //ここを本物のAPIに変えるべき！！！！！
     private static final String EXTERNAL_PREDICTION_API_URL = "/dummy-order-prediction-data";
     // 予測可能な最大日数 (16日先まで)
     private static final int MAX_PREDICTION_DAYS = 16;
@@ -34,8 +32,7 @@ public class OrderPredictionController {
     }
 
     @GetMapping("/prediction")
-
-    public String showWeeklyPrediction(Model model) { 
+    public String showPrediction(Model model) { 
         List<OrderPredictionData> allPredictions;
         try {
             String dummyJsonData = getDummyPredictionDataString();
@@ -56,10 +53,10 @@ public class OrderPredictionController {
         // 日付でソート
         allPredictions.sort(Comparator.comparing(OrderPredictionData::getDate));
 
-        // 直近2回分の発注日と対象期間の組み合わせを生成
+        // 直近4回分までの発注日と対象期間の組み合わせを生成
         List<OrderDateRange> orderDateRangesToShow = generateOrderDateRanges(allPredictions); // メソッド名はそのままでロジック変更
 
-        List<OrderPredictionDisplayData> predictionListForDisplay = new ArrayList<>();
+        List<OrderPredictionDisplayData> predictionListForDisplay = new ArrayList<>();//jsonで受け取った型をそのまま
 
         for (OrderDateRange range : orderDateRangesToShow) {
             LocalDate orderDate = range.getOrderDate();
@@ -113,7 +110,6 @@ public class OrderPredictionController {
         private LocalDate orderDate;
         private LocalDate startDate;
         private LocalDate endDate;
-        // private String displayString; // UIで直接フォーマットするため不要に
 
         public OrderDateRange(LocalDate orderDate, LocalDate startDate, LocalDate endDate) {
             this.orderDate = orderDate;
@@ -124,10 +120,8 @@ public class OrderPredictionController {
         public LocalDate getOrderDate() { return orderDate; }
         public LocalDate getStartDate() { return startDate; }
         public LocalDate getEndDate() { return endDate; }
-        // public String getDisplayString() { return displayString; }
     }
 
-    // generateOrderDateRanges のロジックを変更
     private List<OrderDateRange> generateOrderDateRanges(List<OrderPredictionData> allPredictions) {
         List<OrderDateRange> potentialRanges = new ArrayList<>();
         if (allPredictions.isEmpty()) {
@@ -138,11 +132,10 @@ public class OrderPredictionController {
         LocalDate lastPredictionDate = allPredictions.get(allPredictions.size() - 1).getDate();
 
         LocalDate today = LocalDate.now();
-        LocalDate checkDate = today;
 
-        // 今日から最大予測可能日（16日後）までループし、全ての発注可能日を候補として抽出
-        // 余裕を持って少し長めにループすることも可能ですが、今回はMAX_PREDICTION_DAYSを考慮
-        for (int i = 0; i <= MAX_PREDICTION_DAYS + 7; i++) { // 16日先まで+1週間程度
+
+        // 今日からMAX_PREDICTION_DAYS最大予測可能日（16日後）までループし、全ての発注可能日を候補として抽出
+        for (int i = 0; i <= MAX_PREDICTION_DAYS; i++) { // 16日先まで
             LocalDate orderDate = today.plusDays(i);
             LocalDate currentStartDate = null;
             LocalDate currentEndDate = null;
@@ -177,49 +170,15 @@ public class OrderPredictionController {
         // 発注日でソート
         potentialRanges.sort(Comparator.comparing(OrderDateRange::getOrderDate));
 
-        // 今日以降の最初の2つの発注日のみを抽出して返す
+        // 今日以降の発注日のみを抽出して返す
         return potentialRanges.stream()
                 .filter(range -> !range.getOrderDate().isBefore(today)) // 今日以降
-                .limit(4) // 最初の2つ
+                .limit(4) // 最大４つ
                 .collect(Collectors.toList());
     }
 
-    public String getWeatherDescription(Double code) {
-        if (code == null) return "不明";
-        int intCode = code.intValue();
-        switch(intCode) {
-            case 0: return "快晴";
-            case 1:
-            case 2: return "晴れ";
-            case 3: return "曇り";
-            case 45:
-            case 48: return "霧";
-            case 51:
-            case 53:
-            case 55: return "霧雨";
-            case 56:
-            case 57: return "着氷性霧雨";
-            case 61: return "小雨";
-            case 63: return "雨";
-            case 65: return "大雨";
-            case 66:
-            case 67: return "着氷性の雨";
-            case 71: return "小雪";
-            case 73: return "雪";
-            case 75: return "大雪";
-            case 77: return "雪の粒";
-            case 80: return "小雨/にわか雨";
-            case 81: return "雨/にわか雨";
-            case 82: return "豪雨/にわか雨";
-            case 85: return "小雪/にわか雪";
-            case 86: return "大雪/にわか雪";
-            case 95: return "雷雨";
-            case 96:
-            case 99: return "ひょうを伴う雷雨";
-            default: return "不明";
-        }
-    }
 
+    //開発用
     @GetMapping(EXTERNAL_PREDICTION_API_URL)
     @ResponseBody
     public List<OrderPredictionData> getDummyPredictionDataForApi() {
@@ -231,23 +190,8 @@ public class OrderPredictionController {
         }
     }
 
+    // ダミーデータ
     private String getDummyPredictionDataString() {
-        // 現在の日付は2025年6月18日(水) 18:51:15 JST
-        // 6/19(木)の発注期間は6/20(金)～6/23(月)
-        // 6/23(月)の発注期間は6/24(火)～6/30(月)
-        // 6/26(木)の発注期間は6/27(金)～7/4(月)
-        // 16日先までのデータが必要 (6/18 + 16日 = 7/4)
-        // Dummy data for 6/18 to 6/26 (already provided) includes up to 6/26.
-        // We need data up to 7/4 for the second order (6/26 order's range ends 7/4).
-        // Let's extend the dummy data slightly to ensure 7/4 is covered if needed, or clarify.
-        // Based on the last data provided, it goes up to 6/26. We need up to 7/4.
-        // For demonstration purposes, I will extend the dummy data.
-
-        // Note: The dummy data previously provided only goes up to 2025-06-26.
-        // To accurately calculate for 6/26's order range (which ends 7/4),
-        // the dummy data should extend at least until 2025-07-04.
-        // I will add some example data for those dates for the dummy API.
-
         return """
             [{"date": "2025-06-18", "pale_ale": 5.59, "lager": 8.06, "ipa": 4.82, "white": 5.01, "dark": 3.11, "fruit": 3.72, "temperature_2m_mean": 27.5, "weather_code": 1.0, "temperature_2m_max": 33.0, "temperature_2m_min": 23.0, "wind_speed_10m_max": 7.1, "relative_humidity_2m_max": 93.0, "relative_humidity_2m_min": 50.0, "weekday": 2.0},
             {"date": "2025-06-19", "pale_ale": 6.5, "lager": 8.55, "ipa": 5.25, "white": 5.32, "dark": 3.33, "fruit": 4.14, "temperature_2m_mean": 26.4, "weather_code": 3.0, "temperature_2m_max": 30.8, "temperature_2m_min": 23.4, "wind_speed_10m_max": 7.1, "relative_humidity_2m_max": 98.0, "relative_humidity_2m_min": 60.0, "weekday": 3.0},
