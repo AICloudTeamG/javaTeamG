@@ -6,7 +6,7 @@
     <title th:text="${pageTitle}">発注予測</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* CSSスタイルは前回のものと同じ */
+        /* CSSスタイルは前回のものと同じ。必要に応じて調整 */
         html, body {
             margin: 0;
             padding: 0;
@@ -55,7 +55,8 @@
             font-size: 1.6rem;
             color: #fb8500;
         }
-        .range-selector {
+        /* .range-selector は今回使用しないので削除またはコメントアウト */
+        /* .range-selector {
             margin: 16px 0;
             font-size: 1rem;
             font-weight: bold;
@@ -72,7 +73,7 @@
             font-size: 1rem;
             border-radius: 4px;
             border: 1px solid #ccc;
-        }
+        } */
         .next-order-info {
             margin-top: 10px;
             background-color: #fff3cd;
@@ -95,52 +96,16 @@
             color: white;
             font-weight: bold;
             font-size: 0.9rem;
-            padding: 6px;
+            padding: 8px;
         }
         .forecast-table td {
             border: 1px solid #ddd;
             text-align: center;
-            padding: 6px;
-            font-size: 0.85rem;
+            padding: 8px;
+            font-size: 0.9rem;
         }
-        .weather-cell {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.8rem;
-            gap: 4px;
-            font-weight: bold;
-            color: #333;
-        }
-        .diagonal-cell {
-            position: relative;
-            width: 80px; /* Adjust as needed */
-            height: 60px; /* Adjust as needed */
-            background-color: #f4f4f4;
-        }
-        .diagonal-cell::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent 49.5%, #ddd 49.5%, #ddd 50.5%, transparent 50.5%);
-            z-index: 0;
-        }
-        .diagonal-cell .bottom-left {
-            position: absolute;
-            bottom: 4px;
-            left: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-        .diagonal-cell .top-right {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
+        .forecast-table tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
     </style>
 </head>
@@ -150,75 +115,61 @@
             <h1>メニュー</h1>
             <ul>
                 <li><a href="/dashboard" style="text-decoration: none; color: inherit;">実績・天気データ可視化</a></li>
-                <li class="active">発注予測</li> <li><a href="/admin/staffs/list" style="text-decoration: none; color: inherit;">アカウント管理</a></li>
+                <li class="active">発注予測</li>
+                <li><a href="/admin/staffs/list" style="text-decoration: none; color: inherit;">アカウント管理</a></li>
                 <li>実績入力</li>
             </ul>
         </div>
         <div class="main">
             <h1>発注予測</h1>
 
-            <div class="range-selector">
-                <label for="range">表示期間を選択：</label>
-                <form id="orderDateForm" action="/admin/order-prediction/weekly" method="get" style="display: inline;">
-                    <select id="range" name="selectedOrderDate" onchange="document.getElementById('orderDateForm').submit();">
-                        <option th:each="range : ${orderDateRanges}"
-                                th:value="${range.orderDate}"
-                                th:text="${range.displayString}"
-                                th:selected="${range.orderDate.toString() == selectedOrderDate}">
-                            期間表示例</option>
-                    </select>
-                </form>
-            </div>
-
             <div class="next-order-info">
-                次回の発注予定日は：<span th:text="${#temporals.format(nextOrderDate, 'M月d日（E）')}">6月20日（木）</span>
+                直近の発注予測です。
             </div>
 
             <table class="forecast-table">
-                <tr>
-                    <td class="diagonal-cell">
-                        <div class="bottom-left">日付・天気</div>
-                        <div class="top-right">ビール種類</div>
-                    </td>
-                    <th>Pale Ale</th>
-                    <th>Lager</th>
-                    <th>IPA</th>
-                    <th>White</th>
-                    <th>Dark</th>
-                    <th>Fruit</th>
-                </tr>
-                <tr th:each="data : ${predictionList}">
-                    <td class="weather-cell">
-                        <div class="weather-info" th:text="${#temporals.format(data.date, 'M/d（E）')}">6/20（木）</div>
-                        <div class="weather-icon-text" th:text="${@orderPredictionController.getWeatherDescription(data.weatherCode)}">晴れ</div>
-                        <div class="temp-info" th:text="${#numbers.formatDecimal(data.temperature2mMean, 1, 0)} + '℃'">25℃</div>
-                    </td>
-                    <td th:text="${#numbers.formatDecimal(data.paleAle, 1, 0)}">36</td>
-                    <td th:text="${#numbers.formatDecimal(data.lager, 1, 0)}">30</td>
-                    <td th:text="${#numbers.formatDecimal(data.ipa, 1, 0)}">46</td>
-                    <td th:text="${#numbers.formatDecimal(data.white, 1, 0)}">28</td>
-                    <td th:text="${#numbers.formatDecimal(data.dark, 1, 0)}">18</td>
-                    <td th:text="${#numbers.formatDecimal(data.fruit, 1, 0)}">23</td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(predictionList)}">
-                    <td colspan="8">選択された期間の予測データがありません。</td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>発注日</th>
+                        <th>対象期間</th>
+                        <th>Pale Ale</th>
+                        <th>Lager</th>
+                        <th>IPA</th>
+                        <th>White</th>
+                        <th>Dark</th>
+                        <th>Fruit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(predictionListForDisplay)}">
+                        <td colspan="8">利用可能な予測データがありません。</td>
+                    </tr>
+                    <tr th:each="prediction : ${predictionListForDisplay}">
+                        <td th:text="${#temporals.format(prediction.orderDate, 'M/d（E）')}">6/20（木）</td>
+                        <td th:text="${#temporals.format(prediction.startDate, 'M/d（E）')} + '〜' + ${#temporals.format(prediction.endDate, 'M/d（E）')}">6/21（金）〜6/24（月）</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.paleAleSum, 1, 0)}">36</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.lagerSum, 1, 0)}">30</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.ipaSum, 1, 0)}">46</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.whiteSum, 1, 0)}">28</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.darkSum, 1, 0)}">18</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.fruitSum, 1, 0)}">23</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
 
     <script th:inline="javascript">
-        // Sidebar active state
+        // Sidebar active state (変更なし)
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarItems = document.querySelectorAll('.sidebar li');
             const currentPath = window.location.pathname;
 
             sidebarItems.forEach(item => {
                 const link = item.querySelector('a');
-                // /admin/order-prediction に一致するようにパスを調整
                 if (link && link.getAttribute('href') === currentPath) {
                     item.classList.add('active');
-                } else if (!link && currentPath.includes('/admin/order-prediction')) { // パスを /admin/order-prediction に変更
+                } else if (!link && currentPath.includes('/admin/order-prediction')) {
                     if (item.textContent.trim() === '発注予測') {
                         item.classList.add('active');
                     }
