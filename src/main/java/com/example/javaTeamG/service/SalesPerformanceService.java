@@ -93,12 +93,9 @@ public class SalesPerformanceService {
                     newWeather.setTemperatureMax(BigDecimal.valueOf(20.0));
                     newWeather.setTemperatureMin(BigDecimal.valueOf(10.0));
                     newWeather.setTemperatureMean(BigDecimal.valueOf(15.0));
-                    newWeather.setHumidityMax(BigDecimal.valueOf(90.0)); // DB定義に合わせて追加
-                    newWeather.setHumidityMin(BigDecimal.valueOf(50.0)); // DB定義に合わせて追加
-                    newWeather.setWindspeedMax(BigDecimal.valueOf(5.0));
-                    // windspeed_mean と humidity_mean はDB定義にないため設定しません。
-                    
-                    newWeather.setDeleted(false); // 新規作成時は論理削除フラグをfalseに
+                    newWeather.setHumidityMax(BigDecimal.valueOf(90.0)); 
+                    newWeather.setWindspeedMax(BigDecimal.valueOf(5.0));                  
+                    newWeather.setDeleted(false); 
 
                     System.out.println("No SalesWeather found for " + date + ". Creating a dummy one with default WeatherCode ID: " + defaultWeatherCode.getId());
                     // SalesWeatherServiceのsaveSalesWeatherを呼んでDBに保存

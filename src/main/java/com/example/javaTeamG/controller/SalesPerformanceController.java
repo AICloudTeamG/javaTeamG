@@ -1,8 +1,8 @@
 package com.example.javaTeamG.controller;
 
-import com.example.javaTeamG.model.SalesInputForm; // SalesInputFormはmodelパッケージにあると仮定
+import com.example.javaTeamG.model.SalesInputForm;
 import com.example.javaTeamG.model.Product;
-import com.example.javaTeamG.model.ProductSalesEntry; // ProductSalesEntryもmodelパッケージにあると仮定
+import com.example.javaTeamG.model.ProductSalesEntry;
 import com.example.javaTeamG.model.SalesPerformance;
 import com.example.javaTeamG.model.SalesWeather;
 import com.example.javaTeamG.service.AuthService;
