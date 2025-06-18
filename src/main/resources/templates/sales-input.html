@@ -2,9 +2,10 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
-    <title th:text="${pageTitle}"></title> <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <title th:text="${pageTitle}"></title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
-        /* ここにご提示いただいたCSSスタイルをそのまま貼り付けます */
+        /* CSSは変更なし、以前のものをそのまま貼り付け */
         html, body {
             margin: 0;
             padding: 0;
@@ -202,8 +203,11 @@
     <div class="sidebar">
         <button onclick="location.href='/forecast'">📦 発注予測</button>
         <button onclick="location.href='/weather'">⛅ 天気可視化</button>
-        <button onclick="location.href='/sales/input'">✍️ 実績入力</button> <button onclick="location.href='/account'">👤 アカウント管理</button>
-        <button onclick="location.href='/sales/list'">一覧表示</button> <button onclick="location.href='/logout'">ログアウト</button> </div>
+        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
+        <button onclick="location.href='/account'">👤 アカウント管理</button>
+        <button onclick="location.href='/sales/list'">一覧表示</button>
+        <button onclick="location.href='/logout'">ログアウト</button>
+    </div>
 
     <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
     <div class="weather-popup" id="weatherPopup">
@@ -218,7 +222,7 @@
         <div th:if="${todayWeather == null}" id="weatherContent">
             天気情報がありません。
         </div>
-        </div>
+    </div>
 
     <div class="main-content">
         <div class="box">
@@ -240,12 +244,15 @@
                                th:readonly="${!isAdmin}"
                                th:attr="onchange=${isAdmin ? 'this.form.submit()' : ''}"
                                required>
+                        <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="text-danger" style="font-size: 0.8rem; color: red;">日付エラー</div>
                         <br>
                         <small th:if="${isAdmin}" style="font-size: 0.8rem; color: #555;">日付を変更すると、その日の実績を修正できます。</small>
                     </div>
-                    <!-- <div>
+                    <div>
                         <label>記録者（社員ID）：</label>
-                        <span id="recorder-display" th:text="${#authentication.name}"></span> <input type="hidden" th:field="*{recorderId}" /> </div> -->
+                        <span id="recorder-display" th:text="*{recorderId}"></span>
+                        <input type="hidden" th:field="*{recorderId}" />
+                    </div>
                 </div>
 
                 <table>
@@ -266,8 +273,10 @@
                                        class="form-control"
                                        min="0"
                                        step="1"
-                                       th:attr="oninput='updatePrice(this, ' + ${products.?[name == entry.productName][0].price} + ')'"
+                                       th:attr="oninput='updatePrice(this, ' + ${products.?[name == #object.performances[__${stat.index}__].productName][0].price} + ')'"
                                        required>
+                                <div th:if="${#fields.hasErrors('performances[' + stat.index + '].quantity')}" th:errors="*{performances[__${stat.index}__].quantity}" class="text-danger" style="font-size: 0.8rem; color: red;">数量エラー</div>
+
                                 <input type="hidden" th:field="*{performances[__${stat.index}__].productName}" />
                             </td>
                             <td class="price" th:id="${'price_' + stat.index}">0</td>
@@ -275,57 +284,52 @@
                     </tbody>
                 </table>
                 <div class="button-group">
-                    <button type="submit" class="button">登録/更新</button> </div>
+                    <button type="submit" class="button">登録/更新</button>
+                </div>
 
-                <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             </form>
         </div>
     </div>
 
     <script>
-        // JSの初期化処理はThymeleafで日付を設定するため削除
-        // document.getElementById('date').valueAsDate = new Date();
-
         function updatePrice(input, pricePerUnit) {
             const quantity = parseInt(input.value) || 0;
             const priceCell = input.closest('tr').querySelector('.price');
             priceCell.textContent = quantity * pricePerUnit;
         }
 
-        // ページロード時に既存の数量に基づいて売上金額を計算し表示
         document.addEventListener('DOMContentLoaded', function() {
-            // 現在のフォームの quantities を取得し、価格を更新
+            const dateInput = document.getElementById('date');
+            const isAdmin = [[${isAdmin}]]; // ThymeleafのisAdmin変数をJSに渡す
+
+            if (!isAdmin) {
+                dateInput.readOnly = true;
+            }
+
             document.querySelectorAll('input[type="number"][id^="quantity_"]').forEach(input => {
-                const index = input.id.split('_')[1];
-                const pricePerUnit = parseFloat(input.getAttribute('oninput').match(/\d+/)[0]); // oninput属性から価格を取得
-                updatePrice(input, pricePerUnit);
+                const oninputAttr = input.getAttribute('oninput');
+                const match = oninputAttr.match(/updatePrice\(this, (\d+(\.\d+)?)\)/);
+                if (match && match[1]) {
+                    const pricePerUnit = parseFloat(match[1]);
+                    updatePrice(input, pricePerUnit);
+                } else {
+                    console.warn("Could not parse price from oninput attribute for element:", input);
+                    updatePrice(input, 0);
+                }
             });
-            // 天気ポップアップの初期表示設定
-            updateWeatherContent(); // 現在の天気情報を表示
+
+            updateWeatherContent();
         });
 
-        // submitSales() と modifyData() はサーバーサイドでの処理に置き換わるため削除
-        // function submitSales() { alert("販売実績を登録しました。"); }
-        // function modifyData() { ... }
-
-        // 天気ポップアップのトグル機能
         function toggleWeatherPopup() {
             const popup = document.getElementById('weatherPopup');
             popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
         }
 
-        // weatherContentの表示更新（バックエンドデータに基づく）
-        // Controllerから渡されたtodayWeatherを使用するため、JavaScriptのweatherData配列は不要
         function updateWeatherContent() {
-            // Thymeleafが既にサーバサイドでtodayWeatherを表示しているため、JSで動的に更新する必要は少ない
-            // しかし、ポップアップ表示時に常に最新の状態を保証したい場合、または複雑な表示ロジックがある場合に利用
-            // 今回はThymeleafで表示済みのため、この関数はポップアップ表示/非表示の制御のみを目的とする
             console.log("Weather content updated (Thymeleaf already handled display).");
         }
-
-        // changeWeatherは、バックエンドの天気データが現在日のみのため、不要
-        // function changeWeather(direction) { ... }
-
     </script>
 </body>
 </html>
