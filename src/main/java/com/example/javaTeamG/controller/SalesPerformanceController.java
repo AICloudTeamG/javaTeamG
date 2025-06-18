@@ -1,8 +1,9 @@
 package com.example.javaTeamG.controller;
 
 import com.example.javaTeamG.model.Product;
+import com.example.javaTeamG.model.ProductSalesEntry;
+import com.example.javaTeamG.model.SalesInputForm;
 import com.example.javaTeamG.model.SalesPerformance;
-import com.example.javaTeamG.model.SalesWeather;
 import com.example.javaTeamG.service.AuthService;
 import com.example.javaTeamG.service.ProductService;
 import com.example.javaTeamG.service.SalesPerformanceService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,57 +38,110 @@ public class SalesPerformanceController {
         this.authService = authService;
     }
 
-    // 全ての認証済みユーザーがアクセス可能だが、管理者とスタッフで一部機能が異なる
-    // 役割に応じた詳細なアクセス制御はテンプレート内でThymeleafの条件分岐などで行うか、
-    // 必要ならさらに詳細なインターセプター設定を行う。
-
     /**
      * 販売実績入力フォームを表示します。
+     * 管理者は過去の日付も選択・修正可能。従業員は当日固定。
+     *
      * @param model モデルオブジェクト
      * @param session HTTPセッション
+     * @param selectedDate 管理者が選択した日付（修正時など）
      * @return 販売実績入力ページのビュー名
      */
     @GetMapping("/input")
-    public String showSalesInputForm(Model model, HttpSession session) {
-        if (authService.getLoggedInStaffId(session) == null) {
+    public String showSalesInputForm(
+            @RequestParam(value = "date", required = false) LocalDate selectedDate,
+            Model model,
+            HttpSession session) {
+
+        Integer staffId = authService.getLoggedInStaffId(session);
+        if (staffId == null) {
             return "redirect:/login"; // 未ログインならログインページへ
         }
-        model.addAttribute("salesPerformance", new SalesPerformance());
-        model.addAttribute("products", productService.findAllProducts()); // 商品リスト
-        model.addAttribute("todayWeather", salesWeatherService.findSalesWeatherByDate(LocalDate.now())); // 今日の天気
-        return "sales/input"; // src/main/resources/templates/sales/input.html
+
+        Boolean isAdmin = authService.isAdmin(session);
+        model.addAttribute("isAdmin", isAdmin);
+
+        LocalDate targetDate = (selectedDate != null && isAdmin) ? selectedDate : LocalDate.now();
+        model.addAttribute("pageTitle", isAdmin ? "🍺 販売実績入力（管理者）" : "🍺 販売実績入力（従業員）");
+
+        SalesInputForm salesInputForm;
+        if (model.containsAttribute("salesInputForm")) {
+            // リダイレクトされた場合（エラーなど）はFlash Attributeからフォームデータを取得
+            salesInputForm = (SalesInputForm) model.asMap().get("salesInputForm");
+        } else {
+            salesInputForm = new SalesInputForm();
+            salesInputForm.setDate(targetDate);
+            salesInputForm.setRecorderId(staffId);
+
+            // 選択された日付の既存データをロード
+            List<SalesPerformance> existingPerformances = salesPerformanceService.getSalesPerformanceByDate(targetDate);
+            
+            // 全商品リストを取得し、既存データをプリセット
+            List<Product> allProducts = productService.findAllProducts();
+            List<ProductSalesEntry> productSalesEntries = new ArrayList<>();
+
+            for (Product product : allProducts) {
+                ProductSalesEntry entry = new ProductSalesEntry();
+                entry.setProductName(product.getName());
+                // 既存データから数量を見つける
+                Optional<SalesPerformance> existing = existingPerformances.stream()
+                        .filter(sp -> sp.getProduct().getId().equals(product.getId()))
+                        .findFirst();
+                entry.setQuantity(existing.map(SalesPerformance::getSalesCount).orElse(0)); // 既存があればその数量、なければ0
+                productSalesEntries.add(entry);
+            }
+            salesInputForm.setPerformances(productSalesEntries);
+        }
+        
+        model.addAttribute("salesInputForm", salesInputForm);
+        model.addAttribute("products", productService.findAllProducts()); // 商品リスト (念のため、テンプレートで直接使用する可能性も考慮)
+        
+        // SalesWeatherService.findSalesWeatherByDateがOptionalを返すことを前提に修正
+        model.addAttribute("todayWeather", salesWeatherService.findSalesWeatherByDate(LocalDate.now()).orElse(null)); // 今日の天気
+        
+        return "sales-input"; // src/main/resources/templates/sales-input.html
     }
 
     /**
-     * 販売実績を登録します。
-     * @param salesPerformance 登録する販売実績オブジェクト
+     * 販売実績を登録または更新します。
+     * @param salesInputForm 登録/更新する販売実績のフォームデータ
      * @param redirectAttributes リダイレクト属性
      * @param session HTTPセッション
      * @return 処理後のリダイレクト先
      */
     @PostMapping("/input")
-    public String registerSalesPerformance(@ModelAttribute SalesPerformance salesPerformance,
-                                           RedirectAttributes redirectAttributes,
-                                           HttpSession session) {
-        Integer staffId = authService.getLoggedInStaffId(session);
-        if (staffId == null) {
+    public String processSalesInput(@ModelAttribute("salesInputForm") SalesInputForm salesInputForm,
+                                    RedirectAttributes redirectAttributes,
+                                    HttpSession session) {
+
+        Integer loggedInStaffId = authService.getLoggedInStaffId(session);
+        if (loggedInStaffId == null) {
             return "redirect:/login";
         }
 
-        try {
-            // SalesPerformanceオブジェクトにProduct, Staff, SalesWeatherを設定
-            // 実際はフォームからIDを受け取り、DBから取得してセットする
-            salesPerformance.setRecordedByStaff(authService.findStaffById(staffId).orElseThrow()); // ログイン中のスタッフを設定
-            // salesPerformance.setProduct(productService.findProductById(salesPerformance.getProduct().getId()).orElseThrow());
-            // salesPerformance.setSalesWeather(salesWeatherService.findSalesWeatherById(salesPerformance.getSalesWeather().getId()).orElseThrow());
+        Boolean isAdmin = authService.isAdmin(session);
 
-            salesPerformanceService.saveSalesPerformance(salesPerformance);
-            redirectAttributes.addFlashAttribute("message", "販売実績が正常に記録されました。");
-        } catch (Exception e) { // IllegalArgumentExceptionなど
-            redirectAttributes.addFlashAttribute("errorMessage", "販売実績の記録に失敗しました: " + e.getMessage());
-            return "redirect:/sales/input"; // エラーがあれば入力フォームに戻す
+        // 従業員の場合、日付が本日であることを確認
+        if (!isAdmin && !salesInputForm.getDate().isEqual(LocalDate.now())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "従業員は当日の売上のみ登録できます。");
+            redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm); // エラー時にフォームデータを保持
+            return "redirect:/sales-input";
         }
-        return "redirect:/sales/list";
+
+        try {
+            salesPerformanceService.saveOrUpdateMultipleSalesPerformance(
+                salesInputForm.getDate(),
+                loggedInStaffId,
+                salesInputForm.getPerformances()
+            );
+            redirectAttributes.addFlashAttribute("successMessage", "販売実績が正常に記録されました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "販売実績の記録に失敗しました: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm); // エラー時にフォームデータを保持
+            return "redirect:/sales-input";
+        }
+        // 成功後も入力フォームに戻る（当日または選択日のデータが表示される）
+        return "redirect:/sales-input?date=" + salesInputForm.getDate().toString(); 
     }
 
     /**
@@ -100,9 +155,10 @@ public class SalesPerformanceController {
         if (authService.getLoggedInStaffId(session) == null) {
             return "redirect:/login";
         }
-        model.addAttribute("salesPerformances", salesPerformanceService.findAllSalesPerformances());
-        model.addAttribute("isAdmin", authService.isAdmin(session)); // 管理者フラグをビューに渡す
-        return "sales/list"; // src/main/resources/templates/sales/list.html
+        // 論理削除されていないデータのみ表示するべき (サービス層でフィルタリング)
+        model.addAttribute("salesPerformances", salesPerformanceService.findAllActiveSalesPerformances()); 
+        model.addAttribute("isAdmin", authService.isAdmin(session));
+        return "sales/list"; 
     }
 
     /**
@@ -114,7 +170,7 @@ public class SalesPerformanceController {
      */
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Integer id, Model model, HttpSession session) {
-        if (!authService.isAdmin(session)) { // 管理者のみ
+        if (!authService.isAdmin(session)) {
             return "redirect:/access-denied";
         }
         Optional<SalesPerformance> salesPerformance = salesPerformanceService.findSalesPerformanceById(id);
@@ -122,7 +178,7 @@ public class SalesPerformanceController {
             model.addAttribute("salesPerformance", salesPerformance.get());
             model.addAttribute("products", productService.findAllProducts());
             model.addAttribute("weatherOptions", salesWeatherService.findAllSalesWeather()); // 天気情報の選択肢
-            return "sales/edit"; // src/main/resources/templates/sales/edit.html
+            return "sales/edit";
         } else {
             return "redirect:/sales/list";
         }
@@ -143,16 +199,25 @@ public class SalesPerformanceController {
             return "redirect:/access-denied";
         }
         try {
-            // IDを設定し、関連エンティティをDBから取得して設定 (フォームの入力に依存)
             salesPerformance.setId(id);
-            salesPerformance.setRecordedByStaff(authService.findStaffById(salesPerformance.getRecordedByStaff().getId()).orElseThrow());
-            salesPerformance.setProduct(productService.findProductById(salesPerformance.getProduct().getId()).orElseThrow());
-            salesPerformance.setSalesWeather(salesWeatherService.findSalesWeatherById(salesPerformance.getSalesWeather().getId()).orElseThrow());
+            // 関連エンティティをDBから取得して設定 (フォームの入力に依存)
+            salesPerformance.setRecordedByStaff(authService.findStaffById(salesPerformance.getRecordedByStaff().getId())
+                                                              .orElseThrow(() -> new IllegalArgumentException("記録者スタッフが見つかりません")));
+            salesPerformance.setProduct(productService.findProductById(salesPerformance.getProduct().getId())
+                                                          .orElseThrow(() -> new IllegalArgumentException("商品が見つかりません")));
+            // SalesWeatherService.findSalesWeatherByIdがOptionalを返すことを前提に修正
+            salesPerformance.setSalesWeather(salesWeatherService.findSalesWeatherById(salesPerformance.getSalesWeather().getId())
+                                                                  .orElseThrow(() -> new IllegalArgumentException("天気情報が見つかりません")));
+            // createdAtは新規作成時のみセットされるため、更新時は既存の値を使うか、DBから取得してセット
+            Optional<SalesPerformance> existing = salesPerformanceService.findSalesPerformanceById(id);
+            existing.ifPresent(sp -> salesPerformance.setCreatedAt(sp.getCreatedAt()));
 
             salesPerformanceService.saveSalesPerformance(salesPerformance); // saveメソッドが更新も兼ねる
             redirectAttributes.addFlashAttribute("message", "販売実績が正常に更新されました。");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "販売実績の更新に失敗しました: " + e.getMessage());
+            // エラー時は編集フォームに戻すため、IDを保持してリダイレクト
+            return "redirect:/sales/edit/" + id; 
         }
         return "redirect:/sales/list";
     }
@@ -170,7 +235,7 @@ public class SalesPerformanceController {
             return "redirect:/access-denied";
         }
         try {
-            salesPerformanceService.deleteSalesPerformance(id);
+            salesPerformanceService.deleteSalesPerformance(id); // サービス層で論理削除フラグを立てる
             redirectAttributes.addFlashAttribute("message", "販売実績が正常に削除されました。");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "販売実績の削除に失敗しました: " + e.getMessage());

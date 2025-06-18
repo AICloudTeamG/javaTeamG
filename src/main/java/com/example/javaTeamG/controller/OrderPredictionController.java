@@ -50,7 +50,7 @@ public class OrderPredictionController {
         if (allPredictions.isEmpty()) {
             model.addAttribute("predictionListForDisplay", new ArrayList<>());
             model.addAttribute("pageTitle", "発注予測");
-            return "order-prediction";
+            return "admin/order-prediction";
         }
 
         // 日付でソート
@@ -106,7 +106,7 @@ public class OrderPredictionController {
         model.addAttribute("predictionListForDisplay", predictionListForDisplay);
         model.addAttribute("pageTitle", "発注予測");
 
-        return "order-prediction";
+        return "admin/order-prediction";
     }
 
     public static class OrderDateRange {
