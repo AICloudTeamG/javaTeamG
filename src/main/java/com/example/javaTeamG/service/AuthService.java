@@ -5,6 +5,7 @@ import com.example.javaTeamG.repository.StaffRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.servlet.http.HttpSession;
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -63,5 +64,14 @@ public class AuthService {
      */
     public Integer getLoggedInStaffId(HttpSession session) {
         return (Integer) session.getAttribute("loggedInStaffId");
+    }
+
+        /**
+     * 社員IDに基づいてスタッフ情報を取得します。
+     * @param staffId 取得するスタッフのID
+     * @return 該当するスタッフのOptional。見つからない場合は空のOptional。
+     */
+    public Optional<Staff> findStaffById(Integer staffId) {
+        return staffRepository.findById(staffId);
     }
 }
