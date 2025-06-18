@@ -55,11 +55,11 @@ public class Staff {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     public boolean isAdmin() { return isAdmin; }
-    public void setAdmin(boolean admin) { isAdmin = admin; }
+    public void setAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public boolean isDeleted() { return isDeleted; }
-    public void setDeleted(boolean deleted) { isDeleted = deleted; }
+    public void setDeleted(boolean isDeleted) { this.isDeleted = isDeleted; }
 }

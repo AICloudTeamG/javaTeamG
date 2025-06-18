@@ -2,7 +2,8 @@ package com.example.javaTeamG.service;
 
 import com.example.javaTeamG.model.Staff;
 import com.example.javaTeamG.repository.StaffRepository;
-// import org.springframework.security.crypto.password.PasswordEncoder; // パスワードエンコーダーを削除
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,11 +15,11 @@ import java.util.Optional;
 public class StaffService {
 
     private final StaffRepository staffRepository;
-    // private final PasswordEncoder passwordEncoder; // パスワードエンコーダーを削除
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public StaffService(StaffRepository staffRepository /*, PasswordEncoder passwordEncoder */) { // コンストラクタから削除
+    public StaffService(StaffRepository staffRepository, BCryptPasswordEncoder passwordEncoder) {
         this.staffRepository = staffRepository;
-        // this.passwordEncoder = passwordEncoder;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // 全スタッフ取得（論理削除されていないもののみ）
@@ -42,9 +43,8 @@ public class StaffService {
         if (staffRepository.existsByEmail(staff.getEmail())) {
             throw new IllegalArgumentException("指定されたメールアドレスは既に存在します。");
         }
-        // !!! 警告: パスワードのハッシュ化をここで行っていないため、平文で保存されます。
-        // !!! 本番環境では絶対にこのまま使用しないでください！
-        // staff.setPassword(passwordEncoder.encode(staff.getPassword())); // パスワードのハッシュ化を削除
+
+        staff.setPassword(passwordEncoder.encode(staff.getPassword()));
         staff.setCreatedAt(LocalDateTime.now());
         staff.setUpdatedAt(LocalDateTime.now());
         staff.setDeleted(false); // 論理削除フラグをfalseに設定
@@ -55,7 +55,8 @@ public class StaffService {
     @Transactional
     public Staff updateStaff(Integer id, Staff updatedStaff) {
         return staffRepository.findById(id).map(staff -> {
-            if (!staff.getEmail().equals(updatedStaff.getEmail()) && staffRepository.existsByEmail(updatedStaff.getEmail())) {
+            if (!staff.getEmail().equals(updatedStaff.getEmail())
+                    && staffRepository.existsByEmail(updatedStaff.getEmail())) {
                 throw new IllegalArgumentException("指定されたメールアドレスは既に他のアカウントで使用されています。");
             }
             staff.setName(updatedStaff.getName());
@@ -67,14 +68,13 @@ public class StaffService {
         }).orElseThrow(() -> new IllegalArgumentException("スタッフが見つかりません。ID: " + id));
     }
 
+
     // パスワードリセット
     @Transactional
     public Staff resetPassword(Integer id, String newPassword) {
         return staffRepository.findById(id).map(staff -> {
-            // !!! 警告: パスワードのハッシュ化をここで行っていないため、平文で保存されます。
-            // !!! 本番環境では絶対にこのまま使用しないでください！
-            // staff.setPassword(passwordEncoder.encode(newPassword)); // パスワードのハッシュ化を削除
-            staff.setPassword(newPassword); // 平文で保存される
+            
+            staff.setPassword(passwordEncoder.encode(newPassword)); 
             staff.setUpdatedAt(LocalDateTime.now());
             return staffRepository.save(staff);
         }).orElseThrow(() -> new IllegalArgumentException("スタッフが見つかりません。ID: " + id));
