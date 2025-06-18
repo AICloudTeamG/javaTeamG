@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import com.example.javaTeamG.model.Staff;
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
@@ -14,35 +15,39 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         HttpSession session = request.getSession(false); // セッションが存在しない場合は新しく作成しない
 
-        // セッションがない、またはログインIDがない場合は未ログイン
-        if (session == null || session.getAttribute("loggedInStaffId") == null) {
-            response.sendRedirect("/login"); // ログインページにリダイレクト
-            return false; // リクエストの処理を中断
+        // ログインページへのアクセスは許可
+        if (request.getRequestURI().equals("/login")) {
+            return true;
         }
 
-        // 管理者パスへのアクセスチェック
-        String requestUri = request.getRequestURI();
-        if (requestUri.startsWith("/admin/")) {
-            Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-            if (isAdmin == null || !isAdmin) {
-                // 管理者ではない場合、403 Forbiddenを返すか、アクセス拒否ページへリダイレクト
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied. Admin privileges required.");
-                // または response.sendRedirect("/access-denied"); // /access-denied ページを別途作成
+        // セッションがない、またはセッションにユーザー情報がない場合はログインページへリダイレクト
+        if (session == null || session.getAttribute("loggedInStaff") == null) {
+            response.sendRedirect("/login");
+            return false; // 処理を中断
+        }
+
+        // ここから管理者ページへのアクセス制限のロジック
+        // 例: `/admin/` で始まるパスは isAdmin が true のユーザーのみアクセス可能
+        if (request.getRequestURI().startsWith("/admin/")) {
+            Staff loggedInStaff = (Staff) session.getAttribute("loggedInStaff"); // セッションからStaffオブジェクトを取得
+
+            if (loggedInStaff == null || !loggedInStaff.isAdmin()) {
+                // 管理者ではない場合、アクセス拒否またはエラーページへリダイレクト
+                response.sendRedirect("/access-denied"); // 例: アクセス拒否ページ
                 return false;
             }
         }
-        // StaffsControllerのパスは"/admin/staffs"なので、上記でチェックされます
 
-        return true; // ログイン済みで権限も問題なければ続行
+        return true; // 処理を続行
     }
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        // レンダリング前にモデルに情報を追加するなどの処理が必要であればここに記述
+        // 必要に応じて処理を追加
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        // リクエスト処理完了後（ビューレンダリング後）に実行されるクリーンアップ処理など
+        // 必要に応じて処理を追加
     }
 }
