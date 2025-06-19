@@ -13,9 +13,9 @@ public class AuthService {
     private final StaffRepository staffRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthService(StaffRepository staffRepository) {
+    public AuthService(StaffRepository staffRepository, BCryptPasswordEncoder passwordEncoder) {
         this.staffRepository = staffRepository;
-        this.passwordEncoder = new BCryptPasswordEncoder(); // パスワードエンコーダーをインスタンス化
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -26,25 +26,27 @@ public class AuthService {
      * @return ログイン成功したStaffオブジェクト、または認証失敗時にnull
      */
     public Staff login(String email, String rawPassword, HttpSession session) {
-        Staff staff = staffRepository.findByEmail(email);
+        Optional<Staff> staffOptional = staffRepository.findByEmail(email);
 
-        // スタッフが存在し、削除されておらず、パスワードが一致する場合
-        if (staff != null && !staff.isDeleted() && passwordEncoder.matches(rawPassword, staff.getPassword())) {
-            // ログイン成功: セッションにユーザー情報を保存
-            session.setAttribute("loggedInStaffId", staff.getId());
-            session.setAttribute("loggedInStaffName", staff.getName());
-            session.setAttribute("isAdmin", staff.isAdmin());
-            return staff;
+        if (staffOptional.isPresent()) {
+            Staff staff = staffOptional.get();
+
+            if (!staff.isDeleted() && passwordEncoder.matches(rawPassword, staff.getPassword())) {
+                session.setAttribute("loggedInStaff", staff);
+                session.setAttribute("loggedInStaffId", staff.getId());
+                session.setAttribute("loggedInStaffName", staff.getName());
+                session.setAttribute("isAdmin", staff.isAdmin());
+                return staff;
+            }
         }
-        return null; // ログイン失敗
+        return null;
     }
 
     /**
      * ログアウト処理を実行し、セッションを無効化します。
-     * @param session HTTPセッション
      */
     public void logout(HttpSession session) {
-        session.invalidate(); // セッションを無効化
+        session.invalidate();
     }
 
     /**
@@ -53,8 +55,8 @@ public class AuthService {
      * @return 管理者であればtrue、そうでなければfalse
      */
     public boolean isAdmin(HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        return isAdmin != null && isAdmin;
+        Staff loggedInStaff = (Staff) session.getAttribute("loggedInStaff");
+        return loggedInStaff != null && loggedInStaff.isAdmin();
     }
 
     /**
@@ -63,10 +65,11 @@ public class AuthService {
      * @return ログイン中のスタッフID、未ログインであればnull
      */
     public Integer getLoggedInStaffId(HttpSession session) {
-        return (Integer) session.getAttribute("loggedInStaffId");
+        Staff loggedInStaff = (Staff) session.getAttribute("loggedInStaff");
+        return (loggedInStaff != null) ? loggedInStaff.getId() : null;
     }
 
-        /**
+    /**
      * 社員IDに基づいてスタッフ情報を取得します。
      * @param staffId 取得するスタッフのID
      * @return 該当するスタッフのOptional。見つからない場合は空のOptional。

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">発注予測</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSSスタイルは前回のものと同じ。必要に応じて調整 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #fffef9;
+            color: #2c2c2c;
+            height: 100%;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 16.666%;
+            background-color: #ffb703;
+            color: #2c2c2c;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin: 10px 0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .sidebar li.active {
+            background-color: #fb8500;
+            color: white;
+        }
+        .sidebar li:hover {
+            background-color: #d95d0c;
+            color: white;
+        }
+        .main {
+            width: 83.334%;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        h1 {
+            font-size: 1.6rem;
+            color: #fb8500;
+        }
+        /* .range-selector は今回使用しないので削除またはコメントアウト */
+        /* .range-selector {
+            margin: 16px 0;
+            font-size: 1rem;
+            font-weight: bold;
+            background-color: #ffb703;
+            padding: 10px 14px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .range-selector label {
+            margin-right: 12px;
+        }
+        .range-selector select {
+            padding: 6px 10px;
+            font-size: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        } */
+        .next-order-info {
+            margin-top: 10px;
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px 14px;
+            border-left: 4px solid #ffb703;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .forecast-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+        .forecast-table th {
+            background-color: #ffb703;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            padding: 8px;
+        }
+        .forecast-table td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.9rem;
+        }
+        .forecast-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>メニュー</h1>
+            <ul>
+                <li class="active"><a href="/admin/prediction" style="text-decoration: none; color: inherit;">実績入力</a>発注予測</li>
+                <li><a href="/sales/input" style="text-decoration: none; color: inherit;">実績入力</a></li>
+                <li><a href="/admin/dashboard" style="text-decoration: none; color: inherit;">実績・天気データ可視化</a></li>
+                <li><a href="/admin/account/list" style="text-decoration: none; color: inherit;">アカウント管理</a></li>
+                <li><a href="/logout" style="text-decoration: none; color: inherit;">ログアウト</a></li>
+            </ul>
+        </div>
+        <div class="main">
+            <h1>発注予測</h1>
+
+            <div class="next-order-info">
+                直近の発注予測です。
+            </div>
+
+            <table class="forecast-table">
+                <thead>
+                    <tr>
+                        <th>発注日</th>
+                        <th>対象期間</th>
+                        <th>Pale Ale</th>
+                        <th>Lager</th>
+                        <th>IPA</th>
+                        <th>White</th>
+                        <th>Dark</th>
+                        <th>Fruit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(predictionListForDisplay)}">
+                        <td colspan="8">利用可能な予測データがありません。</td>
+                    </tr>
+                    <tr th:each="prediction : ${predictionListForDisplay}">
+                        <td th:text="${#temporals.format(prediction.orderDate, 'M/d（E）')}">6/20（木）</td>
+                        <td th:text="${#temporals.format(prediction.startDate, 'M/d（E）')} + '〜' + ${#temporals.format(prediction.endDate, 'M/d（E）')}">6/21（金）〜6/24（月）</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.paleAleSum, 1, 0)}">36</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.lagerSum, 1, 0)}">30</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.ipaSum, 1, 0)}">46</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.whiteSum, 1, 0)}">28</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.darkSum, 1, 0)}">18</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.fruitSum, 1, 0)}">23</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarItems = document.querySelectorAll('.sidebar li');
+            const currentPath = window.location.pathname;
+
+            sidebarItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (link && link.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                } 
+            });
+        });
+    </script>
+</body>
+</html>

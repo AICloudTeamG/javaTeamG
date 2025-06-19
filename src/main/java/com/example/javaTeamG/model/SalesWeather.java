@@ -12,38 +12,42 @@ public class SalesWeather {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "date", unique = true, nullable = false)
+    @Column(name = "date", unique = true, nullable = false) // 日付 (ユニークキー)
     private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY) // 必要に応じてEAGERに変更
-    @JoinColumn(name = "weather_code_id", nullable = false)
+    @JoinColumn(name = "weather_code_id", nullable = false) // 天気コードID (weather_codesテーブルのidを参照)
     private WeatherCode weatherCode;
 
-    @Column(name = "temperature_max", nullable = false, precision = 4, scale = 1)
+    @Column(name = "temperature_max", nullable = false, precision = 4, scale = 1) // 最高気温 (℃)
     private BigDecimal temperatureMax;
 
-    @Column(name = "temperature_min", nullable = false, precision = 4, scale = 1)
-    private BigDecimal temperatureMin;
+    @Column(name = "temperature_mean", nullable = false, precision = 4, scale = 1) // 最低気温 (℃)
+    private BigDecimal temperatureMean; // 平均気温 (℃) - 元のDB定義に'temperature_mean'があるため保持
+   
+    @Column(name = "temperature_min", nullable = false, precision = 4, scale = 1) // 最低気温 (℃)
+    private BigDecimal temperatureMin; // 平均気温 (℃) - 元のDB定義に'temperature_mean'があるため保持
 
-    @Column(name = "temperature_mean", nullable = false, precision = 4, scale = 1)
-    private BigDecimal temperatureMean;
+    @Column(name = "humidity_max", nullable = false, precision = 4, scale = 1) // 最大湿度 (%)
+    private BigDecimal humidityMax;
 
-    @Column(name = "humidity_mean", nullable = false, precision = 4, scale = 1)
-    private BigDecimal humidityMean;
+    @Column(name = "humidity_min", nullable = false, precision = 4, scale = 1) // 最低湿度 (%)
+    private BigDecimal humidityMin;
 
-    @Column(name = "windspeed_max", nullable = false, precision = 4, scale = 1)
+    @Column(name = "windspeed_max", nullable = false, precision = 4, scale = 1) // 最大風速 (km/h)
     private BigDecimal windspeedMax;
 
-    @Column(name = "windspeed_mean", nullable = false, precision = 4, scale = 1)
-    private BigDecimal windspeedMean;
+    // DB定義に 'windspeed_mean' がないため、このフィールドは削除します。
+    // DB定義に 'humidity_mean' がないため、このフィールドは削除します。
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+
+    @Column(name = "created_at", nullable = false, updatable = false) // レコード作成日時
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at") // レコード更新日時 (default: `now()` は@PreUpdateで対応)
     private LocalDateTime updatedAt;
 
-    @Column(name = "is_deleted", nullable = false)
+    @Column(name = "is_deleted", nullable = false) // 論理削除フラグ (true: 削除済み, false: 未削除)
     private boolean isDeleted;
 
     public SalesWeather() {} // JPAのためにデフォルトコンストラクタが必要
@@ -61,12 +65,15 @@ public class SalesWeather {
     public void setTemperatureMin(BigDecimal temperatureMin) { this.temperatureMin = temperatureMin; }
     public BigDecimal getTemperatureMean() { return temperatureMean; }
     public void setTemperatureMean(BigDecimal temperatureMean) { this.temperatureMean = temperatureMean; }
-    public BigDecimal getHumidityMean() { return humidityMean; }
-    public void setHumidityMean(BigDecimal humidityMean) { this.humidityMean = humidityMean; }
+
+    public BigDecimal getHumidityMax() { return humidityMax; }
+    public void setHumidityMax(BigDecimal humidityMax) { this.humidityMax = humidityMax; }
+    public BigDecimal getHumidityMin() { return humidityMin; }
+    public void setHumidityMin(BigDecimal humidityMin) { this.humidityMin = humidityMin; }
+
     public BigDecimal getWindspeedMax() { return windspeedMax; }
     public void setWindspeedMax(BigDecimal windspeedMax) { this.windspeedMax = windspeedMax; }
-    public BigDecimal getWindspeedMean() { return windspeedMean; }
-    public void setWindspeedMean(BigDecimal windspeedMean) { this.windspeedMean = windspeedMean; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

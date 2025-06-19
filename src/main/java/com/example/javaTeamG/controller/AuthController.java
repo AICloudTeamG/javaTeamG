@@ -18,13 +18,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    /**
-     * ログインフォームを表示します。
-     * @param error ログイン失敗時のエラーメッセージパラメータ
-     * @param logout ログアウト成功時のメッセージパラメータ
-     * @param model モデルオブジェクト
-     * @return ログインページのビュー名
-     */
+
     @GetMapping("/login")
     public String showLoginForm(@RequestParam(value = "error", required = false) String error,
                                 @RequestParam(value = "logout", required = false) String logout,
@@ -35,17 +29,9 @@ public class AuthController {
         if (logout != null) {
             model.addAttribute("logoutMessage", "ログアウトしました。");
         }
-        return "login"; // src/main/resources/templates/login.html を表示
+        return "login";
     }
 
-    /**
-     * ログイン処理を行います。
-     * @param email 入力されたメールアドレス
-     * @param password 入力されたパスワード
-     * @param session HTTPセッション
-     * @param model モデルオブジェクト
-     * @return ログイン成功時はダッシュボードへリダイレクト、失敗時はログインページへリダイレクト
-     */
     @PostMapping("/login")
     public String login(@RequestParam String email,
                         @RequestParam String password,
@@ -53,38 +39,28 @@ public class AuthController {
                         Model model) {
         Staff staff = authService.login(email, password, session);
         if (staff != null) {
-            return "redirect:/prediction"; // ログイン成功、ダッシュボードへ
+            if(staff.isAdmin()){
+                return "redirect:/admin/prediction"; // ログイン成功、管理者は予測ページへ
+            }else{
+                return "redirect:sales/input";//ログイン成功、従業員は、入力ページへ
+            }
         } else {
             return "redirect:/login?error"; // ログイン失敗
         }
     }
 
-    /**
-     * ログアウト処理を行います。
-     * @param session HTTPセッション
-     * @return ログアウト後にログインページへリダイレクト
-     */
+
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         authService.logout(session); // セッションを無効化
         return "redirect:/login?logout"; // ログインページにリダイレクトしてログアウトメッセージを表示
     }
 
-    /**
-     * ダッシュボードページを表示します。
-     * @param session HTTPセッション
-     * @param model モデルオブジェクト
-     * @return ダッシュボードページのビュー名、未ログインならログインページへリダイレクト
-     */
-    @GetMapping("/dashboard")
-    public String dashboard(HttpSession session, Model model) {
-        // インターセプターが認証済みであることを保証しますが、念のため再チェック
-        Integer staffId = authService.getLoggedInStaffId(session);
-        if (staffId == null) {
-            return "redirect:/login"; // 未ログインならログインページへ
-        }
-        model.addAttribute("loggedInStaffName", session.getAttribute("loggedInStaffName"));
-        model.addAttribute("isAdmin", session.getAttribute("isAdmin"));
-        return "dashboard"; // ダッシュボードページへ
+    @GetMapping("/access-denied")
+    public String AccessDenied(HttpSession session) {
+        authService.logout(session); // セッションを無効化
+        return "redirect:/access-denied"; // アクセス拒否ページへ
     }
+
+
 }

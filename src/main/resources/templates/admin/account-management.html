@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} ?: 'アカウント管理'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 20px;
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
+
+        .action-buttons button,
+        .action-buttons a {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .delete-form,
+        .reset-password-form-in-modal,
+        .create-form-in-modal,
+        .edit-form-in-modal {
+            display: inline-block;
+        }
+
+        .modal-body .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="my-4" th:text="${pageTitle} ?: 'アカウント管理'">アカウント管理</h1>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>スタッフ一覧</h2>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createStaffModal">
+                <i class="fas fa-plus-circle"></i> 新規スタッフ追加
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>名前</th>
+                        <th>メールアドレス</th>
+                        <th>権限</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="staff : ${staffs}" th:id="${'staffRow-' + staff.id}" th:data-staff-id="${staff.id}"
+                        th:data-staff-name="${staff.name}" th:data-staff-email="${staff.email}"
+                        th:data-staff-is-admin="${staff.isAdmin()}">
+
+                        <td th:text="${staff.name}">テスト 太郎</td>
+                        <td th:text="${staff.email}">test@example.com</td>
+                        <td>
+                            <span th:if="${staff.isAdmin()}">管理者</span>
+                            <span th:unless="${staff.isAdmin()}">従業員</span>
+                        </td>
+                        <td class="action-buttons text-nowrap">
+                            <button type="button" class="btn btn-sm btn-info text-white edit-staff-btn"
+                                data-bs-toggle="modal" data-bs-target="#editStaffModal" th:data-staff-id="${staff.id}">
+                                <i class="fas fa-edit"></i> 編集
+                            </button>
+
+                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                th:data-bs-target="${'#resetPasswordModal' + staff.id}">
+                                <i class="fas fa-key"></i> パスワードリセット
+                            </button>
+
+                            <form th:action="@{/admin/account/delete/{id}(id=${staff.id})}" method="post"
+                                class="delete-form" onsubmit="return confirm('本当にこのスタッフを削除（無効化）しますか？');">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash-alt"></i> 削除
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createStaffModal" tabindex="-1" aria-labelledby="createStaffModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createStaffModalLabel">新規アカウント作成</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/account/create}" method="post" class="create-form-in-modal">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="createName" class="form-label">名前:</label>
+                            <input type="text" class="form-control" id="createName" name="name" required>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="createEmail" class="form-label">メールアドレス:</label>
+                            <input type="email" class="form-control" id="createEmail" name="email" required>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="createPassword" class="form-label">パスワード:</label>
+                            <input type="password" class="form-control" id="createPassword" name="password" required
+                                minlength="8">
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="createIsAdmin" class="form-label">管理者権限:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="createIsAdmin" name="isAdmin">
+                                <label class="form-check-label" for="createIsAdmin">管理者</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                        <button type="submit" class="btn btn-primary">作成</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editStaffModal" tabindex="-1" aria-labelledby="editStaffModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStaffModalLabel">アカウント編集</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editStaffForm" method="post" class="edit-form-in-modal">
+                    <div class="modal-body">
+                        <input type="hidden" id="editStaffId" name="id">
+                        <div class="form-group">
+                            <label for="editName" class="form-label">名前:</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="editEmail" class="form-label">メールアドレス:</label>
+                            <input type="email" class="form-control" id="editEmail" name="email" required>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="editIsAdmin" class="form-label">管理者権限:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editIsAdmin" name="isAdmin"
+                                    value="true">
+                                <!-- <input type="hidden" name="isAdmin" value="false"> -->
+                                <label class="form-check-label" for="editIsAdmin">管理者</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                        <button type="submit" class="btn btn-primary">更新</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:each="staff : ${staffs}" class="modal fade" th:id="${'resetPasswordModal' + staff.id}" tabindex="-1"
+        aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetPasswordModalLabel">パスワードリセット: <span
+                            th:text="${staff.name}"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/account/reset-password/{id}(id=${staff.id})}" method="post"
+                    class="reset-password-form-in-modal">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="newPassword" class="form-label">新しいパスワード:</label>
+                            <input type="password" class="form-control" id="newPassword" name="newPassword" required
+                                minlength="8">
+                        </div>
+                        <div class="form-group mt-2">
+                            <label for="confirmNewPassword" class="form-label">新しいパスワード（確認）:</label>
+                            <input type="password" class="form-control" id="confirmNewPassword"
+                                name="confirmNewPassword" required minlength="8">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                        <button type="submit" class="btn btn-primary">パスワードをリセット</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script>
+        // パスワードリセットモーダル内のパスワード一致チェック
+        document.querySelectorAll('.reset-password-form-in-modal').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                const newPasswordInput = this.querySelector('input[name="newPassword"]');
+                const confirmNewPasswordInput = this.querySelector('input[name="confirmNewPassword"]');
+
+                if (newPasswordInput.value !== confirmNewPasswordInput.value) {
+                    alert('新しいパスワードと確認用パスワードが一致しません。');
+                    event.preventDefault(); // フォーム送信をキャンセル
+                }
+            });
+        });
+
+        // 編集モーダルを開く際のデータ設定
+        const editStaffModal = document.getElementById('editStaffModal');
+        editStaffModal.addEventListener('show.bs.modal', function (event) {
+            // モーダルをトリガーしたボタン
+            const button = event.relatedTarget;
+            // データ属性からスタッフIDを取得
+            const staffId = button.getAttribute('data-staff-id');
+
+            // 該当スタッフの行要素からデータを取得
+            const staffRow = document.getElementById('staffRow-' + staffId);
+            const staffName = staffRow.getAttribute('data-staff-name');
+            const staffEmail = staffRow.getAttribute('data-staff-email');
+            const staffIsAdmin = staffRow.getAttribute('data-staff-is-admin') === 'true'; // 文字列を真偽値に変換
+
+            // 編集フォームの各フィールドにデータを設定
+            const modalForm = editStaffModal.querySelector('#editStaffForm');
+            modalForm.action = '/admin/account/edit/' + staffId; // フォームのactionを設定
+
+            editStaffModal.querySelector('#editStaffId').value = staffId;
+            editStaffModal.querySelector('#editName').value = staffName;
+            editStaffModal.querySelector('#editEmail').value = staffEmail;
+            editStaffModal.querySelector('#editIsAdmin').checked = staffIsAdmin;
+
+            // isDeletedの状態も表示・編集できるように追加
+            const staffIsDeleted = staffRow.querySelector('.badge.bg-danger') !== null; // '削除済み'バッジがあればtrue
+            editStaffModal.querySelector('#editIsDeleted').checked = staffIsDeleted;
+        });
+
+        // 編集モーダルを閉じたときにフォームをリセット (任意)
+        editStaffModal.addEventListener('hidden.bs.modal', function () {
+            const modalForm = editStaffModal.querySelector('#editStaffForm');
+            modalForm.reset(); // フォームをリセット
+        });
+    </script>
+</body>
+
+</html>

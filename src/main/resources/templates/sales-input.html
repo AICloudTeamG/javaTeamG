@@ -1,44 +1,257 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragments/header :: header(~{::title}, ~{::body/content()})}">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>🍺 販売実績入力 | H&C ビール発注システム</title>
+    <meta charset="UTF-8" />
+    <title th:text="${pageTitle}"></title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/sales-input.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* CSSは変更なし、以前のものをそのまま貼り付け */
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #fffef9;
+            height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 160px;
+            height: 100vh;
+            background-color: #fff3e0;
+            padding-top: 2rem;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .sidebar button {
+            width: 120px;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            font-size: 0.95rem;
+            background-color: #fb8500;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .sidebar button:hover {
+            background-color: #d95d0c;
+        }
+
+        .main-content {
+            margin-left: 180px;
+            padding: 2rem;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .weather-icon {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .weather-popup {
+            position: fixed;
+            top: 60px;
+            right: 30px;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            display: none; /* デフォルトで非表示 */
+            z-index: 1000;
+            width: 220px;
+        }
+
+        .weather-popup .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .weather-popup button {
+            background-color: #fb8500;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .weather-popup button:hover {
+            background-color: #d95d0c;
+        }
+
+        .box {
+            background-color: #ffffff;
+            border-left: 6px solid #ffb703;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px 30px;
+            border-radius: 8px;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #fb8500;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        input[type="date"],
+        input[type="number"],
+        input[type="text"] {
+            padding: 6px;
+            font-size: 0.9rem;
+            width: 220px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #ccc;
+        }
+
+        table th {
+            background-color: #ffb703;
+            color: white;
+            padding: 6px;
+            font-size: 0.9rem;
+        }
+
+        table td {
+            text-align: center;
+            padding: 6px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: flex-start;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            background-color: #fb8500;
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #d95d0c;
+        }
+
+        /* メッセージ表示用のスタイル */
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
 </head>
 <body>
-    <div class="main-content-wrapper"> <div class="weather-icon" onclick="toggleWeatherPopup()">
-            <i class="fa-solid fa-cloud-sun"></i>
-        </div>
-        <div class="weather-popup" id="weatherPopup">
-            <div id="weatherContent"></div>
-            <div class="controls">
-                <button onclick="changeWeather(-1)"><i class="fas fa-arrow-left"></i></button>
-                <button onclick="changeWeather(1)"><i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
+    <div class="sidebar">
+        <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
+        <button onclick="location.href='/admin/dashboard'">⛅ 天気可視化</button>
+        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
+        <button onclick="location.href='/admin/account'">👤 アカウント管理</button>
+        <button onclick="location.href='/sales/list'">一覧表示</button>
+        <button onclick="location.href='/logout'">ログアウト</button>
+    </div>
 
+    <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
+    <div class="weather-popup" id="weatherPopup">
+        <div th:if="${todayWeather != null}" id="weatherContent">
+            <strong>今日の天気情報</strong><br>
+            <span style="font-size: 0.85rem; color: #555;" th:text="${todayWeather.date}"></span><br>
+            <span th:text="${todayWeather.weatherCode.weatherName}"></span><br>
+            <span th:text="${todayWeather.temperatureMin}"></span>℃ ~ <span th:text="${todayWeather.temperatureMax}"></span>℃<br>
+            <span>🌬️風速：<span th:text="${todayWeather.windspeedMax}"></span> m/s (最大)</span><br>
+            <span>💧湿度：<span th:text="${todayWeather.humidityMin}"></span>% ~ <span th:text="${todayWeather.humidityMax}"></span>%</span>
+        </div>
+        <div th:if="${todayWeather == null}" id="weatherContent">
+            天気情報がありません。
+        </div>
+    </div>
+
+    <div class="main-content">
         <div class="box">
-            <h2>🍺 販売実績入力</h2>
+            <h2 th:text="${pageTitle}">販売実績入力</h2>
 
-            <div th:if="${message}" class="success-message" role="alert">
-                <p th:text="${message}"></p>
-            </div>
-            <div th:if="${errorMessage}" class="error-message" role="alert">
-                <p th:text="${errorMessage}"></p>
+            <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                <span th:text="${errorMessage}"></span>
             </div>
 
-            <form th:action="@{/sales/input}" th:object="${salesPerformance}" method="post">
+            <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <form th:action="@{/sales/input}" th:object="${salesInputForm}" method="post">
                 <div class="input-row">
                     <div>
-                        <label for="recordDate">販売日付：</label>
-                        <input type="date" id="recordDate" th:field="*{recordDate}" required>
+                        <label for="date">販売日付：</label>
+                        <input type="date" id="date" th:field="*{date}" class="form-control"
+                               th:readonly="${!isAdmin}"
+                               th:attr="onchange=${isAdmin ? 'this.form.submit()' : ''}"
+                               required>
+                        <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="text-danger" style="font-size: 0.8rem; color: red;">日付エラー</div>
+                        <br>
+                        <small th:if="${isAdmin}" style="font-size: 0.8rem; color: #555;">日付を変更すると、その日の実績を修正できます。</small>
                     </div>
                     <div>
-                        <label>記録者（社員名）：</label>
-                        <span id="recorder-display" th:text="${session.loggedInStaffName}"></span>
-                        <input type="hidden" name="recordedByStaff.id" th:value="${session.loggedInStaffId}" />
+                        <label>記録者（社員ID）：</label>
+                        <span id="recorder-display" th:text="*{recorderId}"></span>
+                        <input type="hidden" th:field="*{recorderId}" />
                     </div>
                 </div>
 
@@ -46,32 +259,77 @@
                     <thead>
                         <tr>
                             <th>商品名</th>
-                            <th>JANコード</th>
                             <th>販売本数</th>
+                            <th>売上金額（円）</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="product : ${products}">
-                            <td th:text="${product.name}"></td>
-                            <td th:text="${product.janCode}"></td>
+                        <tr th:each="entry, stat : *{performances}">
+                            <td th:text="${entry.productName}"></td>
                             <td>
                                 <input type="number"
-                                       th:name="|salesCounts[${product.id}]|"
-                                       min="0" step="1" />
-                            </td>
-                        </tr>
-                        </tbody>
-                </table>
+                                       th:id="${'quantity_' + stat.index}"
+                                       th:field="*{performances[__${stat.index}__].quantity}"
+                                       class="form-control"
+                                       min="0"
+                                       step="1"
+                                       th:attr="oninput='updatePrice(this, ' + ${products.?[name == #object.performances[__${stat.index}__].productName][0].price} + ')'"
+                                       required>
+                                <div th:if="${#fields.hasErrors('performances[' + stat.index + '].quantity')}" th:errors="*{performances[__${stat.index}__].quantity}" class="text-danger" style="font-size: 0.8rem; color: red;">数量エラー</div>
 
+                                <input type="hidden" th:field="*{performances[__${stat.index}__].productName}" />
+                            </td>
+                            <td class="price" th:id="${'price_' + stat.index}">0</td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div class="button-group">
-                    <button type="submit" class="button primary-button">登録する</button>
-                    <a th:href="@{/dashboard}" class="button secondary-button">キャンセル</a>
+                    <button type="submit" class="button">登録/更新</button>
                 </div>
+
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             </form>
         </div>
     </div>
-    <div th:replace="~{fragments/footer :: footer}"></div>
 
-    <script th:src="@{/js/sales-input.js}"></script>
+    <script>
+        function updatePrice(input, pricePerUnit) {
+            const quantity = parseInt(input.value) || 0;
+            const priceCell = input.closest('tr').querySelector('.price');
+            priceCell.textContent = quantity * pricePerUnit;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('date');
+            const isAdmin = [[${isAdmin}]]; // ThymeleafのisAdmin変数をJSに渡す
+
+            if (!isAdmin) {
+                dateInput.readOnly = true;
+            }
+
+            document.querySelectorAll('input[type="number"][id^="quantity_"]').forEach(input => {
+                const oninputAttr = input.getAttribute('oninput');
+                const match = oninputAttr.match(/updatePrice\(this, (\d+(\.\d+)?)\)/);
+                if (match && match[1]) {
+                    const pricePerUnit = parseFloat(match[1]);
+                    updatePrice(input, pricePerUnit);
+                } else {
+                    console.warn("Could not parse price from oninput attribute for element:", input);
+                    updatePrice(input, 0);
+                }
+            });
+
+            updateWeatherContent();
+        });
+
+        function toggleWeatherPopup() {
+            const popup = document.getElementById('weatherPopup');
+            popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function updateWeatherContent() {
+            console.log("Weather content updated (Thymeleaf already handled display).");
+        }
+    </script>
 </body>
 </html>
