@@ -207,13 +207,12 @@
 
 <body>
     <div class="sidebar">
-        <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
-        <button onclick="location.href='/admin/dashboard'">⛅ 天気可視化</button>
-        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
-        <button onclick="location.href='/admin/account'">👤 アカウント管理</button>
-        <button onclick="location.href='/sales/list'">一覧表示</button>
-        <button onclick="location.href='/logout'">ログアウト</button>
-    </div>
+    <button th:if="${isAdmin}" onclick="location.href='/admin/prediction'">📦 発注予測</button>
+    <button th:if="${isAdmin}" onclick="location.href='/admin/dashboard'">⛅ 天気可視化</button>
+    <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
+    <button th:if="${isAdmin}" onclick="location.href='/admin/account'">👤 アカウント管理</button>
+    <button onclick="location.href='/logout'">ログアウト</button>
+</div>
 
     <!-- <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
     <div class="weather-popup" id="weatherPopup">
