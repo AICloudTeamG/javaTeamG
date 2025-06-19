@@ -5,12 +5,10 @@
   <meta charset="UTF-8">
   <title>🍺 販売実績入力（管理者）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-
-  <!-- 共通CSS -->
-  <link rel="stylesheet" href="../css/i.css">
 </head>
 <body>
+   <link rel="stylesheet" href="../css-all/i.css">
+ <link rel="stylesheet" href="../css-all/sales-entry-staff.css">
   <div class="wrapper">
     <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
     <div class="weather-popup" id="weatherPopup">
@@ -49,7 +47,7 @@
         </tbody>
       </table>
       <div class="button-group">
-        <button class="button" disabled>登録する</button>
+        <button disabled>登録する</button>
       </div>
     </div>
   </div>
@@ -91,7 +89,9 @@
       const day = date.getDate();
       const weekday = getShortWeekday(date);
       const content = document.getElementById('weatherContent');
-      content.innerHTML = `<strong>${data.label}の天気情報</strong><br><span style="font-size: 0.85rem; color: #555;">${month}/${day}（${weekday}）</span><br>${data.tenki}<br>${data.tempLow}℃ ~ ${data.tempHigh}℃<br>🌬️風速：${data.wind}`;
+      content.innerHTML = `<strong>${data.label}の天気情報</strong><br>
+        <span>${month}/${day}（${weekday}）</span><br>
+        ${data.tenki}<br>${data.tempLow}℃ ~ ${data.tempHigh}℃<br>🌬️風速：${data.wind}`;
     }
 
     function changeWeather(direction) {

@@ -1,0 +1,24 @@
+/* === ページ固有: ボックス調整 === */
+.box {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+/* === テーブルスタイル（共通CSSに類似だが、追加の設定があるなら拡張可）=== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 8px;
+}
+
+/* === 操作ボタン内のリンクボタン配置 === */
+td .button {
+  margin-right: 0.5rem;
+  display: inline-block;
+}

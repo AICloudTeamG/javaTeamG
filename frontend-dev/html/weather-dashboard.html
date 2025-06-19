@@ -5,74 +5,11 @@
   <meta charset="UTF-8">
   <title>週間天気とビール売上</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/i.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .summary-box {
-      text-align: center;
-      background-color: #ffebc1;
-      border-left: 6px solid #fb8500;
-      padding: 1rem;
-      margin-bottom: 2rem;
-      border-radius: 10px;
-      font-size: 1.2rem;
-    }
-
-    .beer-buttons, .calendar-nav {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    .beer-buttons button, .calendar-nav button {
-      background-color: #fb8500;
-      color: white;
-      border: none;
-      padding: 0.4rem 0.8rem;
-      margin: 0 0.5rem;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .beer-buttons button.active, .beer-buttons button:hover,
-    .calendar-nav button:hover {
-      background-color: #d95d0c;
-      font-weight: bold;
-    }
-
-    .calendar {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .day-box {
-      background: white;
-      border-left: 4px solid #ffb703;
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-
-    .day-box h3 {
-      margin-bottom: 0.5rem;
-      font-size: 1rem;
-    }
-
-    .day-box p {
-      margin: 0.2rem 0;
-      font-size: 0.85rem;
-    }
-
-    #chart-container {
-      max-width: 800px;
-      margin: 0 auto 2rem;
-    }
-  </style>
 </head>
 <body>
+   <link rel="stylesheet" href="../css-all/i.css">
+ <link rel="stylesheet" href="../css-all/weather-dashboard.css">
   <div class="sidebar">
     <button onclick="location.href='/forecast'">📦 発注予測</button>
     <button onclick="location.href='/weather'">⛅ 天気可視化</button>
@@ -91,16 +28,16 @@
     </div>
 
     <h1>🍺 ビール売上と週間天気</h1>
-    <div class="summary-box" id="dailySummary">今日の売上：-- 円</div>
+    <div id="dailySummary">今日の売上：-- 円</div>
 
     <div class="beer-buttons">
-      <button class="active" onclick="changeBeer('ale', event)">ホワイトビール</button>
+      <button onclick="changeBeer('ale', event)">ホワイトビール</button>
       <button onclick="changeBeer('lager', event)">ラガー</button>
       <button onclick="changeBeer('pale', event)">ペールエール</button>
       <button onclick="changeBeer('fruit', event)">フルーツビール</button>
       <button onclick="changeBeer('black', event)">黒ビール</button>
       <button onclick="changeBeer('ipa', event)">IPA</button>
-      <button onclick="changeBeer('total', event)"><strong>全体売上</strong></button>
+      <button onclick="changeBeer('total', event)">全体売上</button>
     </div>
 
     <div class="calendar-nav">
@@ -117,9 +54,8 @@
   </div>
 
   <script>
-    // Chart + Weather Script (省略なしで再利用)
-    /* （以下の script タグ内容は元のまま再利用） */
-    // ※ ここに JS スクリプト（renderChart, renderCalendar, weatherData 等）を貼ってください
+    // JSスクリプト部分（例: toggleWeatherPopup, changeBeer, renderChart など）は省略されています。
+    // 元のスクリプトがあればそのまま再利用可能です。
   </script>
 </body>
 </html>

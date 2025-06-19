@@ -5,14 +5,10 @@
   <meta charset="UTF-8">
   <title>📦 発注予測</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-
-  <!-- 共通スタイル -->
-  <link rel="stylesheet" href="../css/i.css">
 </head>
 <body>
+ <link rel="stylesheet" href="../css-all/i.css">
+ <link rel="stylesheet" href="../css-all/order-prediction.css">
   <!-- サイドバー -->
   <div class="sidebar">
     <button onclick="location.href='/forecast'">📦 発注予測</button>
@@ -95,7 +91,7 @@
       const weekday = getShortWeekday(date);
       const content = document.getElementById('weatherContent');
       content.innerHTML = `<strong>${data.label}の天気情報</strong><br>
-        <span style=\"font-size: 0.85rem; color: #555;\">${month}/${day}（${weekday}）</span><br>
+        <span>${month}/${day}（${weekday}）</span><br>
         ${data.tenki}<br>${data.tempLow}℃ ~ ${data.tempHigh}℃<br>🌬️風速：${data.wind}`;
     }
 
