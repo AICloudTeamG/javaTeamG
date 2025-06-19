@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import java.time.format.DateTimeFormatter;
+// import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -67,24 +67,21 @@ public class SalesPerformanceController {
         } else {
             targetDate = LocalDate.now();
         }
-        // ここから修正または追加
-        // **日付をISO_LOCAL_DATE形式の文字列にフォーマットしてモデルに追加**
-        model.addAttribute("formattedDate", targetDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
-        // ここまで
+        System.out.println(targetDate);
 
         SalesInputForm salesInputForm;
 
-        // リダイレクトからのFlashAttributeがあるかチェック (バリデーションエラー時など)
-        if (model.containsAttribute("salesInputForm")) {
-            salesInputForm = (SalesInputForm) model.asMap().get("salesInputForm");
-            // 日付が従業員で当日以外の場合、ここで再設定（もし不正なURL操作があった場合のため）
-            if (!isAdmin && !salesInputForm.getDate().isEqual(LocalDate.now())) {
-                salesInputForm.setDate(LocalDate.now());
-            }
-            // recorderIdもセッションから取得した最新のもので上書き（再確認）
-            salesInputForm.setRecorderId(employeeId);
+        // // リダイレクトからのFlashAttributeがあるかチェック (バリデーションエラー時など)
+        // if (model.containsAttribute("salesInputForm")) {
+        //     salesInputForm = (SalesInputForm) model.asMap().get("salesInputForm");
+        //     // 日付が従業員で当日以外の場合、ここで再設定（もし不正なURL操作があった場合のため）
+        //     if (!isAdmin && !salesInputForm.getDate().isEqual(LocalDate.now())) {
+        //         salesInputForm.setDate(LocalDate.now());
+        //     }
+        //     // recorderIdもセッションから取得した最新のもので上書き（再確認）
+        //     salesInputForm.setRecorderId(employeeId);
 
-        } else {
+        // } else {
             // 初回ロード時または正常なGETリクエスト時
             salesInputForm = new SalesInputForm();
             salesInputForm.setDate(targetDate);
@@ -115,7 +112,7 @@ public class SalesPerformanceController {
                         .collect(Collectors.toList());
                 salesInputForm.setPerformances(initialEntries);
             }
-        }
+        // }
 
         model.addAttribute("salesInputForm", salesInputForm);
         model.addAttribute("pageTitle", isAdmin ? "🍺 販売実績入力（管理者）" : "🍺 販売実績入力（従業員）");
@@ -148,7 +145,7 @@ public class SalesPerformanceController {
             redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm",
                     bindingResult);
-            return "redirect:/sales/input?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+            return "redirect:/sales/input";//?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
         }
 
         if (bindingResult.hasErrors()) {
@@ -156,7 +153,7 @@ public class SalesPerformanceController {
             redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm",
                     bindingResult);
-            return "redirect:/sales/input?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+            return "redirect:/sales/input";//?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
         }
 
         try {
@@ -169,10 +166,10 @@ public class SalesPerformanceController {
             redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm",
                     bindingResult);
-            return "redirect:/sales/input?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+            return "redirect:/sales/input";//?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
         }
 
         redirectAttributes.addFlashAttribute("successMessage", "販売実績を登録しました。");
-        return "redirect:/sales/input?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        return "redirect:/sales/input";//?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 }

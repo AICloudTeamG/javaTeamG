@@ -249,8 +249,8 @@
                         <!-- <input type="date" id="date" th:field="*{date}" class="form-control" th:readonly="${!isAdmin}"
                             required> -->
                         <input type="date" id="date" th:field="*{date}" class="form-control" th:readonly="${!isAdmin}"
-                            th:attr="onchange=${isAdmin ? 'location.href=\'' + @{/sales/input(date=__${formattedDate}__)} + '\'' : ''}"
-                            required>
+                            th:value="${salesInputForm.date != null ? #temporals.format(salesInputForm.date, 'yyyy-MM-dd') : ''}"
+                            th:attr="onchange=${isAdmin ? 'redirectToDate(this.value)' : ''}" required>
                         <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="text-danger"
                             style="font-size: 0.8rem; color: red;">日付エラー</div>
                         <br>
@@ -295,12 +295,30 @@
                     <button type="submit" class="button">登録/更新</button>
                 </div>
 
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
             </form>
         </div>
     </div>
 
     <script>
+        /**
+             * 管理者が日付を変更した際に、その日付でページをリダイレクトする関数
+             * @param {string} selectedDateString - 選択された日付の文字列 (YYYY-MM-DD形式)
+             */
+        function redirectToDate(selectedDateString) {
+            if (selectedDateString) {
+                // ThymeleafのURL式をJavaScript内で直接使うのは避けるため、ベースURLとパラメータを結合
+                // Spring Bootアプリケーションのコンテキストパスがルートの場合、@{/sales/input} は /sales/input に解決されます。
+                const baseUrl = '[[@{/sales/input}]]'; // Thymeleafが評価して文字列として埋め込む
+                window.location.href = baseUrl + '?date=' + selectedDateString;
+            }
+        }
+
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
         function updatePrice(input, pricePerUnit) {
             const quantity = parseInt(input.value) || 0;
             const priceCell = input.closest('tr').querySelector('.price');
@@ -314,6 +332,21 @@
             if (!isAdmin) {
                 dateInput.readOnly = true;
             }
+
+            const urlDate = getQueryParam('date');
+
+            if (urlDate) {
+                // URLに日付パラメータがあればそれを設定
+                dateInput.value = urlDate;
+            } else {
+                // URLに日付パラメータがなければ今日の日付を設定
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0'); // 月は0から始まるため+1
+                const day = String(today.getDate()).padStart(2, '0');
+                dateInput.value = `${year}-${month}-${day}`;
+            }
+
 
             document.querySelectorAll('input[type="number"][id^="quantity_"]').forEach(input => {
                 const oninputAttr = input.getAttribute('oninput');
