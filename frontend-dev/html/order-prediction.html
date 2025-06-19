@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>発注予測</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #fffef9;
+      color: #2c2c2c;
+      height: 100%;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 160px;
+      height: 100vh;
+      background-color: #fff3e0;
+      padding-top: 2rem;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .sidebar button {
+      width: 120px;
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      font-size: 0.95rem;
+      background-color: #fb8500;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .sidebar button:hover {
+      background-color: #d95d0c;
+    }
+
+    .main {
+      margin-left: 180px;
+      padding: 2rem;
+      width: calc(100% - 180px);
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      color: #fb8500;
+    }
+
+    .forecast-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+
+    .forecast-table th {
+      background-color: #ffb703;
+      color: white;
+      font-weight: bold;
+      font-size: 0.9rem;
+      padding: 6px;
+    }
+
+    .forecast-table td {
+      border: 1px solid #ddd;
+      text-align: center;
+      padding: 6px;
+      font-size: 0.85rem;
+    }
+
+    .weather-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.8rem;
+      gap: 4px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .diagonal-cell {
+      position: relative;
+      width: 80px;
+      height: 60px;
+      background-color: #f4f4f4;
+    }
+
+    .diagonal-cell::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent 49.5%, #ddd 49.5%, #ddd 50.5%, transparent 50.5%);
+      z-index: 0;
+    }
+
+    .diagonal-cell .bottom-left {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    .diagonal-cell .top-right {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    .weather-icon {
+      position: fixed;
+      top: 20px;
+      right: 30px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .weather-popup {
+      position: fixed;
+      top: 60px;
+      right: 30px;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1000;
+      width: 220px;
+      font-size: 0.95rem;
+    }
+
+    .weather-popup .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .weather-popup button {
+      background-color: #fb8500;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .weather-popup button:hover {
+      background-color: #d95d0c;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <button onclick="location.href='/forecast'">📦 発注予測</button>
+    <button onclick="location.href='/weather'">⛅ 天気可視化</button>
+    <button onclick="location.href='/input'">✍️ 実績入力</button>
+    <button onclick="location.href='/account'">👤 アカウント管理</button>
+  </div>
+
+  <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
+  <div class="weather-popup" id="weatherPopup">
+    <div id="weatherContent"></div>
+    <div class="controls">
+      <button onclick="changeWeather(-1)">←</button>
+      <button onclick="changeWeather(1)">→</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <h1>発注予測</h1>
+    <table class="forecast-table">
+      <tr>
+        <td class="diagonal-cell">
+          <div class="bottom-left">日付・天気</div>
+          <div class="top-right">ビール種類</div>
+        </td>
+        <th>クラフト</th><th>ヴァイツェン</th><th>IPA</th><th>ペール</th><th>黒</th><th>フルーツ</th>
+      </tr>
+      <tr>
+        <td class="weather-cell"><div class="weather-info">6/20（木）</div></td>
+        <td>36</td><td>30</td><td>46</td><td>28</td><td>18</td><td>23</td>
+      </tr>
+      <tr>
+        <td class="weather-cell"><div class="weather-info">6/24（月）</div></td>
+        <td>39</td><td>33</td><td>50</td><td>31</td><td>20</td><td>25</td>
+      </tr>
+      <tr>
+        <td class="weather-cell"><div class="weather-info">6/27（木）</div></td>
+        <td>37</td><td>31</td><td>48</td><td>29</td><td>19</td><td>22</td>
+      </tr>
+      <tr>
+        <td class="weather-cell"><div class="weather-info">7/1（月）</div></td>
+        <td>38</td><td>32</td><td>49</td><td>30</td><td>20</td><td>24</td>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    const weatherData = [
+      { label: '三日前', tenki: '☀️', tempLow: 18, tempHigh: 22, wind: '4 m/s', offset: -3 },
+      { label: '一昨日', tenki: '☔️', tempLow: 17, tempHigh: 20, wind: '7 m/s', offset: -2 },
+      { label: '昨日', tenki: '☁️', tempLow: 19, tempHigh: 23, wind: '5 m/s', offset: -1 },
+      { label: '今日', tenki: '☀️', tempLow: 21, tempHigh: 26, wind: '4 m/s', offset: 0 },
+      { label: '明日', tenki: '☁️', tempLow: 20, tempHigh: 24, wind: '3 m/s', offset: 1 },
+      { label: '明後日', tenki: '☔️', tempLow: 18, tempHigh: 21, wind: '6 m/s', offset: 2 },
+      { label: '大後日', tenki: '☀️', tempLow: 22, tempHigh: 25, wind: '2 m/s', offset: 3 }
+    ];
+
+    let weatherIndex = 3;
+
+    function toggleWeatherPopup() {
+      const popup = document.getElementById('weatherPopup');
+      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+      updateWeatherContent();
+    }
+
+    function getShortWeekday(dateObj) {
+      const days = ['日', '月', '火', '水', '木', '金', '土'];
+      return days[dateObj.getDay()];
+    }
+
+    function updateWeatherContent() {
+      const data = weatherData[weatherIndex];
+      const date = new Date();
+      date.setDate(date.getDate() + data.offset);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const weekday = getShortWeekday(date);
+      const content = document.getElementById('weatherContent');
+      content.innerHTML = `<strong>${data.label}の天気情報</strong><br>
+        <span style="font-size: 0.85rem; color: #555;">${month}/${day}（${weekday}）</span><br>
+        ${data.tenki}<br>${data.tempLow}℃ ~ ${data.tempHigh}℃<br>🌬️風速：${data.wind}`;
+    }
+
+    function changeWeather(direction) {
+      weatherIndex += direction;
+      if (weatherIndex < 0) weatherIndex = 0;
+      if (weatherIndex > 6) weatherIndex = 6;
+      updateWeatherContent();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      updateWeatherContent();
+    });
+  </script>
+</body>
+</html>
