@@ -120,7 +120,7 @@ public class SalesPerformanceController {
         Optional<SalesWeather> weatherOptional = salesWeatherService.findSalesWeatherByDate(LocalDate.now());
         model.addAttribute("todayWeather", weatherOptional.orElse(null));
 
-        return "sales/input";
+        return "sales-input";
     }
 
     @PostMapping("/input")

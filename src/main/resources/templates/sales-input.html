@@ -209,7 +209,7 @@
         <button onclick="location.href='/logout'">ログアウト</button>
     </div>
 
-    <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
+    <!-- <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
     <div class="weather-popup" id="weatherPopup">
         <div th:if="${todayWeather != null}" id="weatherContent">
             <strong>今日の天気情報</strong><br>
@@ -222,7 +222,7 @@
         <div th:if="${todayWeather == null}" id="weatherContent">
             天気情報がありません。
         </div>
-    </div>
+    </div> -->
 
     <div class="main-content">
         <div class="box">
@@ -272,6 +272,7 @@
                                        th:field="*{performances[__${stat.index}__].quantity}"
                                        class="form-control"
                                        min="0"
+                                       max="1000"
                                        step="1"
                                        th:attr="oninput='updatePrice(this, ' + ${products.?[name == #object.performances[__${stat.index}__].productName][0].price} + ')'"
                                        required>
