@@ -104,7 +104,7 @@ public class SalesPerformanceService {
                 });
 
         // 既存のその日のそのスタッフの「アクティブな」売上実績をすべて論理削除
-        List<SalesPerformance> existingActivePerformances = salesPerformanceRepository.findByRecordDateAndRecordedByStaffAndIsDeletedFalse(date, recordedByStaff);
+        List<SalesPerformance> existingActivePerformances = salesPerformanceRepository.findByRecordDateAndIsDeletedFalse(date);
         for (SalesPerformance sp : existingActivePerformances) {
             sp.setDeleted(true); // 論理削除フラグを立てる
             sp.setUpdatedAt(LocalDateTime.now()); // 更新日時を更新

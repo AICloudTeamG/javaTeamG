@@ -71,17 +71,6 @@ public class SalesPerformanceController {
 
         SalesInputForm salesInputForm;
 
-        // // リダイレクトからのFlashAttributeがあるかチェック (バリデーションエラー時など)
-        // if (model.containsAttribute("salesInputForm")) {
-        //     salesInputForm = (SalesInputForm) model.asMap().get("salesInputForm");
-        //     // 日付が従業員で当日以外の場合、ここで再設定（もし不正なURL操作があった場合のため）
-        //     if (!isAdmin && !salesInputForm.getDate().isEqual(LocalDate.now())) {
-        //         salesInputForm.setDate(LocalDate.now());
-        //     }
-        //     // recorderIdもセッションから取得した最新のもので上書き（再確認）
-        //     salesInputForm.setRecorderId(employeeId);
-
-        // } else {
             // 初回ロード時または正常なGETリクエスト時
             salesInputForm = new SalesInputForm();
             salesInputForm.setDate(targetDate);
@@ -145,7 +134,7 @@ public class SalesPerformanceController {
             redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm",
                     bindingResult);
-            return "redirect:/sales/input";//?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+            return "redirect:/sales/input";
         }
 
         if (bindingResult.hasErrors()) {
@@ -153,7 +142,7 @@ public class SalesPerformanceController {
             redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm",
                     bindingResult);
-            return "redirect:/sales/input";//?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+            return "redirect:/sales/input";
         }
 
         try {
@@ -166,10 +155,10 @@ public class SalesPerformanceController {
             redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm",
                     bindingResult);
-            return "redirect:/sales/input";//?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+            return "redirect:/sales/input";
         }
 
         redirectAttributes.addFlashAttribute("successMessage", "販売実績を登録しました。");
-        return "redirect:/sales/input";//?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        return "redirect:/sales/input";
     }
 }
