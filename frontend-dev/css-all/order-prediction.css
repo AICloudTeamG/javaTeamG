@@ -1,0 +1,30 @@
+/* === 対角セル：日付・天気／ビール種類の交差見出し === */
+.diagonal-cell {
+  position: relative;
+  width: 120px;
+  height: 80px;
+  background-color: #ffb703;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.diagonal-cell .bottom-left {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+}
+
+.diagonal-cell .top-right {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+/* === 日付＋天気を表示するセルのスタイル === */
+.weather-cell .weather-info {
+  font-weight: bold;
+  font-size: 0.9rem;
+}

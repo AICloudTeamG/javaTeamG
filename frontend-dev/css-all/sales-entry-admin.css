@@ -1,0 +1,21 @@
+/* === ラベルと日付・社員IDの横並び === */
+.input-row {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+
+/* === テーブル個別スタイル（共通のtableスタイルに追加したい場合）=== */
+/* ※ 基本的な table, th, td は共通CSSに含まれるが、必要に応じて以下も追加可能 */
+
+td input[type="number"] {
+  width: 80px;
+  padding: 4px;
+  font-size: 0.9rem;
+}
+
+/* === 売上金額セルのスタイル（必要に応じて）=== */
+td.price {
+  font-weight: bold;
+  color: #2c2c2c;
+}

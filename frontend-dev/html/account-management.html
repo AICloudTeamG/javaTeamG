@@ -5,14 +5,10 @@
   <meta charset="UTF-8">
   <title>👤 ユーザー管理一覧</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-
-  <!-- 共通スタイル（ファイル名を i.css に変更） -->
-  <link rel="stylesheet" href="i.css">
 </head>
 <body>
+ <link rel="stylesheet" href="../css-all/i.css">
+ <link rel="stylesheet" href="../css-all/account-management.css">
   <!-- サイドバー -->
   <div class="sidebar">
     <button onclick="location.href='/forecast'">📦 発注予測</button>
@@ -35,7 +31,7 @@
   <div class="main-content">
     <div class="box">
       <h1>👥 ユーザー一覧管理</h1>
-      <a th:href="@{/admin/users/new}" class="button">＋ 新規登録</a>
+      <a th:href="@{/admin/users/new}">＋ 新規登録</a>
       <table>
         <thead>
           <tr>
@@ -51,9 +47,9 @@
             <td th:text="${user.email}">taro@example.com</td>
             <td th:text="${user.role}">ADMIN</td>
             <td>
-              <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" class="button">編集</a>
-              <a th:href="@{/admin/users/password/{id}(id=${user.id})}" class="button">パスワード変更</a>
-              <a th:href="@{/admin/users/delete/{id}(id=${user.id})}" class="button"
+              <a th:href="@{/admin/users/edit/{id}(id=${user.id})}">編集</a>
+              <a th:href="@{/admin/users/password/{id}(id=${user.id})}">パスワード変更</a>
+              <a th:href="@{/admin/users/delete/{id}(id=${user.id})}"
                  onclick="return confirm('本当に削除してもよろしいですか？')">削除</a>
             </td>
           </tr>
@@ -96,14 +92,13 @@
       const weekday = getShortWeekday(date);
       const content = document.getElementById('weatherContent');
       content.innerHTML = `<strong>${data.label}の天気情報</strong><br>
-        <span style=\"font-size: 0.85rem; color: #555;\">${month}/${day}（${weekday}）</span><br>
+        <span>${month}/${day}（${weekday}）</span><br>
         ${data.tenki}<br>${data.tempLow}℃ ~ ${data.tempHigh}℃<br>🌬️風速：${data.wind}`;
     }
 
     function changeWeather(direction) {
       weatherIndex += direction;
-      if (weatherIndex < 0) weatherIndex = 0;
-      if (weatherIndex > weatherData.length - 1) weatherIndex = weatherData.length - 1;
+      weatherIndex = Math.max(0, Math.min(weatherIndex, weatherData.length - 1));
       updateWeatherContent();
     }
 
@@ -113,4 +108,3 @@
   </script>
 </body>
 </html>
-
