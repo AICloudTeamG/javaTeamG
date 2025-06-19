@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8" />
     <title th:text="${pageTitle}"></title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
         /* CSSは変更なし、以前のものをそのまま貼り付け */
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
             font-family: 'Roboto', sans-serif;
@@ -22,7 +24,7 @@
             height: 100vh;
             background-color: #fff3e0;
             padding-top: 2rem;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -71,7 +73,8 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
             padding: 15px;
             border-radius: 8px;
-            display: none; /* デフォルトで非表示 */
+            display: none;
+            /* デフォルトで非表示 */
             z-index: 1000;
             width: 220px;
         }
@@ -187,11 +190,13 @@
             border-radius: 5px;
             text-align: center;
         }
+
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
         .alert-success {
             background-color: #d4edda;
             color: #155724;
@@ -199,6 +204,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="sidebar">
         <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
@@ -240,13 +246,16 @@
                 <div class="input-row">
                     <div>
                         <label for="date">販売日付：</label>
-                        <input type="date" id="date" th:field="*{date}" class="form-control"
-                               th:readonly="${!isAdmin}"
-                               th:attr="onchange=${isAdmin ? 'this.form.submit()' : ''}"
-                               required>
-                        <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="text-danger" style="font-size: 0.8rem; color: red;">日付エラー</div>
+                        <!-- <input type="date" id="date" th:field="*{date}" class="form-control" th:readonly="${!isAdmin}"
+                            required> -->
+                        <input type="date" id="date" th:field="*{date}" class="form-control" th:readonly="${!isAdmin}"
+                            th:attr="onchange=${isAdmin ? 'location.href=\'' + @{/sales/input(date=__${formattedDate}__)} + '\'' : ''}"
+                            required>
+                        <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="text-danger"
+                            style="font-size: 0.8rem; color: red;">日付エラー</div>
                         <br>
-                        <small th:if="${isAdmin}" style="font-size: 0.8rem; color: #555;">日付を変更すると、その日の実績を修正できます。</small>
+                        <small th:if="${isAdmin}"
+                            style="font-size: 0.8rem; color: #555;">日付を変更すると、その日の実績を修正できます。</small>
                     </div>
                     <div>
                         <label>記録者（社員ID）：</label>
@@ -267,16 +276,14 @@
                         <tr th:each="entry, stat : *{performances}">
                             <td th:text="${entry.productName}"></td>
                             <td>
-                                <input type="number"
-                                       th:id="${'quantity_' + stat.index}"
-                                       th:field="*{performances[__${stat.index}__].quantity}"
-                                       class="form-control"
-                                       min="0"
-                                       max="1000"
-                                       step="1"
-                                       th:attr="oninput='updatePrice(this, ' + ${products.?[name == #object.performances[__${stat.index}__].productName][0].price} + ')'"
-                                       required>
-                                <div th:if="${#fields.hasErrors('performances[' + stat.index + '].quantity')}" th:errors="*{performances[__${stat.index}__].quantity}" class="text-danger" style="font-size: 0.8rem; color: red;">数量エラー</div>
+                                <input type="number" th:id="${'quantity_' + stat.index}"
+                                    th:field="*{performances[__${stat.index}__].quantity}" class="form-control" min="0"
+                                    max="1000" step="1"
+                                    th:attr="oninput='updatePrice(this, ' + ${products.?[name == #object.performances[__${stat.index}__].productName][0].price} + ')'"
+                                    required>
+                                <div th:if="${#fields.hasErrors('performances[' + stat.index + '].quantity')}"
+                                    th:errors="*{performances[__${stat.index}__].quantity}" class="text-danger"
+                                    style="font-size: 0.8rem; color: red;">数量エラー</div>
 
                                 <input type="hidden" th:field="*{performances[__${stat.index}__].productName}" />
                             </td>
@@ -300,9 +307,9 @@
             priceCell.textContent = quantity * pricePerUnit;
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const dateInput = document.getElementById('date');
-            const isAdmin = [[${isAdmin}]]; // ThymeleafのisAdmin変数をJSに渡す
+            const isAdmin = [[${ isAdmin }]]; // ThymeleafのisAdmin変数をJSに渡す
 
             if (!isAdmin) {
                 dateInput.readOnly = true;
@@ -333,4 +340,5 @@
         }
     </script>
 </body>
+
 </html>

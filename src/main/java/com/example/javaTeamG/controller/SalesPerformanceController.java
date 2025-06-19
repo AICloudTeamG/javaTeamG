@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -66,6 +67,10 @@ public class SalesPerformanceController {
         } else {
             targetDate = LocalDate.now();
         }
+        // ここから修正または追加
+        // **日付をISO_LOCAL_DATE形式の文字列にフォーマットしてモデルに追加**
+        model.addAttribute("formattedDate", targetDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        // ここまで
 
         SalesInputForm salesInputForm;
 
@@ -89,25 +94,25 @@ public class SalesPerformanceController {
             List<SalesPerformance> existingSales = salesPerformanceService.getSalesPerformanceByDate(targetDate);
             if (!existingSales.isEmpty()) {
                 List<ProductSalesEntry> entries = existingSales.stream()
-                    .map(sp -> {
-                        ProductSalesEntry entry = new ProductSalesEntry();
-                        // SalesPerformanceオブジェクトからProduct名とSalesCountを取得
-                        entry.setProductName(sp.getProduct().getName());
-                        entry.setQuantity(sp.getSalesCount());
-                        return entry;
-                    })
-                    .collect(Collectors.toList());
+                        .map(sp -> {
+                            ProductSalesEntry entry = new ProductSalesEntry();
+                            // SalesPerformanceオブジェクトからProduct名とSalesCountを取得
+                            entry.setProductName(sp.getProduct().getName());
+                            entry.setQuantity(sp.getSalesCount());
+                            return entry;
+                        })
+                        .collect(Collectors.toList());
                 salesInputForm.setPerformances(entries);
             } else {
                 List<Product> allProducts = productService.findAllProducts();
                 List<ProductSalesEntry> initialEntries = allProducts.stream()
-                    .map(product -> {
-                        ProductSalesEntry entry = new ProductSalesEntry();
-                        entry.setProductName(product.getName());
-                        entry.setQuantity(0);
-                        return entry;
-                    })
-                    .collect(Collectors.toList());
+                        .map(product -> {
+                            ProductSalesEntry entry = new ProductSalesEntry();
+                            entry.setProductName(product.getName());
+                            entry.setQuantity(0);
+                            return entry;
+                        })
+                        .collect(Collectors.toList());
                 salesInputForm.setPerformances(initialEntries);
             }
         }
@@ -125,9 +130,9 @@ public class SalesPerformanceController {
 
     @PostMapping("/input")
     public String processSalesInput(@Valid @ModelAttribute("salesInputForm") SalesInputForm salesInputForm,
-                                    BindingResult bindingResult,
-                                    RedirectAttributes redirectAttributes,
-                                    HttpSession session) {
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
 
         // 認証情報をセッションから取得
         Integer employeeId = authService.getLoggedInStaffId(session);
@@ -141,32 +146,33 @@ public class SalesPerformanceController {
         if (!isAdmin && !salesInputForm.getDate().isEqual(LocalDate.now())) {
             redirectAttributes.addFlashAttribute("errorMessage", "従業員は当日の売上のみ登録できます。");
             redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm", bindingResult);
-            return "redirect:/sales/input";
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm",
+                    bindingResult);
+            return "redirect:/sales/input?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
         }
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", "入力に不備があります。もう一度確認してください。");
             redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm", bindingResult);
-            return "redirect:/sales/input";
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm",
+                    bindingResult);
+            return "redirect:/sales/input?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
         }
 
         try {
-            // SalesPerformanceServiceのsaveOrUpdateMultipleSalesPerformanceメソッドを呼び出す
             salesPerformanceService.saveOrUpdateMultipleSalesPerformance(
-                salesInputForm.getDate(),
-                salesInputForm.getRecorderId(),
-                salesInputForm.getPerformances()
-            );
+                    salesInputForm.getDate(),
+                    salesInputForm.getRecorderId(),
+                    salesInputForm.getPerformances());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "実績の保存中にエラーが発生しました: " + e.getMessage());
             redirectAttributes.addFlashAttribute("salesInputForm", salesInputForm);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm", bindingResult);
-            return "redirect:/sales/input";
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.salesInputForm",
+                    bindingResult);
+            return "redirect:/sales/input?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
         }
 
         redirectAttributes.addFlashAttribute("successMessage", "販売実績を登録しました。");
-        return "redirect:/sales/input";
+        return "redirect:/sales/input?date=" + salesInputForm.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 }

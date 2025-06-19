@@ -5,13 +5,13 @@ import com.example.javaTeamG.model.ProductSalesEntry;
 import com.example.javaTeamG.model.SalesPerformance;
 import com.example.javaTeamG.model.SalesWeather;
 import com.example.javaTeamG.model.Staff;
-import com.example.javaTeamG.model.WeatherCode; // WeatherCodeをインポート
+import com.example.javaTeamG.model.WeatherCode;
 import com.example.javaTeamG.repository.SalesPerformanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal; // BigDecimalをインポート
+import java.math.BigDecimal; 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -94,6 +94,7 @@ public class SalesPerformanceService {
                     newWeather.setTemperatureMin(BigDecimal.valueOf(10.0));
                     newWeather.setTemperatureMean(BigDecimal.valueOf(15.0));
                     newWeather.setHumidityMax(BigDecimal.valueOf(90.0)); 
+                    newWeather.setHumidityMin(BigDecimal.valueOf(90.0)); 
                     newWeather.setWindspeedMax(BigDecimal.valueOf(5.0));                  
                     newWeather.setDeleted(false); 
 
@@ -122,8 +123,8 @@ public class SalesPerformanceService {
                 newPerformance.setProduct(product);
                 newPerformance.setSalesCount(entry.getQuantity());
                 newPerformance.setRecordedByStaff(recordedByStaff);
-                newPerformance.setSalesWeather(salesWeather); // 取得したSalesWeatherをセット
-                newPerformance.setDeleted(false); // 新規作成時は論理削除フラグをfalseに
+                newPerformance.setSalesWeather(salesWeather); 
+                newPerformance.setDeleted(false);
                 
                 salesPerformanceRepository.save(newPerformance);
             }
