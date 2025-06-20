@@ -18,4 +18,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     // IDと名前が一致しない他のProductで、名前が重複しているかチェック
     Optional<Product> findByIdIsNotAndName(Integer id, String name);
+
+    // JANコードの重複チェックに使用するメソッド (論理削除されていないものに限る)
+    Optional<Product> findByJanCodeAndIsDeletedFalse(String janCode);
 }
+

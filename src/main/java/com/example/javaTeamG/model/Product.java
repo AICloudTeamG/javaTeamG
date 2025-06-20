@@ -1,8 +1,8 @@
 package com.example.javaTeamG.model;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "products") // DBテーブル名と一致させる
@@ -12,6 +12,7 @@ public class Product {
     private Integer id;
 
     @Column(name = "jan_code", unique = true, nullable = false, length = 13)
+    @Pattern(regexp = "^[0-9]{13}$", message = "JANコードは13桁の数字である必要があります。") 
     private String janCode;
 
     @Column(name = "name", unique = true, nullable = false)

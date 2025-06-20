@@ -1,18 +1,17 @@
-// src/main/java/com/example/javaTeamG/controller/ProductController.java
 package com.example.javaTeamG.controller;
 
 import com.example.javaTeamG.model.Product;
 import com.example.javaTeamG.service.AuthService;
 import com.example.javaTeamG.service.ProductService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid; // ★これは必要★
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.validation.BindingResult; // ★これは必要★
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -36,74 +35,89 @@ public class ProductController {
         List<Product> products = productService.findAllProducts();
         model.addAttribute("products", products);
         model.addAttribute("pageTitle", "商品管理");
-        model.addAttribute("product", new Product());
         return "admin/product-management";
     }
 
-    @PostMapping("/api/add")
-    @ResponseBody
-    public ResponseEntity<?> addProductApi(@RequestBody Product product, HttpSession session) {
+    @PostMapping("/create")
+    public String createProduct(@Valid @ModelAttribute Product product,
+                                BindingResult bindingResult,
+                                HttpSession session, RedirectAttributes redirectAttributes) {
         if (!authService.isAdmin(session)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "アクセスが拒否されました。"));
+            redirectAttributes.addFlashAttribute("errorMessage", "アクセス権限がありません。");
+            return "redirect:/access-denied";
         }
+
+        // JANコードの長さチェックはDB制約に任せるが、Bean Validation (例: @NotBlank) のエラーもここで処理
+        if (bindingResult.hasErrors()) {
+            StringBuilder errorMessage = new StringBuilder("入力エラーがあります: ");
+            bindingResult.getAllErrors().forEach(error -> {
+                errorMessage.append(error.getDefaultMessage()).append("; ");
+            });
+            redirectAttributes.addFlashAttribute("errorMessage", errorMessage.toString());
+            return "redirect:/admin/products";
+        }
+
         try {
-            Product newProduct = productService.createProduct(product);
-            return ResponseEntity.ok(Map.of("message", "商品が正常に追加されました。", "product", newProduct));
+            // Service層での重複チェックが重要になる
+            productService.createProduct(product);
+            redirectAttributes.addFlashAttribute("successMessage", "商品「" + product.getName() + "」が正常に追加されました。");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "商品の追加に失敗しました: " + e.getMessage()));
+            redirectAttributes.addFlashAttribute("errorMessage", "商品の追加に失敗しました: " + e.getMessage());
         }
+        return "redirect:/admin/products";
     }
 
-    @GetMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<?> getProductApi(@PathVariable Integer id, HttpSession session) {
+    @PostMapping("/edit/{id}")
+    public String updateProduct(@PathVariable Integer id,
+                                @Valid @ModelAttribute Product product,
+                                BindingResult bindingResult,
+                                HttpSession session, RedirectAttributes redirectAttributes) {
         if (!authService.isAdmin(session)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "アクセスが拒否されました。"));
+            redirectAttributes.addFlashAttribute("errorMessage", "アクセス権限がありません。");
+            return "redirect:/access-denied";
         }
-        Optional<Product> productOpt = productService.findProductById(id);
-        if (productOpt.isPresent()) {
-            return ResponseEntity.ok(productOpt.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "ID " + id + " の商品が見つかりません。"));
-        }
-    }
 
-    @PutMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<?> updateProductApi(@PathVariable Integer id, @RequestBody Product product, HttpSession session) {
-        if (!authService.isAdmin(session)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "アクセスが拒否されました。"));
+        if (bindingResult.hasErrors()) {
+            StringBuilder errorMessage = new StringBuilder("入力エラーがあります: ");
+            bindingResult.getAllErrors().forEach(error -> {
+                errorMessage.append(error.getDefaultMessage()).append("; ");
+            });
+            redirectAttributes.addFlashAttribute("errorMessage", errorMessage.toString());
+            return "redirect:/admin/products";
         }
+
         try {
-            Product updated = productService.updateProduct(id, product);
-            return ResponseEntity.ok(Map.of("message", "商品が正常に更新されました。", "product", updated));
+            Product updatedProduct = productService.updateProduct(id, product);
+            redirectAttributes.addFlashAttribute("successMessage", "商品「" + updatedProduct.getName() + "」が正常に更新されました。");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "商品の更新に失敗しました: " + e.getMessage()));
+            redirectAttributes.addFlashAttribute("errorMessage", "商品の更新に失敗しました: " + e.getMessage());
         }
+        return "redirect:/admin/products";
     }
 
-    @DeleteMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<?> deleteProductApi(@PathVariable Integer id, HttpSession session) {
+    @PostMapping("/delete/{id}")
+    public String deleteProduct(@PathVariable Integer id, HttpSession session, RedirectAttributes redirectAttributes) {
         if (!authService.isAdmin(session)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "アクセスが拒否されました。"));
+            redirectAttributes.addFlashAttribute("errorMessage", "アクセス権限がありません。");
+            return "redirect:/access-denied";
         }
         try {
             Optional<Product> productOpt = productService.findProductById(id);
             if (productOpt.isPresent() && !productOpt.get().isDeleted()) {
                 productService.deleteProduct(id);
-                return ResponseEntity.ok(Map.of("message", "商品が正常に削除されました。"));
+                redirectAttributes.addFlashAttribute("successMessage", "商品「" + productOpt.get().getName() + "」が正常に削除されました。");
             } else if (productOpt.isPresent() && productOpt.get().isDeleted()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "商品は既に削除されています。"));
+                redirectAttributes.addFlashAttribute("errorMessage", "商品は既に削除されています。");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "商品の削除に失敗しました。商品が見つかりません。"));
+                redirectAttributes.addFlashAttribute("errorMessage", "商品の削除に失敗しました。商品が見つかりません。");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "商品の削除に失敗しました: " + e.getMessage()));
+            redirectAttributes.addFlashAttribute("errorMessage", "商品の削除に失敗しました: " + e.getMessage());
         }
+        return "redirect:/admin/products";
     }
 }

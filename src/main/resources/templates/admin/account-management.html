@@ -250,9 +250,7 @@
             editStaffModal.querySelector('#editEmail').value = staffEmail;
             editStaffModal.querySelector('#editIsAdmin').checked = staffIsAdmin;
 
-            // isDeletedの状態も表示・編集できるように追加
-            const staffIsDeleted = staffRow.querySelector('.badge.bg-danger') !== null; // '削除済み'バッジがあればtrue
-            editStaffModal.querySelector('#editIsDeleted').checked = staffIsDeleted;
+
         });
 
         // 編集モーダルを閉じたときにフォームをリセット (任意)
