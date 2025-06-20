@@ -1,367 +1,226 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle} ?: '商品管理'">商品管理</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title th:text="${pageTitle} ?: '商品管理'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* CSSは変更なし（省略） */
-        html, body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; background-color: #fffef9; color: #2c2c2c; height: 100%; }
-        .container { display: flex; height: 100vh; }
-        .sidebar { width: 16.666%; background-color: #ffb703; color: #2c2c2c; padding: 20px; box-sizing: border-box; }
-        .sidebar ul { list-style: none; padding: 0; }
-        .sidebar li { margin: 10px 0; padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: background-color 0.2s ease; }
-        .sidebar li.active { background-color: #fb8500; color: white; }
-        .sidebar li:hover { background-color: #d95d0c; color: white; }
-        .sidebar a { text-decoration: none; color: inherit; display: block; }
-        .main { width: 83.334%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        h1 { font-size: 1.6rem; color: #fb8500; }
+        .container {
+            margin-top: 20px;
+        }
 
-        .message-box { padding: 10px 15px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; }
-        .message-box.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .message-box.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
 
-        .product-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .product-table th, .product-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .product-table th { background-color: #ffb703; color: white; }
-        .product-table tr:nth-child(even) { background-color: #f2f2f2; }
-        .actions { display: flex; gap: 5px; }
-        .actions button { padding: 5px 10px; border-radius: 4px; cursor: pointer; border: none; font-size: 0.85rem; }
-        .actions .edit-btn { background-color: #007bff; color: white; }
-        .actions .edit-btn:hover { background-color: #0056b3; }
-        .actions .delete-btn { background-color: #dc3545; color: white; }
-        .actions .delete-btn:hover { background-color: #c82333; }
-        .add-product-btn { background-color: #28a745; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-block; margin-bottom: 20px; border: none; cursor: pointer;}
-        .add-product-btn:hover { background-color: #218838; }
+        .action-buttons button,
+        .action-buttons a {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
 
-        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; position: relative;}
-        .close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
-        .close-button:hover, .close-button:focus { color: black; text-decoration: none; cursor: pointer; }
+        /* フォームの表示調整 */
+        .delete-form,
+        .create-form-in-modal,
+        .edit-form-in-modal {
+            display: inline-block; /* ボタンが横並びになるように */
+        }
 
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input { width: calc(100% - 22px); padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .form-group input:focus { border-color: #fb8500; outline: none; box-shadow: 0 0 0 2px rgba(251, 133, 0, 0.2); }
-        .form-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .form-buttons button { padding: 10px 20px; border-radius: 5px; cursor: pointer; border: none; font-size: 1rem; }
-        .form-buttons .submit-btn { background-color: #28a745; color: white; }
-        .form-buttons .submit-btn:hover { background-color: #218838; }
-        .form-buttons .cancel-btn { background-color: #6c757d; color: white; }
-        .form-buttons .cancel-btn:hover { background-color: #5a6268; }
-        .form-group .error-message { color: #dc3545; font-size: 0.85rem; margin-top: 5px; }
+        .modal-body .form-group {
+            margin-bottom: 15px;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <div class="sidebar">
-            <h1>メニュー</h1>
-            <ul>
-                <li><a href="/admin/prediction">発注予測</a></li>
-                <li><a href="/sales/input">実績入力</a></li>
-                <li><a href="/admin/dashboard">実績・天気データ可視化</a></li>
-                <li class="active"><a href="/admin/products">商品管理</a></li>
-                <li><a href="/admin/account/list">アカウント管理</a></li>
-                <li><a href="/logout">ログアウト</a></li>
-            </ul>
+        <h1 class="my-4" th:text="${pageTitle} ?: '商品管理'">商品管理</h1>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <div class="main">
-            <h1>商品管理</h1>
 
-            <div id="messageBox" class="message-box" style="display: none;"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
-            <button id="addProductBtn" class="add-product-btn">新しく商品を追加</button>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>商品一覧</h2>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProductModal">
+                <i class="fas fa-plus-circle"></i> 新規商品追加
+            </button>
+        </div>
 
-            <table class="product-table">
-                <thead>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
                     <tr>
                         <th>ID</th>
                         <th>JANコード</th>
                         <th>商品名</th>
                         <th>価格</th>
-                        <th>最終更新日</th>
+                        <th>更新日時</th>
                         <th>操作</th>
                     </tr>
                 </thead>
                 <tbody id="productTableBody">
+                    <tr th:each="product : ${products}" th:id="${'productRow-' + product.id}"
+                        th:data-product-id="${product.id}"
+                        th:data-product-jan-code="${product.janCode}"
+                        th:data-product-name="${product.name}"
+                        th:data-product-price="${product.price}">
+
+                        <td th:text="${product.id}">1</td>
+                        <td th:text="${product.janCode}">1234567890123</td>
+                        <td th:text="${product.name}">商品A</td>
+                        <td th:text="${product.price}">1000</td>
+                        <td th:text="${#temporals.format(product.updatedAt, 'yyyy-MM-dd HH:mm')}">2025-06-20 10:30</td>
+                        <td class="action-buttons text-nowrap">
+                            <button type="button" class="btn btn-sm btn-info text-white edit-product-btn"
+                                data-bs-toggle="modal" data-bs-target="#editProductModal"
+                                th:data-product-id="${product.id}">
+                                <i class="fas fa-edit"></i> 編集
+                            </button>
+
+                            <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post"
+                                class="delete-form" onsubmit="return confirm('本当に商品「' + [[${product.name}]] + '」を削除（無効化）しますか？');">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash-alt"></i> 削除
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
                     <tr th:if="${#lists.isEmpty(products)}">
                         <td colspan="6">商品が登録されていません。</td>
                     </tr>
-                    <th:block th:each="product : ${products}">
-                        <tr th:id="'productRow-' + ${product.id}">
-                            <td th:text="${product.id}">1</td>
-                            <td class="product-jan-code" th:text="${product.janCode}">1234567890123</td>
-                            <td class="product-name" th:text="${product.name}">ペールエール</td>
-                            <td class="product-price" th:text="${product.price}">1000</td> <td th:text="${#temporals.format(product.updatedAt, 'yyyy/MM/dd HH:mm')}">2023/01/01 10:00</td>
-                            <td class="actions">
-                                <button class="edit-btn" th:data-id="${product.id}">編集</button>
-                                <button class="delete-btn" th:data-id="${product.id}">削除</button>
-                            </td>
-                        </tr>
-                    </th:block>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="modalTitle">商品追加</h2>
-            <form id="productForm">
-                <input type="hidden" id="productId" name="id" />
-                <div class="form-group">
-                    <label for="janCode">JANコード:</label>
-                    <input type="text" id="janCode" name="janCode" required minlength="13" maxlength="13" />
-                    <div id="janCodeError" class="error-message"></div>
+    <div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createProductModalLabel">新規商品追加</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="form-group">
-                    <label for="name">商品名:</label>
-                    <input type="text" id="name" name="name" required />
-                    <div id="nameError" class="error-message"></div>
-                </div>
-                <div class="form-group">
-                    <label for="price">価格:</label>
-                    <input type="number" id="price" name="price" min="0" required />
-                    <div id="priceError" class="error-message"></div>
-                </div>
-                <div class="form-buttons">
-                    <button type="submit" id="formSubmitBtn" class="submit-btn">登録</button>
-                    <button type="button" class="cancel-btn">キャンセル</button>
-                </div>
-            </form>
+                <form th:action="@{/admin/products/create}" method="post" class="create-form-in-modal">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="createJanCode" class="form-label">JANコード:</label>
+                            <input type="text" class="form-control" id="createJanCode" name="janCode" required
+                                 title="13桁の数字を入力してください"><!-- pattern="[0-9]{13}" -->
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="createName" class="form-label">商品名:</label>
+                            <input type="text" class="form-control" id="createName" name="name" required>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="createPrice" class="form-label">価格:</label>
+                            <input type="number" class="form-control" id="createPrice" name="price" required min="0">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                        <button type="submit" class="btn btn-primary">登録</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        const csrfParameterName = /*[[${_csrf.parameterName}]]*/ '_csrf';
-        const csrfToken = /*[[${_csrf.token}]]*/ 'default_token_value';
-        /*]]>*/
-    </script>
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">商品編集</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editProductForm" method="post" class="edit-form-in-modal">
+                    <div class="modal-body">
+                        <input type="hidden" id="editProductId" name="id">
+                        <div class="form-group">
+                            <label for="editJanCode" class="form-label">JANコード:</label>
+                            <input type="text" class="form-control" id="editJanCode" name="janCode" required
+                                pattern="[0-9]{13}" title="13桁の数字を入力してください">
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="editName" class="form-label">商品名:</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="editPrice" class="form-label">価格:</label>
+                            <input type="number" class="form-control" id="editPrice" name="price" required min="0">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                        <button type="submit" class="btn btn-primary">更新</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebarItems = document.querySelectorAll('.sidebar li');
-            const currentPath = window.location.pathname;
-            sidebarItems.forEach(item => {
-                const link = item.querySelector('a');
-                if (link && link.getAttribute('href') === '/admin/products' && currentPath.startsWith('/admin/products')) {
-                    item.classList.add('active');
-                }
-            });
+        // 商品編集モーダルを開く際のデータ設定
+        const editProductModal = document.getElementById('editProductModal');
+        editProductModal.addEventListener('show.bs.modal', function (event) {
+            // モーダルをトリガーしたボタン
+            const button = event.relatedTarget;
+            // データ属性から商品IDを取得
+            const productId = button.getAttribute('data-product-id');
 
-            const productModal = document.getElementById('productModal');
-            const closeButton = document.querySelector('.close-button');
-            const cancelButton = productModal.querySelector('.cancel-btn');
-            const addProductBtn = document.getElementById('addProductBtn');
-            const productForm = document.getElementById('productForm');
-            const modalTitle = document.getElementById('modalTitle');
-            const productIdInput = document.getElementById('productId');
-            const janCodeInput = document.getElementById('janCode');
-            const nameInput = document.getElementById('name');
-            const priceInput = document.getElementById('price');
-            const formSubmitBtn = document.getElementById('formSubmitBtn');
-            const messageBox = document.getElementById('messageBox');
-            const productTableBody = document.getElementById('productTableBody');
+            // 該当商品の行要素からデータを取得
+            const productRow = document.getElementById('productRow-' + productId);
+            const productJanCode = productRow.getAttribute('data-product-jan-code');
+            const productName = productRow.getAttribute('data-product-name');
+            const productPrice = productRow.getAttribute('data-product-price');
 
-            const janCodeError = document.getElementById('janCodeError');
-            const nameError = document.getElementById('nameError');
-            const priceError = document.getElementById('priceError');
+            // 編集フォームの各フィールドにデータを設定
+            const modalForm = editProductModal.querySelector('#editProductForm');
+            modalForm.action = '/admin/products/edit/' + productId; // フォームのactionを設定
 
-            function showMessage(message, type) {
-                messageBox.textContent = message;
-                messageBox.className = 'message-box ' + type;
-                messageBox.style.display = 'block';
-                setTimeout(() => {
-                    messageBox.style.display = 'none';
-                }, 5000);
+            editProductModal.querySelector('#editProductId').value = productId;
+            editProductModal.querySelector('#editJanCode').value = productJanCode;
+            editProductModal.querySelector('#editName').value = productName;
+            editProductModal.querySelector('#editPrice').value = productPrice;
+        });
+
+        // 編集モーダルを閉じたときにフォームをリセット (任意)
+        editProductModal.addEventListener('hidden.bs.modal', function () {
+            const modalForm = editProductModal.querySelector('#editProductForm');
+            modalForm.reset(); // フォームをリセット
+        });
+
+        // JANコード入力のリアルタイムバリデーション（任意）
+        document.getElementById('createJanCode').addEventListener('input', function() {
+            if (!this.checkValidity()) {
+                this.setCustomValidity(this.title);
+            } else {
+                this.setCustomValidity('');
             }
-
-            function clearErrors() {
-                janCodeError.textContent = '';
-                nameError.textContent = '';
-                priceError.textContent = '';
+        });
+        document.getElementById('editJanCode').addEventListener('input', function() {
+            if (!this.checkValidity()) {
+                this.setCustomValidity(this.title);
+            } else {
+                this.setCustomValidity('');
             }
-
-            function openModal(isEdit = false, productData = {}) {
-                clearErrors();
-                productForm.reset();
-
-                if (isEdit) {
-                    modalTitle.textContent = '商品を編集';
-                    formSubmitBtn.textContent = '更新';
-                    productIdInput.value = productData.id || '';
-                    janCodeInput.value = productData.janCode || '';
-                    nameInput.value = productData.name || '';
-                    priceInput.value = productData.price || ''; 
-                } else {
-                    modalTitle.textContent = '新しく商品を追加';
-                    formSubmitBtn.textContent = '登録';
-                    productIdInput.value = '';
-                }
-                productModal.style.display = 'block';
-            }
-
-            function closeModal() {
-                productModal.style.display = 'none';
-            }
-
-            addProductBtn.addEventListener('click', () => openModal(false));
-            closeButton.addEventListener('click', closeModal);
-            cancelButton.addEventListener('click', closeModal);
-
-            window.addEventListener('click', (event) => {
-                if (event.target === productModal) {
-                    closeModal();
-                }
-            });
-
-            productForm.addEventListener('submit', async function(event) {
-                event.preventDefault();
-
-                clearErrors();
-
-                const id = productIdInput.value;
-                const url = id ? `/admin/products/api/${id}` : '/admin/products/api/add';
-                const method = id ? 'PUT' : 'POST';
-
-                const productData = {
-                    id: id ? parseInt(id) : null,
-                    janCode: janCodeInput.value,
-                    name: nameInput.value,
-                    price: parseInt(priceInput.value, 10)
-                };
-
-                try {
-                    const headers = {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    };
-                    if (csrfParameterName && csrfToken) {
-                        headers[csrfParameterName] = csrfToken;
-                    }
-
-                    const response = await fetch(url, {
-                        method: method,
-                        headers: headers,
-                        body: JSON.stringify(productData)
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        showMessage(result.message, 'success');
-                        closeModal();
-                        await loadProducts();
-                    } else {
-                        let errorMessage = result.message || '不明なエラーが発生しました。';
-                        if (errorMessage.includes("JANコード") && (errorMessage.includes("既に存在します") || errorMessage.includes("他の商品で既に使用"))) {
-                            janCodeError.textContent = errorMessage;
-                        } else if (errorMessage.includes("商品名") && (errorMessage.includes("既に存在します") || errorMessage.includes("他の商品で既に使用"))) {
-                            nameError.textContent = errorMessage;
-                        } else {
-                            showMessage(errorMessage, 'error');
-                        }
-                    }
-                } catch (error) {
-                    console.error('Fetch error:', error);
-                    showMessage('通信エラーが発生しました。', 'error');
-                }
-            });
-
-            async function loadProducts() {
-                try {
-                    // ★ここを修正しました: product/api/all というエンドポイントが必要です。
-                    // もしProductControllerにこのエンドポイントがなければ、エラーになります。
-                    const response = await fetch('/admin/products/api/all'); 
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const products = await response.json();
-
-                    productTableBody.innerHTML = '';
-
-                    if (products.length === 0) {
-                        productTableBody.innerHTML = '<tr><td colspan="6">商品が登録されていません。</td></tr>';
-                    } else {
-                        products.forEach(product => {
-                            const row = document.createElement('tr');
-                            row.id = `productRow-${product.id}`;
-                            row.innerHTML = `
-                                <td>${product.id}</td>
-                                <td class="product-jan-code">${product.janCode}</td>
-                                <td class="product-name">${product.name}</td>
-                                <td class="product-price">${product.price}</td>
-                                <td>${new Date(product.updatedAt).toLocaleString('ja-JP', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</td>
-                                <td class="actions">
-                                    <button class="edit-btn" data-id="${product.id}">編集</button>
-                                    <button class="delete-btn" data-id="${product.id}">削除</button>
-                                </td>
-                            `;
-                            productTableBody.appendChild(row);
-                        });
-                    }
-                    attachProductEventListeners();
-                } catch (error) {
-                    console.error('Failed to load products:', error);
-                    showMessage('商品リストの読み込み中にエラーが発生しました。', 'error');
-                }
-            }
-
-            function attachProductEventListeners() {
-                document.querySelectorAll('.edit-btn').forEach(button => {
-                    button.onclick = async (event) => {
-                        const id = event.target.dataset.id;
-                        try {
-                            const response = await fetch(`/admin/products/api/${id}`);
-                            const product = await response.json();
-                            if (response.ok) {
-                                openModal(true, product);
-                            } else {
-                                showMessage(product.message || '商品の取得に失敗しました。', 'error');
-                            }
-                        } catch (error) {
-                            console.error('Fetch error:', error);
-                            showMessage('商品の取得中に通信エラーが発生しました。', 'error');
-                        }
-                    };
-                });
-
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.onclick = async (event) => {
-                        const id = event.target.dataset.id;
-                        if (confirm('本当にこの商品を削除しますか？')) {
-                            try {
-                                const headers = {
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                };
-                                if (csrfParameterName && csrfToken) {
-                                    headers[csrfParameterName] = csrfToken;
-                                }
-
-                                const response = await fetch(`/admin/products/api/${id}`, {
-                                    method: 'DELETE',
-                                    headers: headers
-                                });
-                                const result = await response.json();
-                                if (response.ok) {
-                                    showMessage(result.message || '商品が正常に削除されました。', 'success');
-                                    await loadProducts();
-                                } else {
-                                    showMessage(result.message || '削除に失敗しました。', 'error');
-                                }
-                            } catch (error) {
-                                console.error('Fetch error:', error);
-                                showMessage('削除中に通信エラーが発生しました。', 'error');
-                            }
-                        }
-                    };
-                });
-            }
-
-            loadProducts();
         });
     </script>
 </body>
+
 </html>
