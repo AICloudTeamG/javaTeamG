@@ -1,182 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <title>📦 発注予測</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>発注予測</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Roboto', sans-serif;
-      background-color: #fffef9;
-      color: #2c2c2c;
-      height: 100%;
-    }
 
-    .container {
-      display: flex;
-      height: 100vh;
-    }
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 160px;
-      height: 100vh;
-      background-color: #fff3e0;
-      padding-top: 2rem;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      z-index: 999;
-    }
-
-    .sidebar button {
-      width: 120px;
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      font-size: 0.95rem;
-      background-color: #fb8500;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .sidebar button:hover {
-      background-color: #d95d0c;
-    }
-
-    .main {
-      margin-left: 180px;
-      padding: 2rem;
-      width: calc(100% - 180px);
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
-
-    h1 {
-      font-size: 1.6rem;
-      color: #fb8500;
-    }
-
-    .forecast-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      margin-top: 10px;
-    }
-
-    .forecast-table th {
-      background-color: #ffb703;
-      color: white;
-      font-weight: bold;
-      font-size: 0.9rem;
-      padding: 6px;
-    }
-
-    .forecast-table td {
-      border: 1px solid #ddd;
-      text-align: center;
-      padding: 6px;
-      font-size: 0.85rem;
-    }
-
-    .weather-cell {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 0.8rem;
-      gap: 4px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .diagonal-cell {
-      position: relative;
-      width: 80px;
-      height: 60px;
-      background-color: #f4f4f4;
-    }
-
-    .diagonal-cell::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(45deg, transparent 49.5%, #ddd 49.5%, #ddd 50.5%, transparent 50.5%);
-      z-index: 0;
-    }
-
-    .diagonal-cell .bottom-left {
-      position: absolute;
-      bottom: 4px;
-      left: 4px;
-      font-size: 0.7rem;
-      font-weight: bold;
-    }
-
-    .diagonal-cell .top-right {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      font-size: 0.7rem;
-      font-weight: bold;
-    }
-
-    .weather-icon {
-      position: fixed;
-      top: 20px;
-      right: 30px;
-      font-size: 1.8rem;
-      cursor: pointer;
-      z-index: 1001;
-    }
-
-    .weather-popup {
-      position: fixed;
-      top: 60px;
-      right: 30px;
-      background-color: #ffffff;
-      border: 1px solid #ccc;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      padding: 15px;
-      border-radius: 8px;
-      display: none;
-      z-index: 1000;
-      width: 220px;
-      font-size: 0.95rem;
-    }
-
-    .weather-popup .controls {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-
-    .weather-popup button {
-      background-color: #fb8500;
-      color: white;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-
-    .weather-popup button:hover {
-      background-color: #d95d0c;
-    }
-  </style>
+  <!-- 共通スタイル -->
+  <link rel="stylesheet" href="../css/i.css">
 </head>
 <body>
+  <!-- サイドバー -->
   <div class="sidebar">
     <button onclick="location.href='/forecast'">📦 発注予測</button>
     <button onclick="location.href='/weather'">⛅ 天気可視化</button>
@@ -184,6 +20,7 @@
     <button onclick="location.href='/account'">👤 アカウント管理</button>
   </div>
 
+  <!-- 天気アイコン & ポップアップ -->
   <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
   <div class="weather-popup" id="weatherPopup">
     <div id="weatherContent"></div>
@@ -193,6 +30,7 @@
     </div>
   </div>
 
+  <!-- メインコンテンツ -->
   <div class="main">
     <h1>発注予測</h1>
     <table class="forecast-table">
@@ -222,6 +60,7 @@
     </table>
   </div>
 
+  <!-- 天気スクリプト -->
   <script>
     const weatherData = [
       { label: '三日前', tenki: '☀️', tempLow: 18, tempHigh: 22, wind: '4 m/s', offset: -3 },
@@ -255,7 +94,7 @@
       const weekday = getShortWeekday(date);
       const content = document.getElementById('weatherContent');
       content.innerHTML = `<strong>${data.label}の天気情報</strong><br>
-        <span style="font-size: 0.85rem; color: #555;">${month}/${day}（${weekday}）</span><br>
+        <span style=\"font-size: 0.85rem; color: #555;\">${month}/${day}（${weekday}）</span><br>
         ${data.tenki}<br>${data.tempLow}℃ ~ ${data.tempHigh}℃<br>🌬️風速：${data.wind}`;
     }
 

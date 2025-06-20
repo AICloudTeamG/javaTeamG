@@ -1,0 +1,14 @@
+/* === 中央配置用の全体ラッパー === */
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* === ラベルと入力行の横並び === */
+.input-row {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}

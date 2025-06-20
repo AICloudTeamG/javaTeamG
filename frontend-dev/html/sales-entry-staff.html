@@ -1,225 +1,104 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>🍺 販売実績入力（管理者）</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>🍺 販売実績入力（管理者）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- 共通CSS -->
+  <link rel="stylesheet" href="../css/i.css">
 </head>
 <body>
-<!-- 以下に販売実績入力のコードを挿入 -->
- 
-<!-- 販売実績入力 天気翻頁 全コード挿入 -->
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    background-color: #fffef9;
-    height: 100vh;
-    overflow: hidden;
-  }
-  .wrapper {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-  }
-  .weather-icon {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    font-size: 1.8rem;
-    cursor: pointer;
-  }
-  .weather-popup {
-    position: absolute;
-    top: 60px;
-    right: 30px;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    padding: 15px;
-    border-radius: 8px;
-    display: none;
-    z-index: 10;
-    width: 220px;
-  }
-  .weather-popup .controls {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-  .weather-popup button {
-    background-color: #fb8500;
-    color: white;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
-  }
-  .weather-popup button:hover {
-    background-color: #d95d0c;
-  }
-  .box {
-    background-color: #ffffff;
-    border-left: 6px solid #ffb703;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px 30px;
-    border-radius: 8px;
-    width: 1000px;
-    height: 90vh;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-  }
-  h2 {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-  }
-  label {
-    font-weight: bold;
-    margin-right: 10px;
-  }
-  input[type="date"],
-  input[type="number"],
-  input[type="text"] {
-    padding: 6px;
-    font-size: 0.9rem;
-    width: 220px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  input[disabled] {
-    background-color: #e0e0e0;
-    color: #888;
-    cursor: not-allowed;
-  }
-  .input-row {
-    display: flex;
-    gap: 40px;
-    align-items: center;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  table th, table td {
-    border: 1px solid #ccc;
-  }
-  table th {
-    background-color: #ffb703;
-    color: white;
-    padding: 6px;
-    font-size: 0.9rem;
-  }
-  table td {
-    text-align: center;
-    padding: 6px;
-  }
-  .button-group {
-    display: flex;
-    justify-content: flex-start;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-  .button {
-    background-color: #e0e0e0;
-    color: #888;
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    border: none;
-    border-radius: 5px;
-    cursor: not-allowed;
-  }
-</style>
-<div class="wrapper">
-<div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
-<div class="weather-popup" id="weatherPopup">
-<div id="weatherContent"></div>
-<div class="controls">
-<button onclick="changeWeather(-1)">←</button>
-<button onclick="changeWeather(1)">→</button>
-</div>
-</div>
-<div class="box">
-<h2>🍺 販売実績入力</h2>
-<div class="input-row">
-<div>
-<label for="date">販売日付：</label>
-<input type="date" id="date" name="date" disabled>
-</div>
-<div>
-<label>記録者（社員ID）：</label>
-<span id="recorder-display">T12345</span>
-</div>
-</div>
-<table>
-<thead>
-<tr>
-<th>商品名</th>
-<th>販売本数</th>
-</tr>
-</thead>
-<tbody>
-<tr><td>ホワイトビール</td><td><input type="number" name="ホワイトビール" min="0" step="1" /></td></tr>
-<tr><td>ラガー</td><td><input type="number" name="ラガー" min="0" step="1" /></td></tr>
-<tr><td>ペールエール</td><td><input type="number" name="ペールエール" min="0" step="1" /></td></tr>
-<tr><td>フルーツビール</td><td><input type="number" name="フルーツビール" min="0" step="1" /></td></tr>
-<tr><td>黒ビール</td><td><input type="number" name="黒ビール" min="0" step="1" /></td></tr>
-<tr><td>IPA</td><td><input type="number" name="IPA" min="0" step="1" /></td></tr>
-</tbody>
-</table>
-<div class="button-group">
-<button class="button" disabled>登録する</button>
-</div>
-</div>
-</div>
-<script>
-  const weatherData = [
-    { label: '三日前', tenki: '☀️', tempLow: 18, tempHigh: 22, wind: '4 m/s', offset: -3 },
-    { label: '一昨日', tenki: '☔️', tempLow: 17, tempHigh: 20, wind: '7 m/s', offset: -2 },
-    { label: '昨日', tenki: '☁️', tempLow: 19, tempHigh: 23, wind: '5 m/s', offset: -1 },
-    { label: '今日', tenki: '☀️', tempLow: 21, tempHigh: 26, wind: '4 m/s', offset: 0 },
-    { label: '明日', tenki: '☁️', tempLow: 20, tempHigh: 24, wind: '3 m/s', offset: 1 },
-    { label: '明後日', tenki: '☔️', tempLow: 18, tempHigh: 21, wind: '6 m/s', offset: 2 },
-    { label: '大後日', tenki: '☀️', tempLow: 22, tempHigh: 25, wind: '2 m/s', offset: 3 }
-  ];
-  let weatherIndex = 3;
-  document.addEventListener('DOMContentLoaded', function() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('date').value = today;
-    updateWeatherContent();
-  });
-  function toggleWeatherPopup() {
-    const popup = document.getElementById('weatherPopup');
-    popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
-  }
-  function getShortWeekday(dateObj) {
-    const days = ['日', '月', '火', '水', '木', '金', '土'];
-    return days[dateObj.getDay()];
-  }
-  function updateWeatherContent() {
-    const data = weatherData[weatherIndex];
-    const date = new Date();
-    date.setDate(date.getDate() + data.offset);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekday = getShortWeekday(date);
-    const content = document.getElementById('weatherContent');
-    content.innerHTML = `<strong>${data.label}の天気情報</strong><br><span style="font-size: 0.85rem; color: #555;">${month}/${day}（${weekday}）</span><br>${data.tenki}<br>${data.tempLow}℃ ~ ${data.tempHigh}℃<br>🌬️風速：${data.wind}`;
-  }
-  function changeWeather(direction) {
-    weatherIndex += direction;
-    if (weatherIndex < 0) weatherIndex = 0;
-    if (weatherIndex > 6) weatherIndex = 6;
-    updateWeatherContent();
-  }
-</script>
-<!-- ChatGPT が統合した内容がここに入ります -->
- 
+  <div class="wrapper">
+    <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
+    <div class="weather-popup" id="weatherPopup">
+      <div id="weatherContent"></div>
+      <div class="controls">
+        <button onclick="changeWeather(-1)">←</button>
+        <button onclick="changeWeather(1)">→</button>
+      </div>
+    </div>
+    <div class="box">
+      <h2>🍺 販売実績入力</h2>
+      <div class="input-row">
+        <div>
+          <label for="date">販売日付：</label>
+          <input type="date" id="date" name="date" disabled>
+        </div>
+        <div>
+          <label>記録者（社員ID）：</label>
+          <span id="recorder-display">T12345</span>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>商品名</th>
+            <th>販売本数</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>ホワイトビール</td><td><input type="number" name="ホワイトビール" min="0" step="1" /></td></tr>
+          <tr><td>ラガー</td><td><input type="number" name="ラガー" min="0" step="1" /></td></tr>
+          <tr><td>ペールエール</td><td><input type="number" name="ペールエール" min="0" step="1" /></td></tr>
+          <tr><td>フルーツビール</td><td><input type="number" name="フルーツビール" min="0" step="1" /></td></tr>
+          <tr><td>黒ビール</td><td><input type="number" name="黒ビール" min="0" step="1" /></td></tr>
+          <tr><td>IPA</td><td><input type="number" name="IPA" min="0" step="1" /></td></tr>
+        </tbody>
+      </table>
+      <div class="button-group">
+        <button class="button" disabled>登録する</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const weatherData = [
+      { label: '三日前', tenki: '☀️', tempLow: 18, tempHigh: 22, wind: '4 m/s', offset: -3 },
+      { label: '一昨日', tenki: '☔️', tempLow: 17, tempHigh: 20, wind: '7 m/s', offset: -2 },
+      { label: '昨日', tenki: '☁️', tempLow: 19, tempHigh: 23, wind: '5 m/s', offset: -1 },
+      { label: '今日', tenki: '☀️', tempLow: 21, tempHigh: 26, wind: '4 m/s', offset: 0 },
+      { label: '明日', tenki: '☁️', tempLow: 20, tempHigh: 24, wind: '3 m/s', offset: 1 },
+      { label: '明後日', tenki: '☔️', tempLow: 18, tempHigh: 21, wind: '6 m/s', offset: 2 },
+      { label: '大後日', tenki: '☀️', tempLow: 22, tempHigh: 25, wind: '2 m/s', offset: 3 }
+    ];
+
+    let weatherIndex = 3;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('date').value = today;
+      updateWeatherContent();
+    });
+
+    function toggleWeatherPopup() {
+      const popup = document.getElementById('weatherPopup');
+      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function getShortWeekday(dateObj) {
+      const days = ['日', '月', '火', '水', '木', '金', '土'];
+      return days[dateObj.getDay()];
+    }
+
+    function updateWeatherContent() {
+      const data = weatherData[weatherIndex];
+      const date = new Date();
+      date.setDate(date.getDate() + data.offset);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const weekday = getShortWeekday(date);
+      const content = document.getElementById('weatherContent');
+      content.innerHTML = `<strong>${data.label}の天気情報</strong><br><span style="font-size: 0.85rem; color: #555;">${month}/${day}（${weekday}）</span><br>${data.tenki}<br>${data.tempLow}℃ ~ ${data.tempHigh}℃<br>🌬️風速：${data.wind}`;
+    }
+
+    function changeWeather(direction) {
+      weatherIndex += direction;
+      if (weatherIndex < 0) weatherIndex = 0;
+      if (weatherIndex > 6) weatherIndex = 6;
+      updateWeatherContent();
+    }
+  </script>
 </body>
 </html>
