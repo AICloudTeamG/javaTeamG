@@ -6,7 +6,7 @@
     <title th:text="${pageTitle} ?: '商品管理'">商品管理</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* 共通CSS */
+        /* CSSは変更なし（省略） */
         html, body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; background-color: #fffef9; color: #2c2c2c; height: 100%; }
         .container { display: flex; height: 100vh; }
         .sidebar { width: 16.666%; background-color: #ffb703; color: #2c2c2c; padding: 20px; box-sizing: border-box; }
@@ -18,12 +18,10 @@
         .main { width: 83.334%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         h1 { font-size: 1.6rem; color: #fb8500; }
 
-        /* メッセージボックス */
         .message-box { padding: 10px 15px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; }
         .message-box.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .message-box.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        /* テーブル */
         .product-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         .product-table th, .product-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         .product-table th { background-color: #ffb703; color: white; }
@@ -37,8 +35,7 @@
         .add-product-btn { background-color: #28a745; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-block; margin-bottom: 20px; border: none; cursor: pointer;}
         .add-product-btn:hover { background-color: #218838; }
 
-        /* モーダルフォーム */
-        .modal { display: none; /* 初期は非表示 */ position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
         .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; position: relative;}
         .close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
         .close-button:hover, .close-button:focus { color: black; text-decoration: none; cursor: pointer; }
@@ -96,8 +93,7 @@
                             <td th:text="${product.id}">1</td>
                             <td class="product-jan-code" th:text="${product.janCode}">1234567890123</td>
                             <td class="product-name" th:text="${product.name}">ペールエール</td>
-                            <td class="product-price" th:text="${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}">1000.00</td>
-                            <td th:text="${#temporals.format(product.updatedAt, 'yyyy/MM/dd HH:mm')}">2023/01/01 10:00</td>
+                            <td class="product-price" th:text="${product.price}">1000</td> <td th:text="${#temporals.format(product.updatedAt, 'yyyy/MM/dd HH:mm')}">2023/01/01 10:00</td>
                             <td class="actions">
                                 <button class="edit-btn" th:data-id="${product.id}">編集</button>
                                 <button class="delete-btn" th:data-id="${product.id}">削除</button>
@@ -127,7 +123,7 @@
                 </div>
                 <div class="form-group">
                     <label for="price">価格:</label>
-                    <input type="number" id="price" name="price" step="0.01" min="0" required />
+                    <input type="number" id="price" name="price" min="0" required />
                     <div id="priceError" class="error-message"></div>
                 </div>
                 <div class="form-buttons">
@@ -140,15 +136,12 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // CSRFトークンをThymeleafから取得し、JavaScriptで利用できるようにする
-        // Spring Securityが有効な場合、これがないとPOST/PUT/DELETEリクエストが403 Forbiddenになる可能性があります
         const csrfParameterName = /*[[${_csrf.parameterName}]]*/ '_csrf';
         const csrfToken = /*[[${_csrf.token}]]*/ 'default_token_value';
         /*]]>*/
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- サイドバーのアクティブ表示 ---
             const sidebarItems = document.querySelectorAll('.sidebar li');
             const currentPath = window.location.pathname;
             sidebarItems.forEach(item => {
@@ -158,7 +151,6 @@
                 }
             });
 
-            // --- モーダルフォーム要素の取得 ---
             const productModal = document.getElementById('productModal');
             const closeButton = document.querySelector('.close-button');
             const cancelButton = productModal.querySelector('.cancel-btn');
@@ -173,32 +165,28 @@
             const messageBox = document.getElementById('messageBox');
             const productTableBody = document.getElementById('productTableBody');
 
-            // エラーメッセージ要素
             const janCodeError = document.getElementById('janCodeError');
             const nameError = document.getElementById('nameError');
             const priceError = document.getElementById('priceError');
 
-            // --- メッセージ表示関数 ---
             function showMessage(message, type) {
                 messageBox.textContent = message;
                 messageBox.className = 'message-box ' + type;
                 messageBox.style.display = 'block';
                 setTimeout(() => {
                     messageBox.style.display = 'none';
-                }, 5000); // 5秒後に非表示
+                }, 5000);
             }
 
-            // --- エラーメッセージクリア関数 ---
             function clearErrors() {
                 janCodeError.textContent = '';
                 nameError.textContent = '';
                 priceError.textContent = '';
             }
 
-            // --- モーダル表示/非表示関数 ---
             function openModal(isEdit = false, productData = {}) {
-                clearErrors(); // エラーメッセージをクリア
-                productForm.reset(); // フォームをリセット
+                clearErrors();
+                productForm.reset();
 
                 if (isEdit) {
                     modalTitle.textContent = '商品を編集';
@@ -206,11 +194,11 @@
                     productIdInput.value = productData.id || '';
                     janCodeInput.value = productData.janCode || '';
                     nameInput.value = productData.name || '';
-                    priceInput.value = productData.price || '';
+                    priceInput.value = productData.price || ''; 
                 } else {
                     modalTitle.textContent = '新しく商品を追加';
                     formSubmitBtn.textContent = '登録';
-                    productIdInput.value = ''; // IDをクリア
+                    productIdInput.value = '';
                 }
                 productModal.style.display = 'block';
             }
@@ -219,23 +207,20 @@
                 productModal.style.display = 'none';
             }
 
-            // --- イベントリスナー ---
-            addProductBtn.addEventListener('click', () => openModal(false)); // 新規追加ボタン
-            closeButton.addEventListener('click', closeModal); // ×ボタン
-            cancelButton.addEventListener('click', closeModal); // キャンセルボタン
+            addProductBtn.addEventListener('click', () => openModal(false));
+            closeButton.addEventListener('click', closeModal);
+            cancelButton.addEventListener('click', closeModal);
 
-            // モーダルの外側をクリックで閉じる
             window.addEventListener('click', (event) => {
                 if (event.target === productModal) {
                     closeModal();
                 }
             });
 
-            // --- フォーム送信処理 (追加・更新) ---
             productForm.addEventListener('submit', async function(event) {
-                event.preventDefault(); // デフォルトのフォーム送信を防止
+                event.preventDefault();
 
-                clearErrors(); // 再度エラーメッセージをクリア
+                clearErrors();
 
                 const id = productIdInput.value;
                 const url = id ? `/admin/products/api/${id}` : '/admin/products/api/add';
@@ -245,7 +230,7 @@
                     id: id ? parseInt(id) : null,
                     janCode: janCodeInput.value,
                     name: nameInput.value,
-                    price: parseFloat(priceInput.value)
+                    price: parseInt(priceInput.value, 10)
                 };
 
                 try {
@@ -253,7 +238,6 @@
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     };
-                    // CSRFトークンをヘッダーに追加
                     if (csrfParameterName && csrfToken) {
                         headers[csrfParameterName] = csrfToken;
                     }
@@ -269,13 +253,12 @@
                     if (response.ok) {
                         showMessage(result.message, 'success');
                         closeModal();
-                        await loadProducts(); // 成功したらテーブルを再ロード
+                        await loadProducts();
                     } else {
-                        // エラーメッセージの表示
                         let errorMessage = result.message || '不明なエラーが発生しました。';
-                        if (errorMessage.includes("JANコード") && errorMessage.includes("既に存在します") || errorMessage.includes("JANコード") && errorMessage.includes("他の商品で既に使用")) {
+                        if (errorMessage.includes("JANコード") && (errorMessage.includes("既に存在します") || errorMessage.includes("他の商品で既に使用"))) {
                             janCodeError.textContent = errorMessage;
-                        } else if (errorMessage.includes("商品名") && errorMessage.includes("既に存在します") || errorMessage.includes("商品名") && errorMessage.includes("他の商品で既に使用")) {
+                        } else if (errorMessage.includes("商品名") && (errorMessage.includes("既に存在します") || errorMessage.includes("他の商品で既に使用"))) {
                             nameError.textContent = errorMessage;
                         } else {
                             showMessage(errorMessage, 'error');
@@ -287,17 +270,17 @@
                 }
             });
 
-            // --- 商品一覧ロード関数 ---
-            // 直接APIからデータを取得し、JavaScriptでテーブル行を生成する方式に変更
             async function loadProducts() {
                 try {
-                    const response = await fetch('/admin/products/api/all'); // 新しいAPIエンドポイント
+                    // ★ここを修正しました: product/api/all というエンドポイントが必要です。
+                    // もしProductControllerにこのエンドポイントがなければ、エラーになります。
+                    const response = await fetch('/admin/products/api/all'); 
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                    const products = await response.json(); // 商品リストをJSONで取得
+                    const products = await response.json();
 
-                    productTableBody.innerHTML = ''; // 既存のテーブル内容をクリア
+                    productTableBody.innerHTML = '';
 
                     if (products.length === 0) {
                         productTableBody.innerHTML = '<tr><td colspan="6">商品が登録されていません。</td></tr>';
@@ -309,7 +292,7 @@
                                 <td>${product.id}</td>
                                 <td class="product-jan-code">${product.janCode}</td>
                                 <td class="product-name">${product.name}</td>
-                                <td class="product-price">${product.price.toFixed(2)}</td>
+                                <td class="product-price">${product.price}</td>
                                 <td>${new Date(product.updatedAt).toLocaleString('ja-JP', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</td>
                                 <td class="actions">
                                     <button class="edit-btn" data-id="${product.id}">編集</button>
@@ -319,17 +302,14 @@
                             productTableBody.appendChild(row);
                         });
                     }
-                    attachProductEventListeners(); // 新しい行にイベントリスナーを再付与
+                    attachProductEventListeners();
                 } catch (error) {
                     console.error('Failed to load products:', error);
                     showMessage('商品リストの読み込み中にエラーが発生しました。', 'error');
                 }
             }
 
-
-            // --- 商品操作ボタンにイベントリスナーを付与する関数 ---
             function attachProductEventListeners() {
-                // 編集ボタンのイベントリスナー
                 document.querySelectorAll('.edit-btn').forEach(button => {
                     button.onclick = async (event) => {
                         const id = event.target.dataset.id;
@@ -337,7 +317,7 @@
                             const response = await fetch(`/admin/products/api/${id}`);
                             const product = await response.json();
                             if (response.ok) {
-                                openModal(true, product); // 編集モードでモーダルを開く
+                                openModal(true, product);
                             } else {
                                 showMessage(product.message || '商品の取得に失敗しました。', 'error');
                             }
@@ -348,7 +328,6 @@
                     };
                 });
 
-                // 削除ボタンのイベントリスナー
                 document.querySelectorAll('.delete-btn').forEach(button => {
                     button.onclick = async (event) => {
                         const id = event.target.dataset.id;
@@ -357,7 +336,6 @@
                                 const headers = {
                                     'X-Requested-With': 'XMLHttpRequest'
                                 };
-                                // CSRFトークンをヘッダーに追加
                                 if (csrfParameterName && csrfToken) {
                                     headers[csrfParameterName] = csrfToken;
                                 }
@@ -366,12 +344,10 @@
                                     method: 'DELETE',
                                     headers: headers
                                 });
-                                // deleteProductがvoidを返すため、成功ステータス (200 OK) であれば成功とみなす
-                                // コントローラーがボディにメッセージを返すようにしているので、それも確認
-                                const result = await response.json(); // voidでもレスポンスボディは返る場合がある
-                                if (response.ok) { // HTTPステータスが2xxであれば成功
+                                const result = await response.json();
+                                if (response.ok) {
                                     showMessage(result.message || '商品が正常に削除されました。', 'success');
-                                    await loadProducts(); // テーブルを再ロード
+                                    await loadProducts();
                                 } else {
                                     showMessage(result.message || '削除に失敗しました。', 'error');
                                 }
@@ -384,8 +360,7 @@
                 });
             }
 
-            // ページロード時に初回商品リストをロードし、イベントリスナーを付与
-            loadProducts(); // サーバーサイドレンダリングされたリストを初期表示に使うのをやめ、JSで完全に制御
+            loadProducts();
         });
     </script>
 </body>

@@ -85,6 +85,20 @@
             font-weight: bold;
             display: inline-block;
         }
+
+        .order-today-message {
+            text-align: center;
+            background-color: #e0f2f7; /* 青系の背景で目立たせる */
+            color: #01579b; /* 青系の文字色 */
+            padding: 15px 20px;
+            margin: 20px auto; /* 中央寄せ */
+            border-radius: 8px;
+            font-size: 1.5rem; /* 大きめのフォント */
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 400px; /* 最大幅を設定して中央に集める */
+            display: none; /* ← ここが重要: 最初は非表示 */
+        }
         .forecast-table {
             width: 100%;
             border-collapse: collapse;
@@ -124,6 +138,10 @@
         <div class="main">
             <h1>発注予測</h1>
 
+            <div id="orderTodayMessage" class="order-today-message">
+                ✨ 今日は発注日です！ ✨
+            </div>
+
             <div class="next-order-info">
                 直近の発注予測です。
             </div>
@@ -146,7 +164,7 @@
                         <td colspan="8">利用可能な予測データがありません。</td>
                     </tr>
                     <tr th:each="prediction : ${predictionListForDisplay}">
-                        <td th:text="${#temporals.format(prediction.orderDate, 'M/d（E）')}">6/20（木）</td>
+                        <td th:text="${#temporals.format(prediction.orderDate, 'M/d（E）')}">6/20（例）</td>
                         <td th:text="${#temporals.format(prediction.startDate, 'M/d（E）')} + '〜' + ${#temporals.format(prediction.endDate, 'M/d（E）')}">6/21（金）〜6/24（月）</td>
                         <td th:text="${#numbers.formatDecimal(prediction.paleAleSum, 1, 0)}">36</td>
                         <td th:text="${#numbers.formatDecimal(prediction.lagerSum, 1, 0)}">30</td>
@@ -171,6 +189,17 @@
                     item.classList.add('active');
                 } 
             });
+
+            const today = new Date();
+            const dayOfWeek = today.getDay(); 
+
+            // 月曜日 (1) または木曜日 (4) の場合
+            if (dayOfWeek === 1 || dayOfWeek === 4) {
+                const messageElement = document.getElementById('orderTodayMessage');
+                if (messageElement) {
+                    messageElement.style.display = 'block'; // メッセージを表示する
+                }
+            }
         });
     </script>
 </body>
