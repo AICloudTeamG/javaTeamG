@@ -6,74 +6,116 @@
     <title th:text="${pageTitle}">発注予測</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* CSSスタイルは前回のものと同じ。必要に応じて調整 */
-        html, body {
+        /* UIデザインのCSSを適用 */
+        html,
+        body {
             margin: 0;
             padding: 0;
             font-family: 'Roboto', sans-serif;
             background-color: #fffef9;
-            color: #2c2c2c;
-            height: 100%;
+            height: 100vh; /* Changed to 100vh for full viewport height */
+            color: #2c2c2c; /* Ensure text color is defined */
         }
-        .container {
-            display: flex;
-            height: 100vh;
-        }
+
+        /* サイドバーのスタイル */
         .sidebar {
-            width: 16.666%;
-            background-color: #ffb703;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 160px; /* Fixed width for sidebar */
+            height: 100vh;
+            background-color: #ffb703; /* Changed to match previous request's sidebar color */
+            padding-top: 2rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .sidebar h1 {
+            font-size: 1.4rem;
             color: #2c2c2c;
-            padding: 20px;
-            box-sizing: border-box;
+            margin-bottom: 20px;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+
+        /* サイドバーのボタン/リンクの共通スタイル */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 160px;
+            height: 100vh;
+            background-color: #fff3e0;
+            padding-top: 2rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 999;
         }
-        .sidebar li {
-            margin: 10px 0;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        .sidebar li.active {
+
+        .sidebar button {
+            width: 120px;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            font-size: 0.95rem;
             background-color: #fb8500;
             color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
         }
-        .sidebar li:hover {
+
+        .sidebar button:hover {
             background-color: #d95d0c;
-            color: white;
         }
-        .main {
-            width: 83.334%;
-            padding: 20px;
+
+
+        /* メインコンテンツのスタイル */
+        .main-content {
+            margin-left: 180px; /* Adjust based on sidebar width + desired gap */
+            padding: 2rem;
+            height: 100vh; /* Changed to 100vh for full viewport height */
             box-sizing: border-box;
             overflow-y: auto;
         }
+
         h1 {
             font-size: 1.6rem;
             color: #fb8500;
         }
-        /* .range-selector は今回使用しないので削除またはコメントアウト */
-        /* .range-selector {
-            margin: 16px 0;
-            font-size: 1rem;
-            font-weight: bold;
-            background-color: #ffb703;
-            padding: 10px 14px;
+
+        /* ボックスのスタイル (UIデザインから) */
+        .box {
+            background-color: #ffffff;
+            border-left: 6px solid #ffb703;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 1000px; /* Consistent with UI design */
+            margin: 0 auto; /* Center the box */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 今日の発注日メッセージ */
+        .order-today-message {
+            text-align: center;
+            background-color: #e0f2f7; /* 青系の背景で目立たせる */
+            color: #01579b; /* 青系の文字色 */
+            padding: 15px 20px;
+            margin: 20px auto; /* 中央寄せ */
             border-radius: 8px;
-            display: inline-block;
+            font-size: 1.5rem; /* 大きめのフォント */
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 400px; /* 最大幅を設定して中央に集める */
+            display: none; /* JavaScriptで表示を制御 */
         }
-        .range-selector label {
-            margin-right: 12px;
-        }
-        .range-selector select {
-            padding: 6px 10px;
-            font-size: 1rem;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        } */
+
+        /* 次回発注情報 (最初のHTMLから) */
         .next-order-info {
             margin-top: 10px;
             background-color: #fff3cd;
@@ -86,57 +128,47 @@
             display: inline-block;
         }
 
-        .order-today-message {
-            text-align: center;
-            background-color: #e0f2f7; /* 青系の背景で目立たせる */
-            color: #01579b; /* 青系の文字色 */
-            padding: 15px 20px;
-            margin: 20px auto; /* 中央寄せ */
-            border-radius: 8px;
-            font-size: 1.5rem; /* 大きめのフォント */
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 400px; /* 最大幅を設定して中央に集める */
-            display: none; /* ← ここが重要: 最初は非表示 */
-        }
+        /* テーブルのスタイル */
         .forecast-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
-            margin-top: 10px;
+            font-size: 0.85rem; /* Consistent with previous request */
+            margin-top: 20px; /* Adjusted margin */
         }
+
         .forecast-table th {
             background-color: #ffb703;
             color: white;
             font-weight: bold;
-            font-size: 0.9rem;
-            padding: 8px;
-        }
-        .forecast-table td {
-            border: 1px solid #ddd;
+            font-size: 0.95rem; /* Adjusted font size for consistency */
+            padding: 10px; /* Adjusted padding for consistency */
             text-align: center;
-            padding: 8px;
-            font-size: 0.9rem;
         }
+
+        .forecast-table td {
+            border: 1px solid #ddd; /* Consistent with previous request */
+            text-align: center;
+            padding: 10px; /* Adjusted padding for consistency */
+            font-size: 0.95rem; /* Adjusted font size for consistency */
+        }
+
         .forecast-table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <h1>メニュー</h1>
-            <ul>
-                <li><a href="/admin/prediction" style="text-decoration: none; color: inherit;">実績入力</a>発注予測</li>
-                <li><a href="/sales/input" style="text-decoration: none; color: inherit;">実績入力</a></li>
-                <li><a href="/admin/dashboard" style="text-decoration: none; color: inherit;">実績・天気データ可視化</a></li>
-                <li><a href="/admin/products" style="text-decoration: none; color: inherit;">商品管理</a></li>
-                <li><a href="/admin/account/list" style="text-decoration: none; color: inherit;">アカウント管理</a></li>
-                <li><a href="/logout" style="text-decoration: none; color: inherit;">ログアウト</a></li>
-            </ul>
-        </div>
-        <div class="main">
+     <div class="sidebar">
+        <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
+        <button onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
+        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
+        <button onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
+        <button onclick="location.href='/admin/products'">商品管理</button>
+        <button onclick="location.href='/logout'">ログアウト</button>
+    </div>
+
+    <div class="main-content">
+        <div class="box">
             <h1>発注予測</h1>
 
             <div id="orderTodayMessage" class="order-today-message">
@@ -181,24 +213,23 @@
 
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
-            const sidebarItems = document.querySelectorAll('.sidebar li');
+            const sidebarLinks = document.querySelectorAll('.sidebar a');
             const currentPath = window.location.pathname;
 
-            sidebarItems.forEach(item => {
-                const link = item.querySelector('a');
-                if (link && link.getAttribute('href') === currentPath) {
-                    item.classList.add('active');
-                } 
+            sidebarLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active-link'); // Use the new active-link class
+                }
             });
 
             const today = new Date();
-            const dayOfWeek = today.getDay(); 
+            const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
 
-            // 月曜日 (1) または木曜日 (4) の場合
+            // Check if today is Monday (1) or Thursday (4)
             if (dayOfWeek === 1 || dayOfWeek === 4) {
                 const messageElement = document.getElementById('orderTodayMessage');
                 if (messageElement) {
-                    messageElement.style.display = 'block'; // メッセージを表示する
+                    messageElement.style.display = 'block'; // Show the message
                 }
             }
         });

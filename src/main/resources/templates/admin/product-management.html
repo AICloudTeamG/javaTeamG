@@ -4,17 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle} ?: '商品管理'"></title>
+    <title th:text="${pageTitle} ?: '商品管理'">📦 商品管理</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
-        /* sales-and-weather.html の基本スタイルを適用 */
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #fffef9;
-            color: #2c2c2c;
             margin: 0;
+            padding: 0;
         }
 
         .sidebar {
@@ -33,7 +32,7 @@
         }
 
         .sidebar button,
-        .sidebar a { /* aタグもボタンのように見せるため追加 */
+        .sidebar a {
             width: 120px;
             margin: 0.5rem 0;
             padding: 0.5rem;
@@ -43,16 +42,16 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            text-align: center; /* テキストを中央寄せ */
-            text-decoration: none; /* 下線を削除 */
-            display: flex; /* アイコンとテキストを並べるためにflexboxを使用 */
-            align-items: center; /* 垂直方向中央寄せ */
-            justify-content: center; /* 水平方向中央寄せ */
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .sidebar button i,
         .sidebar a i {
-            margin-right: 8px; /* アイコンとテキストの間隔 */
+            margin-right: 8px;
         }
 
 
@@ -62,27 +61,137 @@
         }
 
         .main-content {
-            margin-left: 180px; /* サイドバーの幅 + 余白 */
+            margin-left: 180px;
             padding: 2rem;
         }
 
+        .box {
+            background-color: #fff;
+            border-left: 6px solid #ffb703;
+            padding: 2rem;
+            margin: 0 auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
         h1 {
-            text-align: center;
-            color: #fb8500;
             font-size: 1.8rem;
-            margin-bottom: 2rem;
+            color: #fb8500;
+            margin-bottom: 1.5rem;
         }
 
-        /* 既存のcontainerスタイルはmain-contentの中に移動 */
-        .main-content > .container {
-            margin-top: 0; /* main-contentのpaddingがあるので相殺 */
+        .button-new {
+            background-color: #fb8500;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            font-size: 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            display: inline-block;
         }
 
-        /* 既存のスタイル */
-        .table th,
+        .button-new:hover {
+            background-color: #d95d0c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th {
+            background-color: #ffb703;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+
+        .action-btn {
+            background-color: #fb8500;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 4px;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .action-btn:hover {
+            background-color: #d95d0c;
+        }
+
+        .weather-icon {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .weather-popup {
+            position: fixed;
+            top: 60px;
+            right: 30px;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+            width: 220px;
+            font-size: 0.95rem;
+        }
+
+        .weather-popup span {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .weather-popup .controls {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .weather-popup button {
+            background-color: #fb8500;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            margin: 0 5px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .weather-popup button:hover {
+            background-color: #d95d0c;
+        }
+
+        /* 既存のcontainerスタイルは削除し、main-contentに吸収 */
+        /* .container {
+            margin-top: 20px;
+        } */
+
+        /* table関連のスタイルは既存のデザインのものを優先 */
+        /* .table th,
         .table td {
             vertical-align: middle;
-        }
+        } */
 
         .action-buttons button,
         .action-buttons a {
@@ -107,8 +216,8 @@
 
         /* h2要素のスタイル調整 */
         .main-content h2 {
-            color: #2c2c2c; /* sales-and-weather.html の h1 の色とは異なる色に */
-            font-size: 1.5rem; /* サイズ調整 */
+            color: #2c2c2c;
+            font-size: 1.5rem;
             margin-bottom: 1.5rem;
         }
     </style>
@@ -116,78 +225,80 @@
 
 <body>
     <div class="sidebar">
-        <a th:if="${isAdmin}" href="/admin/prediction"><i class="fas fa-box-open"></i> 発注予測</a>
-        <a th:if="${isAdmin}" href="/admin/dashboard"><i class="fas fa-chart-line"></i> 天気可視化</a>
-        <a href="/sales/input"><i class="fas fa-edit"></i> 実績入力</a>
-        <a th:if="${isAdmin}" href="/admin/account/list"><i class="fas fa-users"></i> アカウント管理</a>
-        <a th:if="${isAdmin}" href="/admin/products">商品管理</a>
-        <a href="/logout"><i class="fas fa-sign-out-alt"></i> ログアウト</a>
+        <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
+        <button onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
+        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
+        <button onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
+        <button onclick="location.href='/admin/products'">商品管理</button>
+        <button onclick="location.href='/logout'">ログアウト</button>
     </div>
 
     <div class="main-content">
-        <h1 class="my-4" th:text="${pageTitle} ?: '商品管理'">商品管理</h1>
+        <div class="box">
+            <h1 class="my-4" th:text="${pageTitle} ?: '商品管理'">📦 商品管理</h1>
 
-        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <span th:text="${successMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
 
-        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <span th:text="${errorMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>商品一覧</h2>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProductModal">
-                <i class="fas fa-plus-circle"></i> 新規商品追加
-            </button>
-        </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>商品一覧</h2>
+                <button type="button" class="btn button-new" data-bs-toggle="modal"
+                    data-bs-target="#createProductModal">
+                    <i class="fas fa-plus-circle"></i> 新規商品追加
+                </button>
+            </div>
 
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>JANコード</th>
-                        <th>商品名</th>
-                        <th>価格</th>
-                        <th>更新日時</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="productTableBody">
-                    <tr th:each="product : ${products}" th:id="${'productRow-' + product.id}"
-                        th:data-product-id="${product.id}"
-                        th:data-product-jan-code="${product.janCode}"
-                        th:data-product-name="${product.name}"
-                        th:data-product-price="${product.price}">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>JANコード</th>
+                            <th>商品名</th>
+                            <th>価格</th>
+                            <th>更新日時</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <tr th:each="product : ${products}" th:id="${'productRow-' + product.id}"
+                            th:data-product-id="${product.id}" th:data-product-jan-code="${product.janCode}"
+                            th:data-product-name="${product.name}" th:data-product-price="${product.price}">
 
-                        <td th:text="${product.id}">1</td>
-                        <td th:text="${product.janCode}">1234567890123</td>
-                        <td th:text="${product.name}">商品A</td>
-                        <td th:text="${product.price}">1000</td>
-                        <td th:text="${#temporals.format(product.updatedAt, 'yyyy-MM-dd HH:mm')}">2025-06-20 10:30</td>
-                        <td class="action-buttons text-nowrap">
-                            <button type="button" class="btn btn-sm btn-info text-white edit-product-btn"
-                                data-bs-toggle="modal" data-bs-target="#editProductModal"
-                                th:data-product-id="${product.id}">
-                                <i class="fas fa-edit"></i> 編集
-                            </button>
-
-                            <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post"
-                                class="delete-form" onsubmit="return confirm('本当に商品「' + [[${product.name}]] + '」を削除（無効化）しますか？');">
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash-alt"></i> 削除
+                            <td th:text="${product.id}">1</td>
+                            <td th:text="${product.janCode}">1234567890123</td>
+                            <td th:text="${product.name}">商品A</td>
+                            <td th:text="${product.price}">1000</td>
+                            <td th:text="${#temporals.format(product.updatedAt, 'yyyy-MM-dd HH:mm')}">2025-06-20 10:30
+                            </td>
+                            <td class="action-buttons text-nowrap">
+                                <button type="button" class="btn action-btn edit-product-btn" data-bs-toggle="modal"
+                                    data-bs-target="#editProductModal" th:data-product-id="${product.id}">
+                                    <i class="fas fa-edit"></i> 編集
                                 </button>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(products)}">
-                        <td colspan="6">商品が登録されていません。</td>
-                    </tr>
-                </tbody>
-            </table>
+
+                                <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post"
+                                    class="delete-form"
+                                    onsubmit="return confirm('本当に商品「' + [[${product.name}]] + '」を削除（無効化）しますか？');">
+                                    <button type="submit" class="btn action-btn">
+                                        <i class="fas fa-trash-alt"></i> 削除
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(products)}">
+                            <td colspan="6">商品が登録されていません。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -204,7 +315,8 @@
                         <div class="form-group">
                             <label for="createJanCode" class="form-label">JANコード:</label>
                             <input type="text" class="form-control" id="createJanCode" name="janCode" required
-                                   title="13桁の数字を入力してください"></div>
+                                pattern="[0-9]{13}" title="13桁の数字を入力してください">
+                        </div>
                         <div class="form-group mt-3">
                             <label for="createName" class="form-label">商品名:</label>
                             <input type="text" class="form-control" id="createName" name="name" required>
@@ -291,14 +403,14 @@
         });
 
         // JANコード入力のリアルタイムバリデーション（任意）
-        document.getElementById('createJanCode').addEventListener('input', function() {
+        document.getElementById('createJanCode').addEventListener('input', function () {
             if (!this.checkValidity()) {
                 this.setCustomValidity(this.title);
             } else {
                 this.setCustomValidity('');
             }
         });
-        document.getElementById('editJanCode').addEventListener('input', function() {
+        document.getElementById('editJanCode').addEventListener('input', function () {
             if (!this.checkValidity()) {
                 this.setCustomValidity(this.title);
             } else {
