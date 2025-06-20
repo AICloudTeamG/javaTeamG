@@ -1,24 +1,28 @@
-/* === ページ固有: ボックス調整 === */
-.box {
-  max-width: 1000px;
-  margin: 2rem auto;
-  padding: 2rem;
-}
 
-/* === テーブルスタイル（共通CSSに類似だが、追加の設定があるなら拡張可）=== */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  border: 1px solid #ccc;
-  text-align: center;
-  padding: 8px;
-}
-
-/* === 操作ボタン内のリンクボタン配置 === */
-td .button {
+/* === 操作リンクボタンのスタイル === */
+td a {
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #fff;
   margin-right: 0.5rem;
   display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+td a:nth-child(1) {
+  background-color: #2196f3; /* 編集：青 */
+}
+
+td a:nth-child(2) {
+  background-color: #ff9800; /* パスワード変更：オレンジ */
+}
+
+td a:nth-child(3) {
+  background-color: #f44336; /* 削除：赤 */
+}
+
+td a:hover {
+  opacity: 0.85;
 }
