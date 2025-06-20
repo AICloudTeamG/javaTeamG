@@ -1,11 +1,89 @@
-.login-box {
-  width: 380px;
+
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Orbitron:wght@600&family=Roboto:wght@400;700&display=swap');
+
+/* === 背景と中央配置 === */
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background-color: #fffef9;
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.logo {
+/* === ログインボックス：白背景・中央寄せ・左縦線 === */
+.login-box {
+  width: 100%;
+  max-width: 500px;
+  background-color: #ffffff;
+  padding: 3rem 2.5rem;
+  border-radius: 16px;
+  border-left: 6px solid #fb8500; /* 左側に一本のオレンジライン */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   text-align: center;
-  font-family: 'Russo One', sans-serif;
-  font-size: 1.2rem;
+}
+
+/* === ログインタイトル（絵文字付き） === */
+.login-box h1 {
+  font-size: 1.6rem;
+  color: #fb8500;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+/* === ロゴ：H&C 強調 === */
+.logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
   color: #2c2c2c;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* === フォーム構成（縦並び） === */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  text-align: left;
+}
+
+/* === ラベル === */
+form label {
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: #2c2c2c;
+}
+
+/* === 入力フィールド === */
+form input[type="email"],
+form input[type="password"] {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* === ログインボタン === */
+form button {
+  padding: 1rem;
+  background-color: #fb8500;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #e07a00;
 }
