@@ -5,14 +5,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${pageTitle} ?: '商品管理'"></title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .container {
-            margin-top: 20px;
+        /* sales-and-weather.html の基本スタイルを適用 */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #fffef9;
+            color: #2c2c2c;
+            margin: 0;
         }
 
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 160px;
+            height: 100vh;
+            background-color: #fff3e0;
+            padding-top: 2rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .sidebar button,
+        .sidebar a { /* aタグもボタンのように見せるため追加 */
+            width: 120px;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            font-size: 0.95rem;
+            background-color: #fb8500;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center; /* テキストを中央寄せ */
+            text-decoration: none; /* 下線を削除 */
+            display: flex; /* アイコンとテキストを並べるためにflexboxを使用 */
+            align-items: center; /* 垂直方向中央寄せ */
+            justify-content: center; /* 水平方向中央寄せ */
+        }
+
+        .sidebar button i,
+        .sidebar a i {
+            margin-right: 8px; /* アイコンとテキストの間隔 */
+        }
+
+
+        .sidebar button:hover,
+        .sidebar a:hover {
+            background-color: #d95d0c;
+        }
+
+        .main-content {
+            margin-left: 180px; /* サイドバーの幅 + 余白 */
+            padding: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fb8500;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        /* 既存のcontainerスタイルはmain-contentの中に移動 */
+        .main-content > .container {
+            margin-top: 0; /* main-contentのpaddingがあるので相殺 */
+        }
+
+        /* 既存のスタイル */
         .table th,
         .table td {
             vertical-align: middle;
@@ -24,21 +90,41 @@
             margin-bottom: 5px;
         }
 
-        /* フォームの表示調整 */
         .delete-form,
         .create-form-in-modal,
         .edit-form-in-modal {
-            display: inline-block; /* ボタンが横並びになるように */
+            display: inline-block;
         }
 
         .modal-body .form-group {
             margin-bottom: 15px;
         }
+
+        /* success/errorメッセージのアラート表示 */
+        .alert {
+            margin-top: 15px;
+        }
+
+        /* h2要素のスタイル調整 */
+        .main-content h2 {
+            color: #2c2c2c; /* sales-and-weather.html の h1 の色とは異なる色に */
+            font-size: 1.5rem; /* サイズ調整 */
+            margin-bottom: 1.5rem;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="sidebar">
+        <a th:if="${isAdmin}" href="/admin/prediction"><i class="fas fa-box-open"></i> 発注予測</a>
+        <a th:if="${isAdmin}" href="/admin/dashboard"><i class="fas fa-chart-line"></i> 天気可視化</a>
+        <a href="/sales/input"><i class="fas fa-edit"></i> 実績入力</a>
+        <a th:if="${isAdmin}" href="/admin/account/list"><i class="fas fa-users"></i> アカウント管理</a>
+        <a th:if="${isAdmin}" href="/admin/products">商品管理</a>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> ログアウト</a>
+    </div>
+
+    <div class="main-content">
         <h1 class="my-4" th:text="${pageTitle} ?: '商品管理'">商品管理</h1>
 
         <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -118,8 +204,7 @@
                         <div class="form-group">
                             <label for="createJanCode" class="form-label">JANコード:</label>
                             <input type="text" class="form-control" id="createJanCode" name="janCode" required
-                                 title="13桁の数字を入力してください"><!-- pattern="[0-9]{13}" -->
-                        </div>
+                                   title="13桁の数字を入力してください"></div>
                         <div class="form-group mt-3">
                             <label for="createName" class="form-label">商品名:</label>
                             <input type="text" class="form-control" id="createName" name="name" required>
