@@ -1,392 +1,503 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
+    <title>週間天気とビール売上</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle} ?: '商品管理'">商品管理</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* 共通CSS */
-        html, body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; background-color: #fffef9; color: #2c2c2c; height: 100%; }
-        .container { display: flex; height: 100vh; }
-        .sidebar { width: 16.666%; background-color: #ffb703; color: #2c2c2c; padding: 20px; box-sizing: border-box; }
-        .sidebar ul { list-style: none; padding: 0; }
-        .sidebar li { margin: 10px 0; padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: background-color 0.2s ease; }
-        .sidebar li.active { background-color: #fb8500; color: white; }
-        .sidebar li:hover { background-color: #d95d0c; color: white; }
-        .sidebar a { text-decoration: none; color: inherit; display: block; }
-        .main { width: 83.334%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        h1 { font-size: 1.6rem; color: #fb8500; }
+        /* CSSは変更なし、以前のものをそのまま貼り付け */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #fffef9;
+            color: #2c2c2c;
+            margin: 0;
+        }
 
-        /* メッセージボックス */
-        .message-box { padding: 10px 15px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; }
-        .message-box.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .message-box.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 160px;
+            height: 100vh;
+            background-color: #fff3e0;
+            padding-top: 2rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 999;
+        }
 
-        /* テーブル */
-        .product-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .product-table th, .product-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .product-table th { background-color: #ffb703; color: white; }
-        .product-table tr:nth-child(even) { background-color: #f2f2f2; }
-        .actions { display: flex; gap: 5px; }
-        .actions button { padding: 5px 10px; border-radius: 4px; cursor: pointer; border: none; font-size: 0.85rem; }
-        .actions .edit-btn { background-color: #007bff; color: white; }
-        .actions .edit-btn:hover { background-color: #0056b3; }
-        .actions .delete-btn { background-color: #dc3545; color: white; }
-        .actions .delete-btn:hover { background-color: #c82333; }
-        .add-product-btn { background-color: #28a745; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-block; margin-bottom: 20px; border: none; cursor: pointer;}
-        .add-product-btn:hover { background-color: #218838; }
+        .sidebar button {
+            width: 120px;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            font-size: 0.95rem;
+            background-color: #fb8500;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
 
-        /* モーダルフォーム */
-        .modal { display: none; /* 初期は非表示 */ position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; position: relative;}
-        .close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
-        .close-button:hover, .close-button:focus { color: black; text-decoration: none; cursor: pointer; }
+        .sidebar button:hover {
+            background-color: #d95d0c;
+        }
 
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input { width: calc(100% - 22px); padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .form-group input:focus { border-color: #fb8500; outline: none; box-shadow: 0 0 0 2px rgba(251, 133, 0, 0.2); }
-        .form-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .form-buttons button { padding: 10px 20px; border-radius: 5px; cursor: pointer; border: none; font-size: 1rem; }
-        .form-buttons .submit-btn { background-color: #28a745; color: white; }
-        .form-buttons .submit-btn:hover { background-color: #218838; }
-        .form-buttons .cancel-btn { background-color: #6c757d; color: white; }
-        .form-buttons .cancel-btn:hover { background-color: #5a6268; }
-        .form-group .error-message { color: #dc3545; font-size: 0.85rem; margin-top: 5px; }
+        .main-content {
+            margin-left: 180px;
+            padding: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fb8500;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-box {
+            text-align: center;
+            background-color: #ffebc1;
+            border-left: 6px solid #fb8500;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+        }
+
+        .beer-buttons,
+        .calendar-nav {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .beer-buttons button,
+        .calendar-nav button {
+            background-color: #fb8500;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            margin: 0 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .beer-buttons button.active,
+        .beer-buttons button:hover,
+        .calendar-nav button:hover {
+            background-color: #d95d0c;
+            font-weight: bold;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .day-box {
+            background: white;
+            border-left: 4px solid #ffb703;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .day-box h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .day-box p {
+            margin: 0.2rem 0;
+            font-size: 0.85rem;
+        }
+
+        #chart-container {
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .weather-icon {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .weather-popup {
+            position: fixed;
+            top: 60px;
+            right: 30px;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+            width: 220px;
+            font-size: 0.95rem;
+        }
+
+        .weather-popup span {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .weather-popup .controls {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .weather-popup button {
+            background-color: #fb8500;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            margin: 0 5px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .weather-popup button:hover {
+            background-color: #d95d0c;
+        }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <h1>メニュー</h1>
-            <ul>
-                <li><a href="/admin/prediction">発注予測</a></li>
-                <li><a href="/sales/input">実績入力</a></li>
-                <li><a href="/admin/dashboard">実績・天気データ可視化</a></li>
-                <li class="active"><a href="/admin/products">商品管理</a></li>
-                <li><a href="/admin/account/list">アカウント管理</a></li>
-                <li><a href="/logout">ログアウト</a></li>
-            </ul>
-        </div>
-        <div class="main">
-            <h1>商品管理</h1>
-
-            <div id="messageBox" class="message-box" style="display: none;"></div>
-
-            <button id="addProductBtn" class="add-product-btn">新しく商品を追加</button>
-
-            <table class="product-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>JANコード</th>
-                        <th>商品名</th>
-                        <th>価格</th>
-                        <th>最終更新日</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="productTableBody">
-                    <tr th:if="${#lists.isEmpty(products)}">
-                        <td colspan="6">商品が登録されていません。</td>
-                    </tr>
-                    <th:block th:each="product : ${products}">
-                        <tr th:id="'productRow-' + ${product.id}">
-                            <td th:text="${product.id}">1</td>
-                            <td class="product-jan-code" th:text="${product.janCode}">1234567890123</td>
-                            <td class="product-name" th:text="${product.name}">ペールエール</td>
-                            <td class="product-price" th:text="${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}">1000.00</td>
-                            <td th:text="${#temporals.format(product.updatedAt, 'yyyy/MM/dd HH:mm')}">2023/01/01 10:00</td>
-                            <td class="actions">
-                                <button class="edit-btn" th:data-id="${product.id}">編集</button>
-                                <button class="delete-btn" th:data-id="${product.id}">削除</button>
-                            </td>
-                        </tr>
-                    </th:block>
-                </tbody>
-            </table>
-        </div>
+    <div class="sidebar">
+        <button th:if="${isAdmin}" onclick="location.href='/admin/prediction'">📦 発注予測</button>
+        <button th:if="${isAdmin}" onclick="location.href='/admin/dashboard'">⛅ 天気可視化</button>
+        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
+        <button th:if="${isAdmin}" onclick="location.href='/admin/account'">👤 アカウント管理</button>
+        <button th:if="${isAdmin}" onclick="location.href='/sales/list'">一覧表示</button>
+        <button onclick="location.href='/logout'">ログアウト</button>
     </div>
 
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="modalTitle">商品追加</h2>
-            <form id="productForm">
-                <input type="hidden" id="productId" name="id" />
-                <div class="form-group">
-                    <label for="janCode">JANコード:</label>
-                    <input type="text" id="janCode" name="janCode" required minlength="13" maxlength="13" />
-                    <div id="janCodeError" class="error-message"></div>
-                </div>
-                <div class="form-group">
-                    <label for="name">商品名:</label>
-                    <input type="text" id="name" name="name" required />
-                    <div id="nameError" class="error-message"></div>
-                </div>
-                <div class="form-group">
-                    <label for="price">価格:</label>
-                    <input type="number" id="price" name="price" step="0.01" min="0" required />
-                    <div id="priceError" class="error-message"></div>
-                </div>
-                <div class="form-buttons">
-                    <button type="submit" id="formSubmitBtn" class="submit-btn">登録</button>
-                    <button type="button" class="cancel-btn">キャンセル</button>
-                </div>
-            </form>
+    <div class="main-content">
+        <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
+        <div class="weather-popup" id="weatherPopup">
+            <div th:if="${todayWeather != null}" id="weatherContent">
+                <strong>今日の天気情報</strong><br>
+                <span style="font-size: 0.85rem; color: #555;"
+                    th:text="${#temporals.format(todayWeather.date, 'MM/dd')} + '（' + ${#temporals.format(todayWeather.date, 'EEE', new java.util.Locale('ja', 'JP'))} + '）'"></span><br>
+                <span th:text="${todayWeatherCondition}"></span><br>
+                <span th:text="${todayWeather.temperatureMin}"></span>℃ ~ <span
+                    th:text="${todayWeather.temperatureMax}"></span>℃<br>
+                <span>🌬️風速：<span th:text="${todayWeather.windspeedMax}"></span> m/s (最大)</span><br>
+                <span>💧湿度：<span th:text="${todayWeather.humidityMin}"></span>% ~ <span
+                        th:text="${todayWeather.humidityMax}"></span>%</span>
+            </div>
+            <div th:unless="${todayWeather != null}" id="weatherContent">
+                今日の天気情報がありません。
+            </div>
         </div>
+
+        <h1>🍺 ビール売上と週間天気</h1>
+        <div class="summary-box" id="dailySummary">今日の売上：-- 円</div>
+        <div class="beer-buttons">
+            <button class="active" onclick="changeBeer('total', event)"><strong>全体売上</strong></button>
+            <button th:each="productName : ${beerCategories}" th:attr="onclick=|changeBeer('${productName}', event)|"
+                th:text="${productName}"> 商品名
+            </button>
+        </div>
+        <div class="calendar-nav">
+            <button onclick="changeWeek(-1)">◀ 前の週</button>
+            <span id="weekRange">2025/6/9 ~ 2025/6/15</span>
+            <button onclick="changeWeek(1)">次の週 ▶</button>
+        </div>
+        <div id="chart-container">
+            <canvas id="salesChart"></canvas>
+        </div>
+        <div class="calendar" id="calendar"></div>
     </div>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // CSRFトークンをThymeleafから取得し、JavaScriptで利用できるようにする
-        // Spring Securityが有効な場合、これがないとPOST/PUT/DELETEリクエストが403 Forbiddenになる可能性があります
-        const csrfParameterName = /*[[${_csrf.parameterName}]]*/ '_csrf';
-        const csrfToken = /*[[${_csrf.token}]]*/ 'default_token_value';
+
+        const beerPrice = 580; // ビール単価は固定としておく（DBから取得することも可能）
+
+        // コントローラーから渡された初期データ
+        let weeklyChartData = [[${ initialChartData }]];
+        let currentWeekStart = new Date([[${ initialWeekStart }]]);
+        let currentBeer = 'total'; // 初期表示は全体売上
+
+        let salesChart;
+
+        // weatherCodeIdから絵文字へのマッピング (バックエンドと合わせる)
+        const weatherCodeToEmojiMap = {
+            0: "☀️", // Clear sky
+            1: "☁️", // Mainly clear
+            2: "☁️", // Partly cloudy
+            3: "☁️", // Overcast
+            45: "🌫️", // Fog
+            48: "🌫️", // Depositing rime fog
+            51: "🌧️", // Drizzle: Light
+            53: "🌧️", // Drizzle: Moderate
+            55: "🌧️", // Drizzle: Dense intensity
+            56: "🌨️", // Freezing Drizzle: Light
+            57: "🌨️", // Freezing Drizzle: Dense intensity
+            61: "🌧️", // Rain: Slight
+            63: "🌧️", // Rain: Moderate
+            65: "🌧️", // Rain: Heavy intensity
+            66: "🌨️", // Freezing Rain: Light
+            67: "🌨️", // Freezing Rain: Heavy intensity
+            71: "🌨️", // Snow fall: Slight
+            73: "🌨️", // Snow fall: Moderate
+            75: "🌨️", // Snow fall: Heavy intensity
+            77: "❄️", // Snow grains
+            80: "⛈️", // Rain showers: Slight
+            81: "⛈️", // Rain showers: Moderate
+            82: "⛈️", // Rain showers: Violent
+            85: "🌨️", // Snow showers slight
+            86: "🌨️", // Snow showers heavy
+            95: "⚡", // Thunderstorm: Slight or moderate
+            96: "🌪️", // Thunderstorm with slight hail
+            99: "🌪️" // Thunderstorm with heavy hail
+        };
+
+        function getWeatherEmoji(weatherCodeId) {
+            return weatherCodeToEmojiMap[weatherCodeId] || "❓"; // Unknown
+        }
+
+
+        /**
+         * Chart.jsを使ってグラフをレンダリングまたは更新する
+         * @param {string} beerType - 表示するビールの種類 ('ale', 'lager', 'total'など)
+         * @param {Array<Object>} dataForChart - 7日分の集計済みデータ (SalesWeatherChartData)
+         */
+        function renderChart(beerType, dataForChart) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+
+            // グラフのラベル（月、火、...日）
+            const labels = dataForChart.map(d => new Date(d.date).toLocaleDateString('ja-JP', { weekday: 'short' }));
+
+            // 売上データ
+            const salesData = dataForChart.map(d => {
+                if (beerType === 'total') {
+                    return d.totalSalesAmount; // 全体売上
+                } else {
+                    // JavaScriptのオブジェクトはキャメルケースに変換される可能性があるため、キーを確認
+                    // 例: 'ホワイトビール' -> 'ホワイトビール' または 'whiteBeer'
+                    // ここではDBの商品名とHTMLのボタンの商品名が一致すると仮定
+                    return d.salesAmounts[beerType] || 0; // 個別商品売上
+                }
+            });
+
+            // 気温データ（平均気温を使用）
+            const tempMeanData = dataForChart.map(d => parseFloat(d.temperatureMean));
+
+
+            const config = {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '売上金額（円）',
+                            data: salesData,
+                            borderColor: '#fb8500',
+                            backgroundColor: 'rgba(251, 133, 0, 0.5)', // 半透明の塗りつぶし
+                            borderWidth: 1, // 棒グラフの枠線
+                            yAxisID: 'y-sales', // 棒グラフ用のY軸ID
+                        },
+                        {
+                            label: '平均気温（℃）',
+                            data: tempMeanData,
+                            type: 'line', // 気温は線グラフ
+                            borderColor: '#219ebc',
+                            backgroundColor: 'rgba(33, 158, 188, 0.2)',
+                            fill: true, // 線グラフの下を塗りつぶす
+                            tension: 0.3,
+                            yAxisID: 'y-temp', // 線グラフ用のY軸ID
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // コンテナに合わせてサイズ調整
+                    scales: {
+                        'y-sales': {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: '売上金額（円）'
+                            },
+                            beginAtZero: true,
+                        },
+                        'y-temp': {
+                            type: 'linear',
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false // グラフ描画エリアにグリッド線を描画しない
+                            },
+                            title: {
+                                display: true,
+                                text: '平均気温（℃）'
+                            },
+                            beginAtZero: false, // 気温は0から始まらない可能性がある
+                            min: Math.min(...tempMeanData) - 5, // 気温の最小値をデータから設定
+                            max: Math.max(...tempMeanData) + 5, // 気温の最大値をデータから設定
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        if (context.dataset.label.includes('売上')) {
+                                            label += new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', minimumFractionDigits: 0 }).format(context.parsed.y);
+                                        } else {
+                                            label += context.parsed.y + '℃';
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            if (salesChart) salesChart.destroy(); // 既存のグラフがあれば破棄
+            salesChart = new Chart(ctx, config);
+        }
+
+        /**
+         * カレンダー表示部分をレンダリングする
+         * @param {Date} startDate - 週の開始日（Dateオブジェクト）
+         * @param {Array<Object>} dataForCalendar - 7日分の集計済みデータ (SalesWeatherChartData)
+         */
+        function renderCalendar(startDate, dataForCalendar) {
+            const calendarDiv = document.getElementById('calendar');
+            calendarDiv.innerHTML = ''; // クリア
+
+            const weekRangeSpan = document.getElementById('weekRange');
+            const weekStartStr = startDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            const weekEnd = new Date(startDate);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            const weekEndStr = weekEnd.toLocaleDateString('ja-JP', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            weekRangeSpan.textContent = `${weekStartStr} ~ ${weekEndStr}`;
+
+            let todayTotalSales = 0;
+            const today = new Date();
+            const todayDateStr = today.toISOString().slice(0, 10); // YYYY-MM-DD
+
+            dataForCalendar.forEach(data => {
+                const day = new Date(data.date); // ISO形式の文字列からDateオブジェクトに変換
+                const isToday = data.date === todayDateStr; // 日付文字列で比較
+
+                if (isToday) {
+                    todayTotalSales = data.totalSalesAmount;
+                }
+
+                const div = document.createElement('div');
+                div.className = 'day-box';
+                div.innerHTML = `
+                    <h3>${day.toLocaleDateString('ja-JP', { weekday: 'short', day: 'numeric' })}</h3>
+                    <p>${data.weatherCondition}</p>
+                    <p>売上金額: ${data.totalSalesAmount.toLocaleString()} 円</p>
+                    <p>平均気温: ${data.temperatureMean}℃</p>
+                    <p>最高: ${data.temperatureMax}℃ / 最低: ${data.temperatureMin}℃</p>
+                    <p>湿度: ${data.humidityMin}% ~ ${data.humidityMax}%</p>
+                    <p>風速: ${data.windspeedMax} m/s</p>
+                `;
+                calendarDiv.appendChild(div);
+            });
+
+            document.getElementById('dailySummary').textContent = `今日の売上：${todayTotalSales.toLocaleString()} 円`;
+            renderChart(currentBeer, dataForCalendar);
+        }
+
+        /**
+         * 週を移動する (API呼び出しを伴う)
+         * @param {number} offset - 週のオフセット (-1:前週, 1:次週)
+         */
+        async function changeWeek(offset) {
+            currentWeekStart.setDate(currentWeekStart.getDate() + offset * 7);
+            await fetchAndRenderData(currentWeekStart);
+        }
+
+        /**
+         * ビールの種類を変更する
+         * @param {string} type - ビールの種類
+         * @param {Event} event - イベントオブジェクト
+         */
+        function changeBeer(type, event) {
+            document.querySelectorAll('.beer-buttons button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            currentBeer = type;
+            // グラフのみ再描画 (データは既に取得済み)
+            renderChart(currentBeer, weeklyChartData);
+        }
+
+        /**
+         * 天気ポップアップの表示/非表示を切り替える
+         */
+        function toggleWeatherPopup() {
+            const popup = document.getElementById('weatherPopup');
+            popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+            // ポップアップを開く際に今日の天気データを再取得して表示を更新する (念のため)
+            if (popup.style.display === 'block') {
+                // Thymeleafで初期データがセットされているので、ここでは特に何もしない
+                // 必要であれば、個別のAPIコールをここに追加することも可能
+            }
+        }
+
+        /**
+         * APIから週間データを取得し、グラフとカレンダーをレンダリングする
+         * @param {Date} startDate - 取得したい週の開始日
+         */
+        async function fetchAndRenderData(startDate) {
+            const formattedStartDate = startDate.toISOString().slice(0, 10); // YYYY-MM-DD形式
+            try {
+                const response = await fetch(`/admin/dashboard/api/weekly-sales-weather?startDate=${formattedStartDate}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                weeklyChartData = data; // 取得したデータを保存
+                renderCalendar(startDate, weeklyChartData); // カレンダーとグラフを再描画
+            } catch (error) {
+                console.error("週間データの取得中にエラーが発生しました:", error);
+                alert("週間データの取得に失敗しました。再試行してください。");
+                // エラー時のUI表示などを考慮
+            }
+        }
+
+        // ページロード時の初期処理
+        window.onload = async () => {
+            // Thymeleafから渡された初期データで最初の描画
+            if (weeklyChartData && weeklyChartData.length > 0) {
+                renderCalendar(currentWeekStart, weeklyChartData);
+            } else {
+                // データが渡されなかった場合（エラーなど）はAPIを呼び出す
+                console.warn("初期データがありません。APIからデータを取得します。");
+                await fetchAndRenderData(currentWeekStart);
+            }
+
+            // 初期選択ボタンを設定 (全体売上)
+            document.querySelector('.beer-buttons button:first-child').classList.add('active');
+        };
+
         /*]]>*/
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- サイドバーのアクティブ表示 ---
-            const sidebarItems = document.querySelectorAll('.sidebar li');
-            const currentPath = window.location.pathname;
-            sidebarItems.forEach(item => {
-                const link = item.querySelector('a');
-                if (link && link.getAttribute('href') === '/admin/products' && currentPath.startsWith('/admin/products')) {
-                    item.classList.add('active');
-                }
-            });
-
-            // --- モーダルフォーム要素の取得 ---
-            const productModal = document.getElementById('productModal');
-            const closeButton = document.querySelector('.close-button');
-            const cancelButton = productModal.querySelector('.cancel-btn');
-            const addProductBtn = document.getElementById('addProductBtn');
-            const productForm = document.getElementById('productForm');
-            const modalTitle = document.getElementById('modalTitle');
-            const productIdInput = document.getElementById('productId');
-            const janCodeInput = document.getElementById('janCode');
-            const nameInput = document.getElementById('name');
-            const priceInput = document.getElementById('price');
-            const formSubmitBtn = document.getElementById('formSubmitBtn');
-            const messageBox = document.getElementById('messageBox');
-            const productTableBody = document.getElementById('productTableBody');
-
-            // エラーメッセージ要素
-            const janCodeError = document.getElementById('janCodeError');
-            const nameError = document.getElementById('nameError');
-            const priceError = document.getElementById('priceError');
-
-            // --- メッセージ表示関数 ---
-            function showMessage(message, type) {
-                messageBox.textContent = message;
-                messageBox.className = 'message-box ' + type;
-                messageBox.style.display = 'block';
-                setTimeout(() => {
-                    messageBox.style.display = 'none';
-                }, 5000); // 5秒後に非表示
-            }
-
-            // --- エラーメッセージクリア関数 ---
-            function clearErrors() {
-                janCodeError.textContent = '';
-                nameError.textContent = '';
-                priceError.textContent = '';
-            }
-
-            // --- モーダル表示/非表示関数 ---
-            function openModal(isEdit = false, productData = {}) {
-                clearErrors(); // エラーメッセージをクリア
-                productForm.reset(); // フォームをリセット
-
-                if (isEdit) {
-                    modalTitle.textContent = '商品を編集';
-                    formSubmitBtn.textContent = '更新';
-                    productIdInput.value = productData.id || '';
-                    janCodeInput.value = productData.janCode || '';
-                    nameInput.value = productData.name || '';
-                    priceInput.value = productData.price || '';
-                } else {
-                    modalTitle.textContent = '新しく商品を追加';
-                    formSubmitBtn.textContent = '登録';
-                    productIdInput.value = ''; // IDをクリア
-                }
-                productModal.style.display = 'block';
-            }
-
-            function closeModal() {
-                productModal.style.display = 'none';
-            }
-
-            // --- イベントリスナー ---
-            addProductBtn.addEventListener('click', () => openModal(false)); // 新規追加ボタン
-            closeButton.addEventListener('click', closeModal); // ×ボタン
-            cancelButton.addEventListener('click', closeModal); // キャンセルボタン
-
-            // モーダルの外側をクリックで閉じる
-            window.addEventListener('click', (event) => {
-                if (event.target === productModal) {
-                    closeModal();
-                }
-            });
-
-            // --- フォーム送信処理 (追加・更新) ---
-            productForm.addEventListener('submit', async function(event) {
-                event.preventDefault(); // デフォルトのフォーム送信を防止
-
-                clearErrors(); // 再度エラーメッセージをクリア
-
-                const id = productIdInput.value;
-                const url = id ? `/admin/products/api/${id}` : '/admin/products/api/add';
-                const method = id ? 'PUT' : 'POST';
-
-                const productData = {
-                    id: id ? parseInt(id) : null,
-                    janCode: janCodeInput.value,
-                    name: nameInput.value,
-                    price: parseFloat(priceInput.value)
-                };
-
-                try {
-                    const headers = {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    };
-                    // CSRFトークンをヘッダーに追加
-                    if (csrfParameterName && csrfToken) {
-                        headers[csrfParameterName] = csrfToken;
-                    }
-
-                    const response = await fetch(url, {
-                        method: method,
-                        headers: headers,
-                        body: JSON.stringify(productData)
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        showMessage(result.message, 'success');
-                        closeModal();
-                        await loadProducts(); // 成功したらテーブルを再ロード
-                    } else {
-                        // エラーメッセージの表示
-                        let errorMessage = result.message || '不明なエラーが発生しました。';
-                        if (errorMessage.includes("JANコード") && errorMessage.includes("既に存在します") || errorMessage.includes("JANコード") && errorMessage.includes("他の商品で既に使用")) {
-                            janCodeError.textContent = errorMessage;
-                        } else if (errorMessage.includes("商品名") && errorMessage.includes("既に存在します") || errorMessage.includes("商品名") && errorMessage.includes("他の商品で既に使用")) {
-                            nameError.textContent = errorMessage;
-                        } else {
-                            showMessage(errorMessage, 'error');
-                        }
-                    }
-                } catch (error) {
-                    console.error('Fetch error:', error);
-                    showMessage('通信エラーが発生しました。', 'error');
-                }
-            });
-
-            // --- 商品一覧ロード関数 ---
-            // 直接APIからデータを取得し、JavaScriptでテーブル行を生成する方式に変更
-            async function loadProducts() {
-                try {
-                    const response = await fetch('/admin/products/api/all'); // 新しいAPIエンドポイント
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const products = await response.json(); // 商品リストをJSONで取得
-
-                    productTableBody.innerHTML = ''; // 既存のテーブル内容をクリア
-
-                    if (products.length === 0) {
-                        productTableBody.innerHTML = '<tr><td colspan="6">商品が登録されていません。</td></tr>';
-                    } else {
-                        products.forEach(product => {
-                            const row = document.createElement('tr');
-                            row.id = `productRow-${product.id}`;
-                            row.innerHTML = `
-                                <td>${product.id}</td>
-                                <td class="product-jan-code">${product.janCode}</td>
-                                <td class="product-name">${product.name}</td>
-                                <td class="product-price">${product.price.toFixed(2)}</td>
-                                <td>${new Date(product.updatedAt).toLocaleString('ja-JP', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</td>
-                                <td class="actions">
-                                    <button class="edit-btn" data-id="${product.id}">編集</button>
-                                    <button class="delete-btn" data-id="${product.id}">削除</button>
-                                </td>
-                            `;
-                            productTableBody.appendChild(row);
-                        });
-                    }
-                    attachProductEventListeners(); // 新しい行にイベントリスナーを再付与
-                } catch (error) {
-                    console.error('Failed to load products:', error);
-                    showMessage('商品リストの読み込み中にエラーが発生しました。', 'error');
-                }
-            }
-
-
-            // --- 商品操作ボタンにイベントリスナーを付与する関数 ---
-            function attachProductEventListeners() {
-                // 編集ボタンのイベントリスナー
-                document.querySelectorAll('.edit-btn').forEach(button => {
-                    button.onclick = async (event) => {
-                        const id = event.target.dataset.id;
-                        try {
-                            const response = await fetch(`/admin/products/api/${id}`);
-                            const product = await response.json();
-                            if (response.ok) {
-                                openModal(true, product); // 編集モードでモーダルを開く
-                            } else {
-                                showMessage(product.message || '商品の取得に失敗しました。', 'error');
-                            }
-                        } catch (error) {
-                            console.error('Fetch error:', error);
-                            showMessage('商品の取得中に通信エラーが発生しました。', 'error');
-                        }
-                    };
-                });
-
-                // 削除ボタンのイベントリスナー
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.onclick = async (event) => {
-                        const id = event.target.dataset.id;
-                        if (confirm('本当にこの商品を削除しますか？')) {
-                            try {
-                                const headers = {
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                };
-                                // CSRFトークンをヘッダーに追加
-                                if (csrfParameterName && csrfToken) {
-                                    headers[csrfParameterName] = csrfToken;
-                                }
-
-                                const response = await fetch(`/admin/products/api/${id}`, {
-                                    method: 'DELETE',
-                                    headers: headers
-                                });
-                                // deleteProductがvoidを返すため、成功ステータス (200 OK) であれば成功とみなす
-                                // コントローラーがボディにメッセージを返すようにしているので、それも確認
-                                const result = await response.json(); // voidでもレスポンスボディは返る場合がある
-                                if (response.ok) { // HTTPステータスが2xxであれば成功
-                                    showMessage(result.message || '商品が正常に削除されました。', 'success');
-                                    await loadProducts(); // テーブルを再ロード
-                                } else {
-                                    showMessage(result.message || '削除に失敗しました。', 'error');
-                                }
-                            } catch (error) {
-                                console.error('Fetch error:', error);
-                                showMessage('削除中に通信エラーが発生しました。', 'error');
-                            }
-                        }
-                    };
-                });
-            }
-
-            // ページロード時に初回商品リストをロードし、イベントリスナーを付与
-            loadProducts(); // サーバーサイドレンダリングされたリストを初期表示に使うのをやめ、JSで完全に制御
-        });
-    </script>
 </body>
+
 </html>
