@@ -17,8 +17,8 @@ public class Product {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
-    @Column(name = "price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    @Column(name = "price", nullable = false)
+    private Integer price;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -38,8 +38,8 @@ public class Product {
     public void setJanCode(String janCode) { this.janCode = janCode; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public BigDecimal getPrice() { return price; }
-    public void setPrice(BigDecimal price) { this.price = price; }
+    public Integer getPrice() { return price; }
+    public void setPrice(Integer price) { this.price = price; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

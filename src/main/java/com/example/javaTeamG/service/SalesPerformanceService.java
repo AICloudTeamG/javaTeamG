@@ -113,8 +113,8 @@ public class SalesPerformanceService {
         
         // 新しい（または更新された）売上実績を登録
         for (ProductSalesEntry entry : productSalesEntries) {
-            // 数量が0以上の場合のみ保存
-            if (entry.getQuantity() != null && entry.getQuantity() >= 0) {
+            // 数量が0より大きい場合のみ保存
+            if (entry.getQuantity() != null && entry.getQuantity() > 0) {
                 Product product = productService.findProductByName(entry.getProductName())
                     .orElseThrow(() -> new IllegalArgumentException("商品が見つかりません: " + entry.getProductName()));
 
