@@ -225,11 +225,11 @@
 
 <body>
     <div class="sidebar">
-        <button th:if="${isAdmin}" onclick="location.href='/admin/prediction'">📦 発注予測</button>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/dashboard'">⛅ 天気可視化</button>
+        <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
+        <button onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
         <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
-        <a th:if="${isAdmin}" href="/admin/account/list">👤 アカウント管理</a>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/products'">商品管理</button>
+        <button onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
+        <button onclick="location.href='/admin/products'">商品管理</button>
         <button onclick="location.href='/logout'">ログアウト</button>
     </div>
 
@@ -276,7 +276,8 @@
                             <td th:text="${product.janCode}">1234567890123</td>
                             <td th:text="${product.name}">商品A</td>
                             <td th:text="${product.price}">1000</td>
-                            <td th:text="${#temporals.format(product.updatedAt, 'yyyy-MM-dd HH:mm')}">2025-06-20 10:30</td>
+                            <td th:text="${#temporals.format(product.updatedAt, 'yyyy-MM-dd HH:mm')}">2025-06-20 10:30
+                            </td>
                             <td class="action-buttons text-nowrap">
                                 <button type="button" class="btn action-btn edit-product-btn" data-bs-toggle="modal"
                                     data-bs-target="#editProductModal" th:data-product-id="${product.id}">

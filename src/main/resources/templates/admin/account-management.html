@@ -201,11 +201,11 @@
 </head>
 
 <body>
-     <div class="sidebar">
+    <div class="sidebar">
         <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
-        <button onclick="location.href='/admin/dashboard'">⛅ 天気可視化</button>
+        <button onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
         <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
-        <button onclick="location.href='/admin/account'">👤 アカウント管理</button>
+        <button onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
         <button onclick="location.href='/admin/products'">商品管理</button>
         <button onclick="location.href='/logout'">ログアウト</button>
     </div>
@@ -235,8 +235,7 @@
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2>スタッフ一覧</h2>
-                <button type="button" class="btn button-new" data-bs-toggle="modal"
-                    data-bs-target="#createStaffModal">
+                <button type="button" class="btn button-new" data-bs-toggle="modal" data-bs-target="#createStaffModal">
                     <i class="fas fa-plus-circle"></i> 新規スタッフ追加
                 </button>
             </div>
@@ -252,9 +251,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="staff : ${staffs}" th:id="${'staffRow-' + staff.id}"
-                            th:data-staff-id="${staff.id}" th:data-staff-name="${staff.name}"
-                            th:data-staff-email="${staff.email}" th:data-staff-is-admin="${staff.isAdmin()}">
+                        <tr th:each="staff : ${staffs}" th:id="${'staffRow-' + staff.id}" th:data-staff-id="${staff.id}"
+                            th:data-staff-name="${staff.name}" th:data-staff-email="${staff.email}"
+                            th:data-staff-is-admin="${staff.isAdmin()}">
 
                             <td th:text="${staff.name}">テスト 太郎</td>
                             <td th:text="${staff.email}">test@example.com</td>

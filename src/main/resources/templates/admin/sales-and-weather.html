@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>週間天気とビール売上</title>
+    <title>売上と天気</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -177,11 +177,11 @@
 
 <body>
     <div class="sidebar">
-        <button th:if="${isAdmin}" onclick="location.href='/admin/prediction'">📦 発注予測</button>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/dashboard'">⛅ 天気可視化</button>
+        <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
+        <button onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
         <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/account'">👤 アカウント管理</button>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/products'">商品管理</button>
+        <button onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
+        <button onclick="location.href='/admin/products'">商品管理</button>
         <button onclick="location.href='/logout'">ログアウト</button>
     </div>
 
@@ -204,7 +204,7 @@
             </div>
         </div>
 
-        <h1>🍺 ビール売上と週間天気</h1>
+        <h1>🍺 売上と天気</h1>
         <div class="summary-box" id="dailySummary">今日の売上：-- 円</div>
         <div class="beer-buttons">
             <button class="active" onclick="changeBeer('total', event)"><strong>全体売上</strong></button>

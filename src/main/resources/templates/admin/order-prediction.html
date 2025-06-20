@@ -40,8 +40,22 @@
         }
 
         /* サイドバーのボタン/リンクの共通スタイル */
-        .sidebar button,
-        .sidebar a {
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 160px;
+            height: 100vh;
+            background-color: #fff3e0;
+            padding-top: 2rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .sidebar button {
             width: 120px;
             margin: 0.5rem 0;
             padding: 0.5rem;
@@ -51,24 +65,10 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            text-align: center;
-            text-decoration: none; /* Remove underline for links */
-            display: flex; /* For aligning icon and text */
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s ease; /* Add transition for hover effect */
         }
 
-        .sidebar button:hover,
-        .sidebar a:hover {
+        .sidebar button:hover {
             background-color: #d95d0c;
-        }
-
-        /* サイドバーのアクティブ状態 */
-        .sidebar .active-link { /* Added a specific class for active link styling */
-            background-color: #d95d0c; /* Deeper orange for active state */
-            color: white;
-            font-weight: bold;
         }
 
 
@@ -158,13 +158,13 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <a  href="/admin/prediction" class="sidebar-button">📦 発注予測</a>
-        <a  href="/admin/dashboard" class="sidebar-button">📊 実績・天気データ可視化</a>
-        <a href="/sales/input" class="sidebar-button">✍️ 実績入力</a>
-        <a  href="/admin/products" class="sidebar-button">🍺 商品管理</a>
-        <a  href="/admin/account/list" class="sidebar-button">👤 アカウント管理</a>
-        <a href="/logout" class="sidebar-button">🚪 ログアウト</a>
+     <div class="sidebar">
+        <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
+        <button onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
+        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
+        <button onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
+        <button onclick="location.href='/admin/products'">商品管理</button>
+        <button onclick="location.href='/logout'">ログアウト</button>
     </div>
 
     <div class="main-content">
