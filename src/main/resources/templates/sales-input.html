@@ -6,7 +6,7 @@
     <title th:text="${pageTitle}"></title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
-        /* CSSは変更なし、以前のものをそのまま貼り付け */
+        /* UIデザインのCSSを適用 */
         html,
         body {
             margin: 0;
@@ -31,7 +31,8 @@
             z-index: 999;
         }
 
-        .sidebar button {
+        .sidebar button,
+        .sidebar a {
             width: 120px;
             margin: 0.5rem 0;
             padding: 0.5rem;
@@ -41,9 +42,20 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .sidebar button:hover {
+        .sidebar button i,
+        .sidebar a i {
+            margin-right: 8px;
+        }
+
+        .sidebar button:hover,
+        .sidebar a:hover {
             background-color: #d95d0c;
         }
 
@@ -74,25 +86,32 @@
             padding: 15px;
             border-radius: 8px;
             display: none;
-            /* デフォルトで非表示 */
             z-index: 1000;
             width: 220px;
+            font-size: 0.95rem; /* フォントサイズ調整 */
+        }
+
+        .weather-popup span { /* 追加 */
+            display: block;
+            margin-bottom: 4px;
         }
 
         .weather-popup .controls {
             display: flex;
             justify-content: space-between;
             margin-top: 10px;
+            text-align: center; /* 中央寄せ */
         }
 
         .weather-popup button {
             background-color: #fb8500;
             color: white;
             border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 4px 10px; /* パディング調整 */
+            margin: 0 5px; /* マージン調整 */
+            border-radius: 5px; /* 角丸調整 */
+            font-size: 0.85rem; /* フォントサイズ調整 */
             cursor: pointer;
-            font-size: 0.8rem;
         }
 
         .weather-popup button:hover {
@@ -102,9 +121,9 @@
         .box {
             background-color: #ffffff;
             border-left: 6px solid #ffb703;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px 30px;
-            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* 影を調整 */
+            padding: 2rem; /* パディング調整 */
+            border-radius: 10px; /* 角丸調整 */
             max-width: 1000px;
             margin: 0 auto;
             display: flex;
@@ -114,7 +133,7 @@
 
         h2 {
             font-size: 1.8rem;
-            margin-bottom: 10px;
+            margin-bottom: 1.5rem; /* マージン調整 */
             color: #fb8500;
         }
 
@@ -126,39 +145,40 @@
         input[type="date"],
         input[type="number"],
         input[type="text"] {
-            padding: 6px;
-            font-size: 0.9rem;
+            padding: 0.6rem; /* パディング調整 */
+            font-size: 0.95rem; /* フォントサイズ調整 */
             width: 220px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 6px; /* 角丸調整 */
         }
 
         .input-row {
             display: flex;
             gap: 40px;
             align-items: center;
+            margin-bottom: 1.5rem; /* マージン調整 */
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-        }
-
-        table th,
-        table td {
-            border: 1px solid #ccc;
+            margin-top: 1rem; /* マージン調整 */
         }
 
         table th {
             background-color: #ffb703;
             color: white;
-            padding: 6px;
-            font-size: 0.9rem;
+            padding: 10px; /* パディング調整 */
+            font-weight: bold;
+            font-size: 0.95rem; /* フォントサイズ調整 */
+            text-align: center;
         }
 
         table td {
             text-align: center;
-            padding: 6px;
+            padding: 10px; /* パディング調整 */
+            border-bottom: 1px solid #eee; /* 下線 */
+            font-size: 0.95rem; /* フォントサイズ調整 */
         }
 
         .button-group {
@@ -166,15 +186,16 @@
             justify-content: flex-start;
             gap: 15px;
             flex-wrap: wrap;
+            margin-top: 1.5rem; /* マージン調整 */
         }
 
         .button {
             background-color: #fb8500;
             color: white;
-            padding: 8px 16px;
-            font-size: 0.9rem;
+            padding: 0.6rem 1.2rem; /* パディング調整 */
+            font-size: 1rem; /* フォントサイズ調整 */
             border: none;
-            border-radius: 5px;
+            border-radius: 6px; /* 角丸調整 */
             cursor: pointer;
             transition: background-color 0.3s;
         }
@@ -189,6 +210,9 @@
             margin-bottom: 15px;
             border-radius: 5px;
             text-align: center;
+            /* 追加 */
+            margin-top: 15px;
+            /* 追加 */
         }
 
         .alert-danger {
@@ -207,12 +231,13 @@
 
 <body>
     <div class="sidebar">
-    <button th:if="${isAdmin}" onclick="location.href='/admin/prediction'">📦 発注予測</button>
-    <button th:if="${isAdmin}" onclick="location.href='/admin/dashboard'">⛅ 天気可視化</button>
-    <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
-    <button th:if="${isAdmin}" onclick="location.href='/admin/account'">👤 アカウント管理</button>
-    <button onclick="location.href='/logout'">ログアウト</button>
-</div>
+        <button th:if="${isAdmin}" onclick="location.href='/admin/prediction'">📦 発注予測</button>
+        <button th:if="${isAdmin}" onclick="location.href='/admin/dashboard'">⛅ 天気可視化</button>
+        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
+        <a th:if="${isAdmin}" href="/admin/account/list">👤 アカウント管理</a>
+        <button th:if="${isAdmin}" onclick="location.href='/admin/products'">商品管理</button>
+        <button onclick="location.href='/logout'">ログアウト</button>
+    </div>
 
     <!-- <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
     <div class="weather-popup" id="weatherPopup">
@@ -245,8 +270,6 @@
                 <div class="input-row">
                     <div>
                         <label for="date">販売日付：</label>
-                        <!-- <input type="date" id="date" th:field="*{date}" class="form-control" th:readonly="${!isAdmin}"
-                            required> -->
                         <input type="date" id="date" th:field="*{date}" class="form-control" th:readonly="${!isAdmin}"
                             th:value="${salesInputForm.date != null ? #temporals.format(salesInputForm.date, 'yyyy-MM-dd') : ''}"
                             th:attr="onchange=${isAdmin ? 'redirectToDate(this.value)' : ''}" required>
@@ -294,16 +317,15 @@
                     <button type="submit" class="button">登録/更新</button>
                 </div>
 
-                <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
-            </form>
+                </form>
         </div>
     </div>
 
     <script>
         /**
-             * 管理者が日付を変更した際に、その日付でページをリダイレクトする関数
-             * @param {string} selectedDateString - 選択された日付の文字列 (YYYY-MM-DD形式)
-             */
+         * 管理者が日付を変更した際に、その日付でページをリダイレクトする関数
+         * @param {string} selectedDateString - 選択された日付の文字列 (YYYY-MM-DD形式)
+         */
         function redirectToDate(selectedDateString) {
             if (selectedDateString) {
                 // ThymeleafのURL式をJavaScript内で直接使うのは避けるため、ベースURLとパラメータを結合
@@ -326,7 +348,7 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             const dateInput = document.getElementById('date');
-            const isAdmin = [[${ isAdmin }]]; // ThymeleafのisAdmin変数をJSに渡す
+            const isAdmin = [[${isAdmin}]]; // ThymeleafのisAdmin変数をJSに渡す
 
             if (!isAdmin) {
                 dateInput.readOnly = true;
@@ -359,7 +381,7 @@
                 }
             });
 
-            updateWeatherContent();
+            updateWeatherContent(); // 既存の天気情報表示関数を呼び出し
         });
 
         function toggleWeatherPopup() {
@@ -367,6 +389,7 @@
             popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
         }
 
+        // 天気情報の表示はThymeleafで直接行われているため、JSでの追加ロジックは不要
         function updateWeatherContent() {
             console.log("Weather content updated (Thymeleaf already handled display).");
         }
