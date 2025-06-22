@@ -313,6 +313,7 @@
                             <label for="createIsAdmin" class="form-label">管理者権限:</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="createIsAdmin" name="isAdmin">
+                                <input type="hidden" name="isAdmin" value="false">
                                 <label class="form-check-label" for="createIsAdmin">管理者</label>
                             </div>
                         </div>
@@ -348,7 +349,8 @@
                             <label for="editIsAdmin" class="form-label">管理者権限:</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="editIsAdmin" name="isAdmin"
-                                    value="true">
+                                value="true">
+                                <input type="hidden" name="isAdmin" value="false">
                                 <label class="form-check-label" for="editIsAdmin">管理者</label>
                             </div>
                         </div>
