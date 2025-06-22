@@ -24,7 +24,7 @@ public class StaffService {
 
     // 全スタッフ取得（論理削除されていないもののみ）
     public List<Staff> findAllActiveStaffs() {
-        return staffRepository.findByIsDeletedFalse();
+        return staffRepository.findByIsDeletedFalseOrderByIdAsc();
     }
 
     // IDでスタッフを取得

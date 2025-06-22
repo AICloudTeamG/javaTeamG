@@ -5,239 +5,12 @@
     <meta charset="UTF-8" />
     <title th:text="${pageTitle}"></title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <style>
-        /* UIデザインのCSSを適用 */
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', sans-serif;
-            background-color: #fffef9;
-            height: 100vh;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 160px;
-            height: 100vh;
-            background-color: #fff3e0;
-            padding-top: 2rem;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 999;
-        }
-
-        .sidebar button,
-        .sidebar a {
-            width: 120px;
-            margin: 0.5rem 0;
-            padding: 0.5rem;
-            font-size: 0.95rem;
-            background-color: #fb8500;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar button i,
-        .sidebar a i {
-            margin-right: 8px;
-        }
-
-        .sidebar button:hover,
-        .sidebar a:hover {
-            background-color: #d95d0c;
-        }
-
-        .main-content {
-            margin-left: 180px;
-            padding: 2rem;
-            height: 100vh;
-            box-sizing: border-box;
-            overflow-y: auto;
-        }
-
-        .weather-icon {
-            position: fixed;
-            top: 20px;
-            right: 30px;
-            font-size: 1.8rem;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .weather-popup {
-            position: fixed;
-            top: 60px;
-            right: 30px;
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-            z-index: 1000;
-            width: 220px;
-            font-size: 0.95rem; /* フォントサイズ調整 */
-        }
-
-        .weather-popup span { /* 追加 */
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .weather-popup .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            text-align: center; /* 中央寄せ */
-        }
-
-        .weather-popup button {
-            background-color: #fb8500;
-            color: white;
-            border: none;
-            padding: 4px 10px; /* パディング調整 */
-            margin: 0 5px; /* マージン調整 */
-            border-radius: 5px; /* 角丸調整 */
-            font-size: 0.85rem; /* フォントサイズ調整 */
-            cursor: pointer;
-        }
-
-        .weather-popup button:hover {
-            background-color: #d95d0c;
-        }
-
-        .box {
-            background-color: #ffffff;
-            border-left: 6px solid #ffb703;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* 影を調整 */
-            padding: 2rem; /* パディング調整 */
-            border-radius: 10px; /* 角丸調整 */
-            max-width: 1000px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem; /* マージン調整 */
-            color: #fb8500;
-        }
-
-        label {
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        input[type="date"],
-        input[type="number"],
-        input[type="text"] {
-            padding: 0.6rem; /* パディング調整 */
-            font-size: 0.95rem; /* フォントサイズ調整 */
-            width: 220px;
-            border: 1px solid #ccc;
-            border-radius: 6px; /* 角丸調整 */
-        }
-
-        .input-row {
-            display: flex;
-            gap: 40px;
-            align-items: center;
-            margin-bottom: 1.5rem; /* マージン調整 */
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem; /* マージン調整 */
-        }
-
-        table th {
-            background-color: #ffb703;
-            color: white;
-            padding: 10px; /* パディング調整 */
-            font-weight: bold;
-            font-size: 0.95rem; /* フォントサイズ調整 */
-            text-align: center;
-        }
-
-        table td {
-            text-align: center;
-            padding: 10px; /* パディング調整 */
-            border-bottom: 1px solid #eee; /* 下線 */
-            font-size: 0.95rem; /* フォントサイズ調整 */
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: flex-start;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-top: 1.5rem; /* マージン調整 */
-        }
-
-        .button {
-            background-color: #fb8500;
-            color: white;
-            padding: 0.6rem 1.2rem; /* パディング調整 */
-            font-size: 1rem; /* フォントサイズ調整 */
-            border: none;
-            border-radius: 6px; /* 角丸調整 */
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .button:hover {
-            background-color: #d95d0c;
-        }
-
-        /* メッセージ表示用のスタイル */
-        .alert {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            text-align: center;
-            /* 追加 */
-            margin-top: 15px;
-            /* 追加 */
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/sales-input.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
 </head>
 
 <body>
-    <div class="sidebar">
-        <button th:if="${isAdmin}" onclick="location.href='/admin/prediction'">📦 発注予測</button>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
-        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/products'">商品管理</button>
-        <button onclick="location.href='/logout'">ログアウト</button>
-    </div>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <!-- <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
     <div class="weather-popup" id="weatherPopup">
@@ -317,7 +90,7 @@
                     <button type="submit" class="button">登録/更新</button>
                 </div>
 
-                </form>
+            </form>
         </div>
     </div>
 
@@ -348,7 +121,7 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             const dateInput = document.getElementById('date');
-            const isAdmin = [[${isAdmin}]]; // ThymeleafのisAdmin変数をJSに渡す
+            const isAdmin = [[${ isAdmin }]]; // ThymeleafのisAdmin変数をJSに渡す
 
             if (!isAdmin) {
                 dateInput.readOnly = true;

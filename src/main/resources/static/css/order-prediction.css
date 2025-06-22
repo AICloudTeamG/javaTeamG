@@ -1,0 +1,100 @@
+ /* メインコンテンツのスタイル */
+ .main-content {
+     margin-left: 180px;
+     /* Adjust based on sidebar width + desired gap */
+     padding: 2rem;
+     height: 100vh;
+     /* Changed to 100vh for full viewport height */
+     box-sizing: border-box;
+     overflow-y: auto;
+ }
+
+ h1 {
+     font-size: 1.6rem;
+     color: #fb8500;
+ }
+
+ /* ボックスのスタイル (UIデザインから) */
+ .box {
+     background-color: #ffffff;
+     border-left: 6px solid #ffb703;
+     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+     padding: 2rem;
+     border-radius: 10px;
+     max-width: 1000px;
+     /* Consistent with UI design */
+     margin: 0 auto;
+     /* Center the box */
+     display: flex;
+     flex-direction: column;
+     gap: 20px;
+ }
+
+ /* 今日の発注日メッセージ */
+ .order-today-message {
+     text-align: center;
+     background-color: #e0f2f7;
+     /* 青系の背景で目立たせる */
+     color: #01579b;
+     /* 青系の文字色 */
+     padding: 15px 20px;
+     margin: 20px auto;
+     /* 中央寄せ */
+     border-radius: 8px;
+     font-size: 1.5rem;
+     /* 大きめのフォント */
+     font-weight: bold;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+     max-width: 400px;
+     /* 最大幅を設定して中央に集める */
+     display: none;
+     /* JavaScriptで表示を制御 */
+ }
+
+ /* 次回発注情報 (最初のHTMLから) */
+ .next-order-info {
+     margin-top: 10px;
+     background-color: #fff3cd;
+     color: #856404;
+     padding: 10px 14px;
+     border-left: 4px solid #ffb703;
+     border-radius: 6px;
+     font-size: 0.95rem;
+     font-weight: bold;
+     display: inline-block;
+ }
+
+ /* テーブルのスタイル */
+ .forecast-table {
+     width: 100%;
+     border-collapse: collapse;
+     font-size: 0.85rem;
+     /* Consistent with previous request */
+     margin-top: 20px;
+     /* Adjusted margin */
+ }
+
+ .forecast-table th {
+     background-color: #ffb703;
+     color: white;
+     font-weight: bold;
+     font-size: 0.95rem;
+     /* Adjusted font size for consistency */
+     padding: 10px;
+     /* Adjusted padding for consistency */
+     text-align: center;
+ }
+
+ .forecast-table td {
+     border: 1px solid #ddd;
+     /* Consistent with previous request */
+     text-align: center;
+     padding: 10px;
+     /* Adjusted padding for consistency */
+     font-size: 0.95rem;
+     /* Adjusted font size for consistency */
+ }
+
+ .forecast-table tr:nth-child(even) {
+     background-color: #f9f9f9;
+ }

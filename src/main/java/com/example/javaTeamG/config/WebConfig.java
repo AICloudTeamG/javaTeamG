@@ -28,7 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**") // 全てのパス
                 // 除外パス: ログインページ、静的リソース、faviconなど
                 .excludePathPatterns(
-                    "/login", "/login/**", // ログインフォームとログイン処理
+                    "/login", "/login/**", "/access-denied",// ログインフォームとログイン処理
                     "/css/**", "/js/**", "/images/**", "/webjars/**", // 静的リソース
                     "/favicon.ico",
                     "/error" // エラーページ（Spring Bootが提供するデフォルト）

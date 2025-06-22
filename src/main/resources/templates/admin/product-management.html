@@ -8,230 +8,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #fffef9;
-            margin: 0;
-            padding: 0;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 160px;
-            height: 100vh;
-            background-color: #fff3e0;
-            padding-top: 2rem;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 999;
-        }
-
-        .sidebar button,
-        .sidebar a {
-            width: 120px;
-            margin: 0.5rem 0;
-            padding: 0.5rem;
-            font-size: 0.95rem;
-            background-color: #fb8500;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar button i,
-        .sidebar a i {
-            margin-right: 8px;
-        }
-
-
-        .sidebar button:hover,
-        .sidebar a:hover {
-            background-color: #d95d0c;
-        }
-
-        .main-content {
-            margin-left: 180px;
-            padding: 2rem;
-        }
-
-        .box {
-            background-color: #fff;
-            border-left: 6px solid #ffb703;
-            padding: 2rem;
-            margin: 0 auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            color: #fb8500;
-            margin-bottom: 1.5rem;
-        }
-
-        .button-new {
-            background-color: #fb8500;
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border: none;
-            font-size: 1rem;
-            border-radius: 6px;
-            text-decoration: none;
-            margin-bottom: 1rem;
-            display: inline-block;
-        }
-
-        .button-new:hover {
-            background-color: #d95d0c;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        th {
-            background-color: #ffb703;
-            color: white;
-            padding: 10px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        td {
-            padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            font-size: 0.95rem;
-        }
-
-        .action-btn {
-            background-color: #fb8500;
-            color: white;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 0 4px;
-            text-decoration: none;
-            font-size: 0.85rem;
-        }
-
-        .action-btn:hover {
-            background-color: #d95d0c;
-        }
-
-        .weather-icon {
-            position: fixed;
-            top: 20px;
-            right: 30px;
-            font-size: 1.8rem;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .weather-popup {
-            position: fixed;
-            top: 60px;
-            right: 30px;
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-            z-index: 1000;
-            width: 220px;
-            font-size: 0.95rem;
-        }
-
-        .weather-popup span {
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .weather-popup .controls {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .weather-popup button {
-            background-color: #fb8500;
-            color: white;
-            border: none;
-            padding: 4px 10px;
-            margin: 0 5px;
-            border-radius: 5px;
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
-
-        .weather-popup button:hover {
-            background-color: #d95d0c;
-        }
-
-        /* 既存のcontainerスタイルは削除し、main-contentに吸収 */
-        /* .container {
-            margin-top: 20px;
-        } */
-
-        /* table関連のスタイルは既存のデザインのものを優先 */
-        /* .table th,
-        .table td {
-            vertical-align: middle;
-        } */
-
-        .action-buttons button,
-        .action-buttons a {
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-
-        .delete-form,
-        .create-form-in-modal,
-        .edit-form-in-modal {
-            display: inline-block;
-        }
-
-        .modal-body .form-group {
-            margin-bottom: 15px;
-        }
-
-        /* success/errorメッセージのアラート表示 */
-        .alert {
-            margin-top: 15px;
-        }
-
-        /* h2要素のスタイル調整 */
-        .main-content h2 {
-            color: #2c2c2c;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/product-management.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
 </head>
 
 <body>
-    <div class="sidebar">
-        <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
-        <button onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
-        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
-        <button onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
-        <button onclick="location.href='/admin/products'">商品管理</button>
-        <button onclick="location.href='/logout'">ログアウト</button>
-    </div>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <div class="main-content">
         <div class="box">
@@ -285,8 +67,7 @@
                                 </button>
 
                                 <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post"
-                                    class="delete-form"
-                                    onsubmit="return confirm('本当にこの商品を削除（無効化）しますか？');">
+                                    class="delete-form" onsubmit="return confirm('本当にこの商品を削除（無効化）しますか？');">
                                     <button type="submit" class="btn action-btn">
                                         <i class="fas fa-trash-alt"></i> 削除
                                     </button>
@@ -315,7 +96,7 @@
                         <div class="form-group">
                             <label for="createJanCode" class="form-label">JANコード:</label>
                             <input type="text" class="form-control" id="createJanCode" name="janCode" required
-                                pattern="[0-9]{13}" title="13桁の数字を入力してください">
+                                title="13桁の数字を入力してください"><!-- pattern="[0-9]{13}" -->
                         </div>
                         <div class="form-group mt-3">
                             <label for="createName" class="form-label">商品名:</label>
@@ -349,7 +130,7 @@
                         <div class="form-group">
                             <label for="editJanCode" class="form-label">JANコード:</label>
                             <input type="text" class="form-control" id="editJanCode" name="janCode" required
-                                pattern="[0-9]{13}" title="13桁の数字を入力してください">
+                                title="13桁の数字を入力してください"><!-- pattern="[0-9]{13}" -->
                         </div>
                         <div class="form-group mt-3">
                             <label for="editName" class="form-label">商品名:</label>

@@ -1,34 +1,15 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
-<div class="sidebar-wrapper bg-dark border-end" id="sidebar-wrapper" th:fragment="sidebar">
-    <div class="sidebar-heading text-white text-center py-4 custom-sidebar-heading">
-        <i class="fas fa-bars me-2"></i>メニュー
+<head>
+    </head>
+<body>
+    <div th:fragment="sidebar" class="sidebar">
+        <button onclick="location.href='/admin/prediction'" th:data-path="@{/admin/prediction}" class="sidebar-button">📦 発注予測</button>
+        <button onclick="location.href='/admin/dashboard'" th:data-path="@{/admin/dashboard}" class="sidebar-button">⛅ 売上と天気</button>
+        <button onclick="location.href='/sales/input'" th:data-path="@{/sales/input}" class="sidebar-button">✍️ 実績入力</button>
+        <button onclick="location.href='/admin/account/list'" th:data-path="@{/admin/account/list}" class="sidebar-button">👤 アカウント管理</button>
+        <button onclick="location.href='/admin/products'" th:data-path="@{/admin/products}" class="sidebar-button">🍺商品管理</button>
+        <button onclick="location.href='/logout'" th:data-path="@{/logout}" class="sidebar-button">ログアウト</button>
     </div>
-    <div class="list-group list-group-flush">
-        <a class="list-group-item list-group-item-action list-group-item-dark p-3 custom-list-item" th:href="@{/dashboard}">
-            <i class="fas fa-home me-2"></i>ダッシュボード
-        </a>
-        <a class="list-group-item list-group-item-action list-group-item-dark p-3 custom-list-item" th:href="@{/sales/input}">
-            <i class="fas fa-edit me-2"></i>販売実績入力
-        </a>
-        <a class="list-group-item list-group-item-action list-group-item-dark p-3 custom-list-item" th:href="@{/sales/list}">
-            <i class="fas fa-list me-2"></i>販売実績一覧
-        </a>
-        
-        <div th:if="${session.isAdmin}">
-            <a class="list-group-item list-group-item-action list-group-item-dark p-3 custom-list-item" th:href="@{/admin/prediction/weekly}">
-                <i class="fas fa-chart-line me-2"></i>発注予測
-            </a>
-            <a class="list-group-item list-group-item-action list-group-item-dark p-3 custom-list-item" th:href="@{/admin/data/visualization}">
-                <i class="fas fa-chart-pie me-2"></i>実績・天気データ可視化
-            </a>
-            <a class="list-group-item list-group-item-action list-group-item-dark p-3 custom-list-item" th:href="@{/admin/staffs/list}">
-                <i class="fas fa-users-cog me-2"></i>アカウント管理
-            </a>
-            </div>
-        <a class="list-group-item list-group-item-action list-group-item-dark p-3 custom-list-item mt-auto" th:href="@{/logout}">
-            <i class="fas fa-sign-out-alt me-2"></i>ログアウト
-        </a>
-    </div>
-</div>
+</body>
 </html>
