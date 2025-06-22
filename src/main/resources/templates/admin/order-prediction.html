@@ -5,17 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${pageTitle}">発注予測</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/order-prediction.css}">
 </head>
-<body>
-     <div class="sidebar">
-        <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
-        <button onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
-        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
-        <button onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
-        <button onclick="location.href='/admin/products'">商品管理</button>
-        <button onclick="location.href='/logout'">ログアウト</button>
-    </div>
+<body>  
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <div class="main-content">
         <div class="box">

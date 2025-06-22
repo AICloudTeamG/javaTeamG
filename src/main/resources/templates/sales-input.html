@@ -6,17 +6,11 @@
     <title th:text="${pageTitle}"></title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/sales-input.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
 </head>
 
 <body>
-    <div class="sidebar">
-        <button th:if="${isAdmin}" onclick="location.href='/admin/prediction'">📦 発注予測</button>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
-        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
-        <button th:if="${isAdmin}" onclick="location.href='/admin/products'">商品管理</button>
-        <button onclick="location.href='/logout'">ログアウト</button>
-    </div>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <!-- <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
     <div class="weather-popup" id="weatherPopup">

@@ -10,17 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/account-management.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
 </head>
 
 <body>
-    <div class="sidebar">
-        <button onclick="location.href='/admin/prediction'">📦 発注予測</button>
-        <button onclick="location.href='/admin/dashboard'">⛅ 売上と天気</button>
-        <button onclick="location.href='/sales/input'">✍️ 実績入力</button>
-        <button onclick="location.href='/admin/account/list'">👤 アカウント管理</button>
-        <button onclick="location.href='/admin/products'">商品管理</button>
-        <button onclick="location.href='/logout'">ログアウト</button>
-    </div>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <div class="main-content">
         <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
