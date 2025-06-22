@@ -1,7 +1,6 @@
 package com.example.javaTeamG.repository;
 
 import com.example.javaTeamG.model.Product;
-import com.example.javaTeamG.model.Staff;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
