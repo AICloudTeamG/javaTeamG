@@ -1,0 +1,42 @@
+body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #fffef9; /* ログインページと同じ背景色 */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column; /* 縦方向に要素を並べる */
+        }
+
+        .spinner-container {
+            text-align: center;
+            padding: 2rem;
+            background-color: #fff;
+            border-left: 5px solid #ffb703; /* ログインページと同じアクセントボーダー */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* ログインページと同じ影 */
+            border-radius: 12px; /* ログインページと同じ角丸 */
+            width: 300px; /* 適当な幅 */
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3; /* ライトグレー */
+            border-top: 8px solid #fb8500; /* オレンジ（サイトのアクセントカラー） */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto; /* 中央寄せ */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        p {
+            font-size: 1.1em;
+            color: #333;
+            margin-top: 15px;
+        }
