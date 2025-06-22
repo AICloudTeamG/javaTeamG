@@ -1,6 +1,8 @@
 package com.example.javaTeamG.repository;
 
 import com.example.javaTeamG.model.Product;
+import com.example.javaTeamG.model.Staff;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +16,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     Optional<Product> findByNameAndIsDeletedFalse(String name);
     List<Product> findByIsDeletedFalse();
         // IDとJANコードが一致しない他のProductで、JANコードが重複しているかチェック
+
+    List<Product> findByIsDeletedFalseOrderByIdAsc();
+    // 論理削除されていないスタッフをIDの昇順で取得するメソッド
+
     Optional<Product> findByIdIsNotAndJanCode(Integer id, String janCode);
 
     // IDと名前が一致しない他のProductで、名前が重複しているかチェック

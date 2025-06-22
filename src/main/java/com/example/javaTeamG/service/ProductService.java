@@ -19,7 +19,7 @@ public class ProductService {
     }
 
     public List<Product> findAllProducts() {
-        return productRepository.findByIsDeletedFalse();
+        return productRepository.findByIsDeletedFalseOrderByIdAsc();
     }
 
     public Optional<Product> findProductById(Integer id) {
