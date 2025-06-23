@@ -10,6 +10,56 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/product-management.css}">
     <link rel="stylesheet" th:href="@{/css/common.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script>
+        // 商品編集モーダルを開く際のデータ設定
+        const editProductModal = document.getElementById('editProductModal');
+        editProductModal.addEventListener('show.bs.modal', function (event) {
+            // モーダルをトリガーしたボタン
+            const button = event.relatedTarget;
+            // データ属性から商品IDを取得
+            const productId = button.getAttribute('data-product-id');
+
+            // 該当商品の行要素からデータを取得
+            const productRow = document.getElementById('productRow-' + productId);
+            const productJanCode = productRow.getAttribute('data-product-jan-code');
+            const productName = productRow.getAttribute('data-product-name');
+            const productPrice = productRow.getAttribute('data-product-price');
+
+            // 編集フォームの各フィールドにデータを設定
+            const modalForm = editProductModal.querySelector('#editProductForm');
+            modalForm.action = '/admin/products/edit/' + productId; // フォームのactionを設定
+
+            editProductModal.querySelector('#editProductId').value = productId;
+            editProductModal.querySelector('#editJanCode').value = productJanCode;
+            editProductModal.querySelector('#editName').value = productName;
+            editProductModal.querySelector('#editPrice').value = productPrice;
+        });
+
+        // 編集モーダルを閉じたときにフォームをリセット (任意)
+        editProductModal.addEventListener('hidden.bs.modal', function () {
+            const modalForm = editProductModal.querySelector('#editProductForm');
+            modalForm.reset(); // フォームをリセット
+        });
+
+        // JANコード入力のリアルタイムバリデーション（任意）
+        document.getElementById('createJanCode').addEventListener('input', function () {
+            if (!this.checkValidity()) {
+                this.setCustomValidity(this.title);
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+        document.getElementById('editJanCode').addEventListener('input', function () {
+            if (!this.checkValidity()) {
+                this.setCustomValidity(this.title);
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+    </script>
 </head>
 
 <body>
@@ -148,56 +198,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-    <script>
-        // 商品編集モーダルを開く際のデータ設定
-        const editProductModal = document.getElementById('editProductModal');
-        editProductModal.addEventListener('show.bs.modal', function (event) {
-            // モーダルをトリガーしたボタン
-            const button = event.relatedTarget;
-            // データ属性から商品IDを取得
-            const productId = button.getAttribute('data-product-id');
-
-            // 該当商品の行要素からデータを取得
-            const productRow = document.getElementById('productRow-' + productId);
-            const productJanCode = productRow.getAttribute('data-product-jan-code');
-            const productName = productRow.getAttribute('data-product-name');
-            const productPrice = productRow.getAttribute('data-product-price');
-
-            // 編集フォームの各フィールドにデータを設定
-            const modalForm = editProductModal.querySelector('#editProductForm');
-            modalForm.action = '/admin/products/edit/' + productId; // フォームのactionを設定
-
-            editProductModal.querySelector('#editProductId').value = productId;
-            editProductModal.querySelector('#editJanCode').value = productJanCode;
-            editProductModal.querySelector('#editName').value = productName;
-            editProductModal.querySelector('#editPrice').value = productPrice;
-        });
-
-        // 編集モーダルを閉じたときにフォームをリセット (任意)
-        editProductModal.addEventListener('hidden.bs.modal', function () {
-            const modalForm = editProductModal.querySelector('#editProductForm');
-            modalForm.reset(); // フォームをリセット
-        });
-
-        // JANコード入力のリアルタイムバリデーション（任意）
-        document.getElementById('createJanCode').addEventListener('input', function () {
-            if (!this.checkValidity()) {
-                this.setCustomValidity(this.title);
-            } else {
-                this.setCustomValidity('');
-            }
-        });
-        document.getElementById('editJanCode').addEventListener('input', function () {
-            if (!this.checkValidity()) {
-                this.setCustomValidity(this.title);
-            } else {
-                this.setCustomValidity('');
-            }
-        });
-
-    </script>
+    
 </body>
 
 </html>
