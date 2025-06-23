@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
     <script>
-        
+
 
         // JANコード入力のリアルタイムバリデーション（任意）
         document.getElementById('createJanCode').addEventListener('input', function () {
@@ -38,6 +38,43 @@
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <div class="main-content">
+        <div class="weather-forecast">
+            <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
+            <div class="weather-popup" id="weatherPopup">
+                <div class="weather-content-wrapper" id="weatherContentWrapper">
+                    <th:block th:if="${forecastWeatherList != null and !forecastWeatherList.isEmpty()}">
+                        <div th:each="data, iterStat : ${forecastWeatherList}" class="weather-day-content" th:attr="data-weather-code=${data.weatherCode}, 
+                                  data-temp-min=${data.temperature2mMin},
+                                  data-temp-max=${data.temperature2mMax},
+                                  data-wind-speed=${data.windSpeed10mMax},
+                                  data-date=${data.date},
+                                  data-day-index=${iterStat.index}">
+                            <strong><span style="font-size: 0.85rem; color: #555;"
+                                    th:text="${#temporals.format(data.date, 'M/d')} + '（' + ${#temporals.format(data.date, 'E', new java.util.Locale('ja'))} + '）'">
+                                </span><span>の天気予報</span></strong><br>
+
+                            <span class="weather-icon-text"></span><br>
+
+                            <span
+                                th:text="${#numbers.formatDecimal(data.temperature2mMin, 0, 0, 'POINT') + '℃ ~ ' + #numbers.formatDecimal(data.temperature2mMax, 0, 0, 'POINT') + '℃'}"></span><br>
+                            <span>風速：<span
+                                    th:text="${#numbers.formatDecimal(data.windSpeed10mMax, 0, 1, 'POINT')}"></span>
+                                m/s</span>
+                        </div>
+                    </th:block>
+                    <th:block th:unless="${forecastWeatherList != null and !forecastWeatherList.isEmpty()}">
+                        <div class="weather-day-content" style="width: 250px;">
+                            <p>天気予報データが見つかりませんでした。</p>
+                        </div>
+                    </th:block>
+                </div>
+                <div class="controls">
+                    <button id="prevWeatherBtn" onclick="changeWeather(-1)" disabled>←</button>
+                    <button id="nextWeatherBtn" onclick="changeWeather(1)" disabled>→</button>
+                </div>
+            </div>
+        </div>
+
         <div class="box">
             <h1 class="my-4" th:text="${pageTitle} ?: '商品管理'">📦 商品管理</h1>
 
@@ -168,7 +205,8 @@
             </div>
         </div>
     </div>
-    <script>
+
+    <script th:inline="javascript">
         // 商品編集モーダルを開く際のデータ設定
         const editProductModal = document.getElementById('editProductModal');
         editProductModal.addEventListener('show.bs.modal', function (event) {
@@ -198,8 +236,114 @@
             const modalForm = editProductModal.querySelector('#editProductForm');
             modalForm.reset(); // フォームをリセット
         });
+
+        //***ここからweather-forecast
+        let currentDayIndex = 0; // 現在表示している日のインデックス (0 = 今日)
+        const totalDays = /*[[${forecastWeatherList != null ? forecastWeatherList.size() : 0}]]*/ 0; // サーバーから渡された総日数
+
+        const weatherPopup = document.getElementById('weatherPopup');
+        const weatherContentWrapper = document.getElementById('weatherContentWrapper');
+        const prevWeatherBtn = document.getElementById('prevWeatherBtn');
+        const nextWeatherBtn = document.getElementById('nextWeatherBtn');
+        const weatherDayContents = document.querySelectorAll('.weather-day-content'); // 各日のコンテンツ要素
+
+        // Weather Code から絵文字と日本語の説明に変換する関数
+        function convertWeatherCodeToEmoji(code) {
+            if (code === null || typeof code === 'undefined') return { emoji: "❓", description: "不明" };
+            const intCode = Math.floor(code);
+            switch (intCode) {
+                case 0: return { emoji: "☀️", description: "快晴" }; // Clear sky
+                case 1: return { emoji: "☁️", description: "主に晴れ" }; // Mainly clear
+                case 2: return { emoji: "☁️", description: "一部曇り" }; // Partly cloudy
+                case 3: return { emoji: "☁️", description: "曇り" }; // Overcast
+                case 45: return { emoji: "🌫️", description: "霧" }; // Fog
+                case 48: return { emoji: "🌫️", description: "霧氷" }; // Depositing rime fog
+                case 51: return { emoji: "🌧️", description: "霧雨 (弱)" }; // Drizzle light
+                case 53: return { emoji: "🌧️", description: "霧雨 (中)" }; // Drizzle moderate
+                case 55: return { emoji: "🌧️", description: "霧雨 (強)" }; // Drizzle dense
+                case 56: return { emoji: "🌨️", description: "着氷性の霧雨 (弱)" }; // Freezing Drizzle light
+                case 57: return { emoji: "🌨️", description: "着氷性の霧雨 (強)" }; // Freezing Drizzle dense
+                case 61: return { emoji: "🌧️", description: "小雨" }; // Rain slight
+                case 63: return { emoji: "🌧️", description: "雨" }; // Rain moderate
+                case 65: return { emoji: "🌧️", description: "大雨" }; // Rain heavy
+                case 66: return { emoji: "🌨️", description: "着氷性の雨 (弱)" }; // Freezing Rain light
+                case 67: return { emoji: "🌨️", description: "着氷性の雨 (強)" }; // Freezing Rain heavy
+                case 71: return { emoji: "🌨️", description: "小雪" }; // Snow fall slight
+                case 73: return { emoji: "🌨️", description: "雪" }; // Snow fall moderate
+                case 75: return { emoji: "🌨️", description: "大雪" }; // Snow fall heavy
+                case 77: return { emoji: "❄️", description: "降雪粒" }; // Snow grains
+                case 80: return { emoji: "⛈️", description: "小にわか雨" }; // Rain showers slight
+                case 81: return { emoji: "⛈️", description: "にわか雨" }; // Rain showers moderate
+                case 82: return { emoji: "⛈️", description: "大にわか雨" }; // Rain showers violent
+                case 85: return { emoji: "🌨️", description: "小雪にわか雨" }; // Snow showers slight
+                case 86: return { emoji: "🌨️", description: "大雪にわか雨" }; // Snow showers heavy
+                case 95: return { emoji: "⚡", description: "雷雨" }; // Thunderstorm slight or moderate
+                case 96: return { emoji: "🌪️", description: "雷雨（ひょう）" }; // Thunderstorm with slight hail
+                case 99: return { emoji: "🌪️", description: "雷雨（大ひょう）" }; // Thunderstorm with heavy hail
+                default: return { emoji: "❓", description: "不明" };
+            }
+        }
+
+        // 各日のコンテンツに天気アイコンと説明をセット
+        function updateWeatherIcons() {
+            weatherDayContents.forEach(dayContent => {
+                const weatherCode = parseFloat(dayContent.dataset.weatherCode);
+                const weatherInfo = convertWeatherCodeToEmoji(weatherCode);
+                const iconSpan = dayContent.querySelector('.weather-icon-text');
+                if (iconSpan) {
+                    iconSpan.innerHTML = `${weatherInfo.emoji} ${weatherInfo.description}`;
+                }
+            });
+        }
+
+        // ポップアップ表示/非表示を切り替える
+        function toggleWeatherPopup() {
+            if (weatherPopup.style.display === 'block') {
+                weatherPopup.style.display = 'none';
+            } else {
+                weatherPopup.style.display = 'block';
+                // ポップアップを開くときに、常に現在のインデックスの天気情報を表示
+                updateDisplay();
+            }
+        }
+
+        // 天気情報の表示をスライドさせる
+        function updateDisplay() {
+            if (totalDays === 0) {
+                prevWeatherBtn.disabled = true;
+                nextWeatherBtn.disabled = true;
+                return;
+            }
+
+            // ★ ここを修正します ★
+            // 各日のコンテンツの幅を正確に取得、または固定値を使用
+            // CSSで width: 250px; を設定しているので、それをJavaScriptでも利用
+            const dayContentWidth = 250; // CSSの .weather-popup .weather-day-content のflex-basis: 250px と合わせる
+
+            weatherContentWrapper.style.transform = `translateX(-${currentDayIndex * dayContentWidth}px)`;
+
+            // 矢印ボタンの有効/無効を制御
+            prevWeatherBtn.disabled = currentDayIndex === 0;
+            nextWeatherBtn.disabled = currentDayIndex >= totalDays - 1; // totalDays - 1 が最後のインデックス
+        }
+
+        // 天気情報のインデックスを変更
+        function changeWeather(direction) {
+            currentDayIndex += direction;
+            if (currentDayIndex < 0) currentDayIndex = 0;
+            if (currentDayIndex >= totalDays) currentDayIndex = totalDays - 1; // totalDays - 1 まで
+            updateDisplay();
+        }
+
+        // ページロード時に初期表示とアイコン設定
+        document.addEventListener('DOMContentLoaded', function () {
+            updateWeatherIcons(); // 各日のコンテンツに天気アイコンと説明をセット
+            updateDisplay(); // 初期表示を更新
+        });
+        /*]]>*/
+
     </script>
-    
+
 </body>
 
 </html>
