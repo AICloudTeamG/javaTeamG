@@ -39,13 +39,14 @@
      border-collapse: collapse;
      margin-top: 1rem;
  }
-
+table.table thead 
  th {
      background-color: #ffb703;
      color: white;
      padding: 10px;
      font-weight: bold;
      text-align: center;
+     border:none
  }
 
  td {

@@ -40,7 +40,7 @@ h1 {
 .beer-buttons button.active,
 .beer-buttons button:hover,
 .calendar-nav button:hover {
-    background-color: #d95d0c;
+    background-color: #73baf5;
     font-weight: bold;
 }
 
@@ -71,7 +71,8 @@ h1 {
 }
 
 #chart-container {
-    max-width: 1200px;
+    max-width: 1400px;
+    height: 400px;
     margin: 0 auto 2rem;
 }
 
@@ -122,4 +123,21 @@ h1 {
 
 .weather-popup button:hover {
     background-color: #d95d0c;
+}
+#prev-week {
+    background-color: #75a51d;  /* 緑系 */
+    color: white;
+}
+
+#prev-week:hover {
+    background-color: #75a51d;
+}
+
+#next-week {
+    background-color: #75a51d;  /* 赤系 */
+    color: white;
+}
+
+#next-week:hover {
+    background-color: #75a51d;
 }
