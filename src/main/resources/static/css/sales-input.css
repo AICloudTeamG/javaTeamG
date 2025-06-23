@@ -6,64 +6,6 @@
     overflow-y: auto;
 }
 
-.weather-icon {
-    position: fixed;
-    top: 20px;
-    right: 30px;
-    font-size: 1.8rem;
-    cursor: pointer;
-    z-index: 1001;
-}
-
-.weather-popup {
-    position: fixed;
-    top: 60px;
-    right: 30px;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    padding: 15px;
-    border-radius: 8px;
-    display: none;
-    z-index: 1000;
-    width: 220px;
-    font-size: 0.95rem;
-    /* フォントサイズ調整 */
-}
-
-.weather-popup span {
-    /* 追加 */
-    display: block;
-    margin-bottom: 4px;
-}
-
-.weather-popup .controls {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    text-align: center;
-    /* 中央寄せ */
-}
-
-.weather-popup button {
-    background-color: #fb8500;
-    color: white;
-    border: none;
-    padding: 4px 10px;
-    /* パディング調整 */
-    margin: 0 5px;
-    /* マージン調整 */
-    border-radius: 5px;
-    /* 角丸調整 */
-    font-size: 0.85rem;
-    /* フォントサイズ調整 */
-    cursor: pointer;
-}
-
-.weather-popup button:hover {
-    background-color: #d95d0c;
-}
-
 .box {
     background-color: #ffffff;
     border-left: 6px solid #ffb703;
