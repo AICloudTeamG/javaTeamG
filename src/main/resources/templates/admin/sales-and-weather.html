@@ -26,9 +26,9 @@
                                   data-wind-speed=${data.windSpeed10mMax},
                                   data-date=${data.date},
                                   data-day-index=${iterStat.index}">
-                            <strong><span style="font-size: 0.85rem; color: #555;"
+                            <strong><span 
                                     th:text="${#temporals.format(data.date, 'M/d')} + '（' + ${#temporals.format(data.date, 'E', new java.util.Locale('ja'))} + '）'">
-                                </span><span>の天気予報</span></strong><br>
+                                </span><span>天気予報</span></strong><br>
 
                             <span class="weather-icon-text"></span><br>
 
