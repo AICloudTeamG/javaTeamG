@@ -26,7 +26,7 @@
 
 
     <div class="main-content">
-        <div class="weather-forecast">
+        <div th:if="${isAdmin}" class="weather-forecast">
             <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
             <div class="weather-popup" id="weatherPopup">
                 <div class="weather-content-wrapper" id="weatherContentWrapper">
