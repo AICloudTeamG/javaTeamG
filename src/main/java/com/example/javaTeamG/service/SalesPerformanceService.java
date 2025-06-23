@@ -92,12 +92,12 @@ public class SalesPerformanceService {
                     newWeather.setWeatherCode(defaultWeatherCode);
 
                     // その他の必須フィールドも設定（仮のデフォルト値）
-                    newWeather.setTemperatureMax(BigDecimal.valueOf(20.0));
-                    newWeather.setTemperatureMin(BigDecimal.valueOf(10.0));
-                    newWeather.setTemperatureMean(BigDecimal.valueOf(15.0));
-                    newWeather.setHumidityMax(BigDecimal.valueOf(90.0)); 
-                    newWeather.setHumidityMin(BigDecimal.valueOf(90.0)); 
-                    newWeather.setWindspeedMax(BigDecimal.valueOf(5.0)); 
+                    newWeather.setTemperatureMax(BigDecimal.valueOf(0.0));
+                    newWeather.setTemperatureMin(BigDecimal.valueOf(0.0));
+                    newWeather.setTemperatureMean(BigDecimal.valueOf(0.0));
+                    newWeather.setHumidityMax(BigDecimal.valueOf(0.0)); 
+                    newWeather.setHumidityMin(BigDecimal.valueOf(0.0)); 
+                    newWeather.setWindspeedMax(BigDecimal.valueOf(0.0)); 
                     newWeather.setDeleted(false); 
 
                     System.out.println("No SalesWeather found for " + date + ". Creating a dummy one with default WeatherCode ID: " + defaultWeatherCode.getId());

@@ -101,7 +101,7 @@ public class SalesWeatherService {
     public WeatherCode getDefaultWeatherCode() {
         // 例: IDが1のWeatherCodeをデフォルトとする
         // 実際のアプリケーションでは、適切なロジックでデフォルトを取得してください
-        return weatherCodeRepository.findById(1) // 例としてID=1を使用
-            .orElseThrow(() -> new IllegalStateException("Default WeatherCode (ID: 1) not found. Please ensure WeatherCode with ID 1 exists."));
+        return weatherCodeRepository.findById(45) // 例としてID=1を使用
+            .orElseThrow(() -> new IllegalStateException("Default WeatherCode (ID: 45) not found. Please ensure WeatherCode with ID 1 exists."));
     }
 }
