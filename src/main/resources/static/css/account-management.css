@@ -102,25 +102,25 @@ td {
 }
 
 .btn-password {
-    background-color: #898886;
+    background-color: #492b7b;
 }
 .btn-password:hover {
     background-color: #898886;
 }
 
 .btn-delete {
-    background-color: #e22a0e;
+    background-color: #c32136;
 }
 .btn-delete:hover {
-    background-color: #874338;
+    background-color: #c32136;
 }
 .role-admin {
-    color: #d32f2f; /* 濃い赤系：管理者 */
+    color: #fb8500; /* 濃い赤系：管理者 */
     font-weight: bold;
 }
 
 .role-staff {
-    color: #2e7d32; /* 濃い緑系：従業員 */
+    color: #492b7b; /* 濃い緑系：従業員 */
     font-weight: bold;
 }
 
