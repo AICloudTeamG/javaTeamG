@@ -55,7 +55,7 @@ public class DataVisualizationController {
         model.addAttribute("isAdmin", true);
 
         // ★ここから追加：ビールの銘柄リストをDBから取得し、モデルに追加するロジック
-        List<Product> products = productRepository.findByIsDeletedFalse();
+        List<Product> products = productRepository.findByIsDeletedFalseOrderByIdAsc();
         List<String> beerCategories = products.stream()
                                             .map(Product::getName)
                                             .collect(Collectors.toList());
