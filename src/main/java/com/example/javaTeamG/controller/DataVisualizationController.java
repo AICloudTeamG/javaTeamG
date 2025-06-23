@@ -68,16 +68,6 @@ public class DataVisualizationController {
         model.addAttribute("initialChartData", initialData);
         model.addAttribute("initialWeekStart", startOfWeek.toString());
 
-        // 今日の天気情報をポップアップ用に取得
-        Optional<SalesWeather> todayWeatherOpt = dataVisualizationService.getSalesWeatherForDate(LocalDate.now());
-        if (todayWeatherOpt.isPresent()) {
-            SalesWeather todayWeather = todayWeatherOpt.get();
-            model.addAttribute("todayWeather", todayWeather);
-            model.addAttribute("todayWeatherCondition", dataVisualizationService.convertWeatherCodeToEmoji(todayWeather.getWeatherCode().getId()) + " " + todayWeather.getWeatherCode().getDescription());
-        } else {
-            model.addAttribute("todayWeather", null);
-        }
-
         // ページタイトルも追加（HTML側で ${pageTitle} を使用している場合）
         model.addAttribute("pageTitle", "実績・天気データ可視化");
 
