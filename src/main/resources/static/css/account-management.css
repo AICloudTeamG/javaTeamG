@@ -34,6 +34,7 @@ h1 {
     background-color: #d95d0c;
 }
 
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -122,3 +123,4 @@ td {
     color: #2e7d32; /* 濃い緑系：従業員 */
     font-weight: bold;
 }
+
