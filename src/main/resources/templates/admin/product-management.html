@@ -41,7 +41,6 @@
                 <table class="table table-striped table-hover">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
                             <th>JANコード</th>
                             <th>商品名</th>
                             <th>価格</th>
@@ -54,7 +53,6 @@
                             th:data-product-id="${product.id}" th:data-product-jan-code="${product.janCode}"
                             th:data-product-name="${product.name}" th:data-product-price="${product.price}">
 
-                            <td th:text="${product.id}">1</td>
                             <td th:text="${product.janCode}">1234567890123</td>
                             <td th:text="${product.name}">商品A</td>
                             <td th:text="${product.price}">1000</td>
