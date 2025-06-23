@@ -16,53 +16,56 @@
 
     <div class="main-content">
         <div class="weather-forecast">
-        <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
-        <div class="weather-popup" id="weatherPopup">
-            <div class="weather-content-wrapper" id="weatherContentWrapper">
-                <th:block th:if="${forecastWeatherList != null and !forecastWeatherList.isEmpty()}">
-                    <div th:each="data, iterStat : ${forecastWeatherList}" 
-                         class="weather-day-content" 
-                         th:attr="data-weather-code=${data.weatherCode}, 
+            <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
+            <div class="weather-popup" id="weatherPopup">
+                <div class="weather-content-wrapper" id="weatherContentWrapper">
+                    <th:block th:if="${forecastWeatherList != null and !forecastWeatherList.isEmpty()}">
+                        <div th:each="data, iterStat : ${forecastWeatherList}" class="weather-day-content" th:attr="data-weather-code=${data.weatherCode}, 
                                   data-temp-min=${data.temperature2mMin},
                                   data-temp-max=${data.temperature2mMax},
                                   data-wind-speed=${data.windSpeed10mMax},
                                   data-date=${data.date},
-                                  data-day-index=${iterStat.index}">                        
-                        <strong><span style="font-size: 0.85rem; color: #555;"
-                              th:text="${#temporals.format(data.date, 'M/d')} + '（' + ${#temporals.format(data.date, 'E', new java.util.Locale('ja'))} + '）'">
-                        </span><span>の天気予報</span></strong><br>
-                        
-                        <span class="weather-icon-text"></span><br>
-                        
-                        <span th:text="${#numbers.formatDecimal(data.temperature2mMin, 0, 0, 'POINT') + '℃ ~ ' + #numbers.formatDecimal(data.temperature2mMax, 0, 0, 'POINT') + '℃'}"></span><br>
-                        <span>風速：<span th:text="${#numbers.formatDecimal(data.windSpeed10mMax, 0, 1, 'POINT')}"></span> m/s</span>
-                    </div>
-                </th:block>
-                <th:block th:unless="${forecastWeatherList != null and !forecastWeatherList.isEmpty()}">
-                    <div class="weather-day-content" style="width: 250px;"> <p>天気予報データが見つかりませんでした。</p>
-                    </div>
-                </th:block>
-            </div>
-            <div class="controls">
-                <button id="prevWeatherBtn" onclick="changeWeather(-1)" disabled>←</button>
-                <button id="nextWeatherBtn" onclick="changeWeather(1)" disabled>→</button>
+                                  data-day-index=${iterStat.index}">
+                            <strong><span style="font-size: 0.85rem; color: #555;"
+                                    th:text="${#temporals.format(data.date, 'M/d')} + '（' + ${#temporals.format(data.date, 'E', new java.util.Locale('ja'))} + '）'">
+                                </span><span>の天気予報</span></strong><br>
+
+                            <span class="weather-icon-text"></span><br>
+
+                            <span
+                                th:text="${#numbers.formatDecimal(data.temperature2mMin, 0, 0, 'POINT') + '℃ ~ ' + #numbers.formatDecimal(data.temperature2mMax, 0, 0, 'POINT') + '℃'}"></span><br>
+                            <span>風速：<span
+                                    th:text="${#numbers.formatDecimal(data.windSpeed10mMax, 0, 1, 'POINT')}"></span>
+                                m/s</span>
+                        </div>
+                    </th:block>
+                    <th:block th:unless="${forecastWeatherList != null and !forecastWeatherList.isEmpty()}">
+                        <div class="weather-day-content" style="width: 250px;">
+                            <p>天気予報データが見つかりませんでした。</p>
+                        </div>
+                    </th:block>
+                </div>
+                <div class="controls">
+                    <button id="prevWeatherBtn" onclick="changeWeather(-1)" disabled>←</button>
+                    <button id="nextWeatherBtn" onclick="changeWeather(1)" disabled>→</button>
+                </div>
             </div>
         </div>
-    </div>
 
         <h1>🍺 売上と天気</h1>
         <div class="summary-box" id="dailySummary">今日の売上：-- 円</div>
         <div class="beer-buttons">
-            <button class="active" onclick="changeBeer('total', event)"><strong>全体売上</strong></button>
+
             <button th:each="productName : ${beerCategories}" th:attr="onclick=|changeBeer('${productName}', event)|"
                 th:text="${productName}"> 商品名
             </button>
         </div>
         <div class="calendar-nav">
-    <button id="prev-week" onclick="changeWeek(-1)">◀ 前の週</button>
-    <span id="weekRange">2025/6/9 ~ 2025/6/15</span>
-    <button id="next-week" onclick="changeWeek(1)">次の週 ▶</button>
-</div>
+            <button class="active" onclick="changeBeer('total', event)"><strong>全体売上</strong></button>
+            <button id="prev-week" onclick="changeWeek(-1)">◀ 前の週</button>
+            <span id="weekRange">2025/6/9 ~ 2025/6/15</span>
+            <button id="next-week" onclick="changeWeek(1)">次の週 ▶</button>
+        </div>
 
         <div id="chart-container">
             <canvas id="salesChart"></canvas>
