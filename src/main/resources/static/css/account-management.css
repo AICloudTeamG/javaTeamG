@@ -101,7 +101,7 @@ td {
 }
 
 .btn-password {
-    background-color: #492b7b;
+    background-color: #514b5c;
 }
 .btn-password:hover {
     background-color: #898886;
@@ -119,6 +119,6 @@ td {
 }
 
 .role-staff {
-    color: #492b7b; /* 濃い緑系：従業員 */
-    font-weight: bold;
+    color: black; /* 濃い緑系：従業員 */
+    font-weight:
 }
