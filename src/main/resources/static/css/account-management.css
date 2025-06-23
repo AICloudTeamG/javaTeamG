@@ -40,13 +40,18 @@ table {
     margin-top: 1rem;
 }
 
+
+    /* テーブルヘッダーの背景色をブランドカラーのオレンジに統一 */
+table.table thead
 th {
-    background-color: #ffb703;
+    background-color: #fb8500;
     color: white;
     padding: 10px;
     font-weight: bold;
     text-align: center;
 }
+
+
 
 td {
     padding: 10px;
@@ -86,4 +91,34 @@ td {
 
 .modal-body .form-group {
     margin-bottom: 15px;
+}
+/* 追加するボタン別クラス */
+.btn-edit {
+    background-color:#c57a18;
+}
+.btn-edit:hover {
+    background-color: #c57a18;
+}
+
+.btn-password {
+    background-color: #898886;
+}
+.btn-password:hover {
+    background-color: #898886;
+}
+
+.btn-delete {
+    background-color: #874338;
+}
+.btn-delete:hover {
+    background-color: #874338;
+}
+.role-admin {
+    color: #d32f2f; /* 濃い赤系：管理者 */
+    font-weight: bold;
+}
+
+.role-staff {
+    color: #2e7d32; /* 濃い緑系：従業員 */
+    font-weight: bold;
 }
