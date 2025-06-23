@@ -2,7 +2,11 @@ package com.example.javaTeamG.controller;
 
 import com.example.javaTeamG.model.OrderPredictionData;
 import com.example.javaTeamG.model.OrderPredictionDisplayData;
+import com.example.javaTeamG.model.SalesWeather; // SalesWeatherをインポート
+import com.example.javaTeamG.model.WeatherCode;  // WeatherCodeをインポート
 import com.example.javaTeamG.service.OrderPredictionService;
+import com.example.javaTeamG.service.SalesWeatherService; // SalesWeatherServiceをインポート
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,12 +20,15 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.math.BigDecimal;
+import java.util.Optional; 
 import java.util.stream.Collectors;
 
 @Controller
 public class OrderPredictionController {
 
     private final OrderPredictionService orderPredictionService;
+    private final SalesWeatherService salesWeatherService;
     // ここを本物のAPIに変えるべき！！！！！
     private static final String EXTERNAL_PREDICTION_API_URL = "";
     // 予測可能な最大日数 (16日先まで)
@@ -30,8 +37,9 @@ public class OrderPredictionController {
     private static final int FORECAST_DISPLAY_DAYS = 7;
 
     @Autowired
-    public OrderPredictionController(OrderPredictionService orderPredictionService) {
+    public OrderPredictionController(OrderPredictionService orderPredictionService, SalesWeatherService salesWeatherService) {
         this.orderPredictionService = orderPredictionService;
+        this.salesWeatherService = salesWeatherService;
     }
 
     @GetMapping("/admin/prediction")
@@ -51,6 +59,28 @@ public class OrderPredictionController {
                 // 本番用
                 // allPredictions =
                 // orderPredictionService.fetchPredictionDataFromExternalApi(EXTERNAL_PREDICTION_API_URL);
+
+                // ★★★ ここから天気情報をSalesWeatherに反映させるロジック ★★★
+                // 当日、1日前、2日前の日付を計算
+                LocalDate today = LocalDate.now();
+                LocalDate dayBefore1 = today.minusDays(1);
+                LocalDate dayBefore2 = today.minusDays(2);
+
+                // 必要な日付の予測データを取得
+                // allPredictionsは日付でソートされていると仮定（またはここでソートする）
+                allPredictions.sort(Comparator.comparing(OrderPredictionData::getDate));
+
+                List<OrderPredictionData> relevantPredictionDataForWeather = allPredictions.stream()
+                        .filter(data -> data.getDate().equals(today) || 
+                                         data.getDate().equals(dayBefore1) || 
+                                         data.getDate().equals(dayBefore2))
+                        .collect(Collectors.toList());
+
+                // 取得した予測データを使ってSalesWeatherを更新または新規登録
+                for (OrderPredictionData predictionData : relevantPredictionDataForWeather) {
+                    updateSalesWeatherFromPrediction(predictionData);
+                }
+                // ★★★ ここまで追加/変更 ★★★
 
                 // 取得したデータをセッションに保存
                 session.setAttribute("cachedPredictions", allPredictions);
@@ -139,6 +169,53 @@ public class OrderPredictionController {
         model.addAttribute("pageTitle", "発注予測");
 
         return "admin/order-prediction";
+    }
+
+     // ★追加: OrderPredictionDataからSalesWeatherを更新/作成するプライベートメソッド★
+    private void updateSalesWeatherFromPrediction(OrderPredictionData predictionData) {
+        // 既存のSalesWeatherデータを日付で検索 (isDeleted=false)
+        Optional<SalesWeather> existingSalesWeather = salesWeatherService.findSalesWeatherByDate(predictionData.getDate());
+
+        SalesWeather salesWeather;
+        if (existingSalesWeather.isPresent()) {
+            salesWeather = existingSalesWeather.get();
+            System.out.println("Updating existing SalesWeather for date: " + predictionData.getDate());
+        } else {
+            salesWeather = new SalesWeather();
+            salesWeather.setDate(predictionData.getDate());
+            salesWeather.setDeleted(false); // 新規作成時はfalse
+            System.out.println("Creating new SalesWeather for date: " + predictionData.getDate());
+        }
+
+        // OrderPredictionDataの天気情報をSalesWeatherにマッピング
+        salesWeather.setTemperatureMax(BigDecimal.valueOf(predictionData.getTemperature2mMax()));
+        salesWeather.setTemperatureMin(BigDecimal.valueOf(predictionData.getTemperature2mMin()));
+        salesWeather.setTemperatureMean(BigDecimal.valueOf(predictionData.getTemperature2mMean()));
+        salesWeather.setHumidityMax(BigDecimal.valueOf(predictionData.getRelativeHumidity2mMax()));
+        salesWeather.setHumidityMin(BigDecimal.valueOf(predictionData.getRelativeHumidity2mMin()));
+        salesWeather.setWindspeedMax(BigDecimal.valueOf(predictionData.getWindSpeed10mMax()));
+
+        // WeatherCodeの処理
+        // OrderPredictionDataのweather_codeはDouble型なので、
+        // salesWeatherServiceから適切なWeatherCodeエンティティを取得して設定する必要がある
+        // weather_codeがInteger型として使えると仮定し、対応するWeatherCodeを取得する
+        // 実際のweather_codeの値と、WeatherCodeテーブルのid/codeのマッピングによってロジックを調整してください
+        if (predictionData.getWeatherCode() != null) {
+            try {
+                // predictionData.getWeather_code().intValue() でDoubleをintに変換し、IDで検索
+                WeatherCode wc = salesWeatherService.findWeatherCodeById(predictionData.getWeatherCode().intValue())
+                                        .orElse(salesWeatherService.getDefaultWeatherCode()); // 見つからなければデフォルト
+                salesWeather.setWeatherCode(wc);
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid weather_code format for date " + predictionData.getDate() + ": " + predictionData.getWeatherCode());
+                salesWeather.setWeatherCode(salesWeatherService.getDefaultWeatherCode()); // エラーの場合はデフォルト
+            }
+        } else {
+            salesWeather.setWeatherCode(salesWeatherService.getDefaultWeatherCode()); // nullの場合はデフォルト
+        }
+
+        // 保存（新規の場合は登録、既存の場合は更新）
+        salesWeatherService.saveSalesWeather(salesWeather);
     }
 
     public static class OrderDateRange {

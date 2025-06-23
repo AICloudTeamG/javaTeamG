@@ -104,4 +104,9 @@ public class SalesWeatherService {
         return weatherCodeRepository.findById(45) // 例としてID=1を使用
             .orElseThrow(() -> new IllegalStateException("Default WeatherCode (ID: 45) not found. Please ensure WeatherCode with ID 1 exists."));
     }
+
+        // ★追加: WeatherCodeをIDで検索するメソッド★
+    public Optional<WeatherCode> findWeatherCodeById(Integer id) {
+        return weatherCodeRepository.findById(id);
+    }
 }

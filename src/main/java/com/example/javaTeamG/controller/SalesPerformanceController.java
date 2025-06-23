@@ -81,6 +81,8 @@ public class SalesPerformanceController {
         List<SalesPerformance> existingSales = salesPerformanceService.getSalesPerformanceByDate(targetDate);
         if (!existingSales.isEmpty()) {
             List<ProductSalesEntry> entries = existingSales.stream()
+                    // まずSalesPerformanceをProductのIDでソートします
+                    .sorted((sp1, sp2) -> sp1.getProduct().getId().compareTo(sp2.getProduct().getId()))
                     .map(sp -> {
                         ProductSalesEntry entry = new ProductSalesEntry();
                         // SalesPerformanceオブジェクトからProduct名とSalesCountを取得
