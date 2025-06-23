@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors; // Collectorsをインポート
 
+import com.example.javaTeamG.model.OrderPredictionData;
 import com.example.javaTeamG.model.Product;       // ★ここを追加：Productモデルをインポート
 import com.example.javaTeamG.repository.ProductRepository; // ★ここを追加：ProductRepositoryをインポート
 
@@ -79,6 +80,11 @@ public class DataVisualizationController {
 
         // ページタイトルも追加（HTML側で ${pageTitle} を使用している場合）
         model.addAttribute("pageTitle", "実績・天気データ可視化");
+
+        @SuppressWarnings("unchecked")
+        List<OrderPredictionData> forecastWeatherList = (List<OrderPredictionData>) session
+                .getAttribute("forecastWeatherList");
+        model.addAttribute("forecastWeatherList", forecastWeatherList);
 
         return "admin/sales-and-weather";
     }

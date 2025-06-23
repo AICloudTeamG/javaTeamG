@@ -26,6 +26,8 @@ public class OrderPredictionController {
     private static final String EXTERNAL_PREDICTION_API_URL = "";
     // 予測可能な最大日数 (16日先まで)
     private static final int MAX_PREDICTION_DAYS = 16;
+    // 天気予報ポップアップで表示する日数
+    private static final int FORECAST_DISPLAY_DAYS = 7;
 
     @Autowired
     public OrderPredictionController(OrderPredictionService orderPredictionService) {
@@ -68,6 +70,18 @@ public class OrderPredictionController {
 
         // 日付でソート
         allPredictions.sort(Comparator.comparing(OrderPredictionData::getDate));
+
+         // --- ここから天気予報ポップアップ用のデータ準備 ---
+        LocalDate today = LocalDate.now();
+        List<OrderPredictionData> forecastWeatherList = allPredictions.stream()
+                .filter(data -> !data.getDate().isBefore(today)) // 今日以降のデータのみを対象
+                .limit(FORECAST_DISPLAY_DAYS) // 指定された日数（7日間）に制限
+                .collect(Collectors.toList());
+
+        session.setAttribute("forecastWeatherList", forecastWeatherList);
+        model.addAttribute("forecastWeatherList", forecastWeatherList);
+        // --- 天気予報ポップアップ用のデータ準備ここまで ---
+
 
         // 直近4回分までの発注日と対象期間の組み合わせを生成
         List<OrderDateRange> orderDateRangesToShow = generateOrderDateRanges(allPredictions); // メソッド名はそのままでロジック変更
