@@ -69,12 +69,12 @@
                     <tr>
                         <th>発注日</th>
                         <th>対象期間</th>
-                        <th>Pale Ale</th>
-                        <th>Lager</th>
+                        <th>ホワイトビール</th>
+                        <th>ラガー</th>
+                        <th>ペールエール</th>
+                        <th>フルーツビール</th>
+                        <th>黒ビール</th>
                         <th>IPA</th>
-                        <th>White</th>
-                        <th>Dark</th>
-                        <th>Fruit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,12 +86,12 @@
                         <td
                             th:text="${#temporals.format(prediction.startDate, 'M/d（E）')} + '〜' + ${#temporals.format(prediction.endDate, 'M/d（E）')}">
                             6/21（金）〜6/24（月）</td>
-                        <td th:text="${#numbers.formatDecimal(prediction.paleAleSum, 1, 0)}">36</td>
-                        <td th:text="${#numbers.formatDecimal(prediction.lagerSum, 1, 0)}">30</td>
-                        <td th:text="${#numbers.formatDecimal(prediction.ipaSum, 1, 0)}">46</td>
                         <td th:text="${#numbers.formatDecimal(prediction.whiteSum, 1, 0)}">28</td>
-                        <td th:text="${#numbers.formatDecimal(prediction.darkSum, 1, 0)}">18</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.lagerSum, 1, 0)}">30</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.paleAleSum, 1, 0)}">36</td>
                         <td th:text="${#numbers.formatDecimal(prediction.fruitSum, 1, 0)}">23</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.darkSum, 1, 0)}">18</td>
+                        <td th:text="${#numbers.formatDecimal(prediction.ipaSum, 1, 0)}">46</td>
                     </tr>
                 </tbody>
             </table>
