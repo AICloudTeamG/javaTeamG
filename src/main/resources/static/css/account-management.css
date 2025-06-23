@@ -94,10 +94,10 @@ td {
 }
 /* 追加するボタン別クラス */
 .btn-edit {
-    background-color:#c57a18;
+    background-color:#fb8500;
 }
 .btn-edit:hover {
-    background-color: #c57a18;
+    background-color: #fb8500;
 }
 
 .btn-password {
@@ -108,7 +108,7 @@ td {
 }
 
 .btn-delete {
-    background-color: #874338;
+    background-color: #e22a0e;
 }
 .btn-delete:hover {
     background-color: #874338;

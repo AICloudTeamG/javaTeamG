@@ -40,7 +40,9 @@ h1 {
 .beer-buttons button.active,
 .beer-buttons button:hover,
 .calendar-nav button:hover {
-    background-color: #73baf5;
+    background-color: white;
+    border: 3px solid #eb8e24;
+    color:#eb8e24;
     font-weight: bold;
 }
 
