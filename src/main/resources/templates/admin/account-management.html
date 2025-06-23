@@ -17,15 +17,6 @@
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <div class="main-content">
-        <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
-        <div class="weather-popup" id="weatherPopup">
-            <div id="weatherContent"></div>
-            <div class="controls">
-                <button onclick="changeWeather(-1)">←</button>
-                <button onclick="changeWeather(1)">→</button>
-            </div>
-        </div>
-
         <div class="box">
             <h1 class="my-4" th:text="${pageTitle} ?: 'アカウント管理'">👤 アカウント管理</h1>
 
@@ -52,6 +43,7 @@
                         
 
                         <tr>
+                            <th>ID</th>
                             <th>名前</th>
                             <th>メールアドレス</th>
                             <th>権限</th>
@@ -63,7 +55,9 @@
                             th:data-staff-name="${staff.name}" th:data-staff-email="${staff.email}"
                             th:data-staff-is-admin="${staff.isAdmin()}">
 
-                            <td th:text="${staff.name}">テスト 太郎 </td>
+                            <td th:text="${staff.id}">0</td>
+                            <td th:text="${staff.name}">テスト 太郎</td>
+
                             <td th:text="${staff.email}">test@example.com</td>
                             <td>
                                 <span th:if="${staff.isAdmin()}"class="role-admin"> 管理者</span>
@@ -158,7 +152,7 @@
                             <label for="editIsAdmin" class="form-label">管理者権限:</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="editIsAdmin" name="isAdmin"
-                                value="true">
+                                    value="true">
                                 <input type="hidden" name="isAdmin" value="false">
                                 <label class="form-check-label" for="editIsAdmin">管理者</label>
                             </div>

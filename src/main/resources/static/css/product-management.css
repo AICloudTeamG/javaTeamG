@@ -72,66 +72,6 @@ table.table thead
      background-color: #d95d0c;
  }
 
- .weather-icon {
-     position: fixed;
-     top: 20px;
-     right: 30px;
-     font-size: 1.8rem;
-     cursor: pointer;
-     z-index: 1001;
- }
-
- .weather-popup {
-     position: fixed;
-     top: 60px;
-     right: 30px;
-     background-color: #ffffff;
-     border: 1px solid #ccc;
-     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-     padding: 15px;
-     border-radius: 8px;
-     display: none;
-     z-index: 1000;
-     width: 220px;
-     font-size: 0.95rem;
- }
-
- .weather-popup span {
-     display: block;
-     margin-bottom: 4px;
- }
-
- .weather-popup .controls {
-     text-align: center;
-     margin-top: 10px;
- }
-
- .weather-popup button {
-     background-color: #fb8500;
-     color: white;
-     border: none;
-     padding: 4px 10px;
-     margin: 0 5px;
-     border-radius: 5px;
-     font-size: 0.85rem;
-     cursor: pointer;
- }
-
- .weather-popup button:hover {
-     background-color: #d95d0c;
- }
-
- /* 既存のcontainerスタイルは削除し、main-contentに吸収 */
- /* .container {
-            margin-top: 20px;
-        } */
-
- /* table関連のスタイルは既存のデザインのものを優先 */
- /* .table th,
-        .table td {
-            vertical-align: middle;
-        } */
-
  .action-buttons button,
  .action-buttons a {
      margin-right: 5px;

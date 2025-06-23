@@ -1,127 +1,46 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle}">発注予測</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/common.css}">
-    <link rel="stylesheet" th:href="@{/css/order-prediction.css}">
-    <script type="text/javascript" th:src="@{/js/weather-forecast.js}"></script>
+    
 </head>
-
 <body>
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-
-    <div class="main-content">
-        <div th:fragment="weather-forecast" class="weather-forecast">
-            <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
-            <div class="weather-popup" id="weatherPopup">
-                <div class="weather-content-wrapper" id="weatherContentWrapper">
-                    <th:block th:if="${forecastWeatherList != null and !forecastWeatherList.isEmpty()}">
-                        <div th:each="data, iterStat : ${forecastWeatherList}" class="weather-day-content" th:attr="data-weather-code=${data.weatherCode}, 
+    <!-- <div th:fragment="weather-forecast" class="weather-forecast"> -->
+    <div class="weather-forecast">
+        <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
+        <div class="weather-popup" id="weatherPopup">
+            <div class="weather-content-wrapper" id="weatherContentWrapper">
+                <th:block th:if="${forecastWeatherList != null and !forecastWeatherList.isEmpty()}">
+                    <div th:each="data, iterStat : ${forecastWeatherList}" 
+                         class="weather-day-content" 
+                         th:attr="data-weather-code=${data.weatherCode}, 
                                   data-temp-min=${data.temperature2mMin},
                                   data-temp-max=${data.temperature2mMax},
                                   data-wind-speed=${data.windSpeed10mMax},
                                   data-date=${data.date},
-                                  data-day-index=${iterStat.index}">
-                            <strong><span style="font-size: 0.85rem; color: #555;"
-                                    th:text="${#temporals.format(data.date, 'M/d')} + '（' + ${#temporals.format(data.date, 'E', new java.util.Locale('ja'))} + '）'">
-                                </span><span>の天気予報</span></strong><br>
-
-                            <span class="weather-icon-text"></span><br>
-
-                            <span
-                                th:text="${#numbers.formatDecimal(data.temperature2mMin, 0, 0, 'POINT') + '℃ ~ ' + #numbers.formatDecimal(data.temperature2mMax, 0, 0, 'POINT') + '℃'}"></span><br>
-                            <span>風速：<span
-                                    th:text="${#numbers.formatDecimal(data.windSpeed10mMax, 0, 1, 'POINT')}"></span>
-                                m/s</span>
-                        </div>
-                    </th:block>
-                    <th:block th:unless="${forecastWeatherList != null and !forecastWeatherList.isEmpty()}">
-                        <div class="weather-day-content" style="width: 250px;">
-                            <p>天気予報データが見つかりませんでした。</p>
-                        </div>
-                    </th:block>
-                </div>
-                <div class="controls">
-                    <button id="prevWeatherBtn" onclick="changeWeather(-1)" disabled>←</button>
-                    <button id="nextWeatherBtn" onclick="changeWeather(1)" disabled>→</button>
-                </div>
+                                  data-day-index=${iterStat.index}">                        
+                        <strong><span style="font-size: 0.85rem; color: #555;"
+                              th:text="${#temporals.format(data.date, 'M/d')} + '（' + ${#temporals.format(data.date, 'E', new java.util.Locale('ja'))} + '）'">
+                        </span><span>の天気予報</span></strong><br>
+                        
+                        <span class="weather-icon-text"></span><br>
+                        
+                        <span th:text="${#numbers.formatDecimal(data.temperature2mMin, 0, 0, 'POINT') + '℃ ~ ' + #numbers.formatDecimal(data.temperature2mMax, 0, 0, 'POINT') + '℃'}"></span><br>
+                        <span>風速：<span th:text="${#numbers.formatDecimal(data.windSpeed10mMax, 0, 1, 'POINT')}"></span> m/s</span>
+                    </div>
+                </th:block>
+                <th:block th:unless="${forecastWeatherList != null and !forecastWeatherList.isEmpty()}">
+                    <div class="weather-day-content" style="width: 250px;"> <p>天気予報データが見つかりませんでした。</p>
+                    </div>
+                </th:block>
             </div>
-        </div>
-
-
-        <div class="box">
-            <h1>発注予測</h1>
-
-            <div id="orderTodayMessage" class="order-today-message">
-                ✨ 今日は発注日です！ ✨
+            <div class="controls">
+                <button id="prevWeatherBtn" onclick="changeWeather(-1)" disabled>←</button>
+                <button id="nextWeatherBtn" onclick="changeWeather(1)" disabled>→</button>
             </div>
-
-            <div class="next-order-info">
-                直近の発注予測です。
-            </div>
-
-            <table class="forecast-table">
-                <thead>
-                    <tr>
-                        <th>発注日</th>
-                        <th>対象期間</th>
-                        <th>Pale Ale</th>
-                        <th>Lager</th>
-                        <th>IPA</th>
-                        <th>White</th>
-                        <th>Dark</th>
-                        <th>Fruit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:if="${#lists.isEmpty(predictionListForDisplay)}">
-                        <td colspan="8">利用可能な予測データがありません。</td>
-                    </tr>
-                    <tr th:each="prediction : ${predictionListForDisplay}">
-                        <td th:text="${#temporals.format(prediction.orderDate, 'M/d（E）')}">6/20（例）</td>
-                        <td
-                            th:text="${#temporals.format(prediction.startDate, 'M/d（E）')} + '〜' + ${#temporals.format(prediction.endDate, 'M/d（E）')}">
-                            6/21（金）〜6/24（月）</td>
-                        <td th:text="${#numbers.formatDecimal(prediction.paleAleSum, 1, 0)}">36</td>
-                        <td th:text="${#numbers.formatDecimal(prediction.lagerSum, 1, 0)}">30</td>
-                        <td th:text="${#numbers.formatDecimal(prediction.ipaSum, 1, 0)}">46</td>
-                        <td th:text="${#numbers.formatDecimal(prediction.whiteSum, 1, 0)}">28</td>
-                        <td th:text="${#numbers.formatDecimal(prediction.darkSum, 1, 0)}">18</td>
-                        <td th:text="${#numbers.formatDecimal(prediction.fruitSum, 1, 0)}">23</td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </div>
 
     <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebarLinks = document.querySelectorAll('.sidebar a');
-            const currentPath = window.location.pathname;
-
-            sidebarLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active-link'); // Use the new active-link class
-                }
-            });
-
-            const today = new Date();
-            const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-
-            // Check if today is Monday (1) or Thursday (4)
-            if (dayOfWeek === 1 || dayOfWeek === 4) {
-                const messageElement = document.getElementById('orderTodayMessage');
-                if (messageElement) {
-                    messageElement.style.display = 'block'; // Show the message
-                }
-            }
-        });
-
-
         //***ここからweather-forecast
         let currentDayIndex = 0; // 現在表示している日のインデックス (0 = 今日)
         const totalDays = /*[[${forecastWeatherList != null ? forecastWeatherList.size() : 0}]]*/ 0; // サーバーから渡された総日数
@@ -226,8 +145,6 @@
             updateDisplay(); // 初期表示を更新
         });
         /*]]>*/
-
     </script>
 </body>
-
 </html>

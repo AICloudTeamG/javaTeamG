@@ -10,22 +10,20 @@
 </head>
 
 <body>
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="sidebar">
+        <button th:if="${isAdmin}" onclick="location.href='/admin/prediction'" th:data-path="@{/admin/prediction}"
+            class="sidebar-button">📦 発注予測</button>
+        <button th:if="${isAdmin}" onclick="location.href='/admin/dashboard'" th:data-path="@{/admin/dashboard}"
+            class="sidebar-button">⛅ 売上と天気</button>
+        <button onclick="location.href='/sales/input'" th:data-path="@{/sales/input}" class="sidebar-button">✍️
+            実績入力</button>
+        <button th:if="${isAdmin}" onclick="location.href='/admin/account/list'" th:data-path="@{/admin/account/list}"
+            class="sidebar-button">👤 アカウント管理</button>
+        <button th:if="${isAdmin}" onclick="location.href='/admin/products'" th:data-path="@{/admin/products}"
+            class="sidebar-button">🍺商品管理</button>
+        <button onclick="location.href='/logout'" th:data-path="@{/logout}" class="sidebar-button">ログアウト</button>
+    </div>
 
-    <!-- <div class="weather-icon" onclick="toggleWeatherPopup()">⛅</div>
-    <div class="weather-popup" id="weatherPopup">
-        <div th:if="${todayWeather != null}" id="weatherContent">
-            <strong>今日の天気情報</strong><br>
-            <span style="font-size: 0.85rem; color: #555;" th:text="${todayWeather.date}"></span><br>
-            <span th:text="${todayWeather.weatherCode.weatherName}"></span><br>
-            <span th:text="${todayWeather.temperatureMin}"></span>℃ ~ <span th:text="${todayWeather.temperatureMax}"></span>℃<br>
-            <span>🌬️風速：<span th:text="${todayWeather.windspeedMax}"></span> m/s (最大)</span><br>
-            <span>💧湿度：<span th:text="${todayWeather.humidityMin}"></span>% ~ <span th:text="${todayWeather.humidityMax}"></span>%</span>
-        </div>
-        <div th:if="${todayWeather == null}" id="weatherContent">
-            天気情報がありません。
-        </div>
-    </div> -->
 
     <div class="main-content">
         <div class="box">
@@ -154,18 +152,7 @@
                 }
             });
 
-            updateWeatherContent(); // 既存の天気情報表示関数を呼び出し
         });
-
-        function toggleWeatherPopup() {
-            const popup = document.getElementById('weatherPopup');
-            popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
-        }
-
-        // 天気情報の表示はThymeleafで直接行われているため、JSでの追加ロジックは不要
-        function updateWeatherContent() {
-            console.log("Weather content updated (Thymeleaf already handled display).");
-        }
     </script>
 </body>
 

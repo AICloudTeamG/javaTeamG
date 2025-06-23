@@ -15,7 +15,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SalesPerformanceService {
@@ -60,11 +62,12 @@ public class SalesPerformanceService {
         return salesPerformanceRepository.save(salesPerformance);
     }
 
+
     /**
      * 複数の商品販売実績を一度に登録または更新します。
-     * 指定された日付と記録者スタッフの既存の販売実績（is_deleted=false）は、
-     * まず論理削除（is_deleted=true）し、その後、新しいデータを登録します。
-     * これにより、修正（UPDATE）も実質的に対応します。
+     * 指定された日付と記録者スタッフの既存の販売実績（is_deleted=false）に対して、
+     * 入力された商品販売数に基づいて更新（または新規登録）を行います。
+     * 数量が0の場合でもレコードを保存し、論理削除は行いません。
      *
      * @param date 対象日付
      * @param recorderStaffId 記録者スタッフID
@@ -82,53 +85,69 @@ public class SalesPerformanceService {
                 .orElseGet(() -> {
                     // SalesWeatherが存在しない場合、自動生成する例
                     SalesWeather newWeather = new SalesWeather();
-                    newWeather.setDate(date); // dateフィールドを設定
+                    newWeather.setDate(date);
 
                     // SalesWeatherServiceからデフォルトのWeatherCodeを取得して設定
                     WeatherCode defaultWeatherCode = salesWeatherService.getDefaultWeatherCode();
                     newWeather.setWeatherCode(defaultWeatherCode);
 
                     // その他の必須フィールドも設定（仮のデフォルト値）
-                    // 実際には、天気APIから取得したり、設定で管理したりする
                     newWeather.setTemperatureMax(BigDecimal.valueOf(20.0));
                     newWeather.setTemperatureMin(BigDecimal.valueOf(10.0));
                     newWeather.setTemperatureMean(BigDecimal.valueOf(15.0));
                     newWeather.setHumidityMax(BigDecimal.valueOf(90.0)); 
                     newWeather.setHumidityMin(BigDecimal.valueOf(90.0)); 
-                    newWeather.setWindspeedMax(BigDecimal.valueOf(5.0));                  
+                    newWeather.setWindspeedMax(BigDecimal.valueOf(5.0)); 
                     newWeather.setDeleted(false); 
 
                     System.out.println("No SalesWeather found for " + date + ". Creating a dummy one with default WeatherCode ID: " + defaultWeatherCode.getId());
-                    // SalesWeatherServiceのsaveSalesWeatherを呼んでDBに保存
                     return salesWeatherService.saveSalesWeather(newWeather);
                 });
 
-        // 既存のその日のそのスタッフの「アクティブな」売上実績をすべて論理削除
-        List<SalesPerformance> existingActivePerformances = salesPerformanceRepository.findByRecordDateAndIsDeletedFalse(date);
-        for (SalesPerformance sp : existingActivePerformances) {
-            sp.setDeleted(true); // 論理削除フラグを立てる
-            sp.setUpdatedAt(LocalDateTime.now()); // 更新日時を更新
-            salesPerformanceRepository.save(sp); // 更新を保存
-        }
-        
-        // 新しい（または更新された）売上実績を登録
-        for (ProductSalesEntry entry : productSalesEntries) {
-            // 数量が0より大きい場合のみ保存
-            if (entry.getQuantity() != null && entry.getQuantity() > 0) {
-                Product product = productService.findProductByName(entry.getProductName())
-                    .orElseThrow(() -> new IllegalArgumentException("商品が見つかりません: " + entry.getProductName()));
+        // 既存のその日の「有効な（isDeleted=false）」売上実績を取得
+        // 製品名でマップ化しておくと、後続の処理で効率的に検索できる
+        Map<String, SalesPerformance> existingActivePerformancesMap = salesPerformanceRepository.findByRecordDateAndIsDeletedFalse(date)
+            .stream()
+            .collect(Collectors.toMap(sp -> sp.getProduct().getName(), sp -> sp));
 
+        // 入力された販売実績を処理
+        for (ProductSalesEntry entry : productSalesEntries) {
+            String productName = entry.getProductName();
+            // 数量がnullの場合は0として扱う
+            Integer newQuantity = entry.getQuantity() != null ? entry.getQuantity() : 0; 
+
+            // 商品エンティティを取得
+            Product product = productService.findProductByName(productName)
+                    .orElseThrow(() -> new IllegalArgumentException("商品が見つかりません: " + productName));
+
+            // 既存のパフォーマンスを探す
+            SalesPerformance existingPerformance = existingActivePerformancesMap.get(productName);
+
+            if (existingPerformance != null) {
+                // 既存のレコードがある場合、数量を更新
+                existingPerformance.setSalesCount(newQuantity);
+                existingPerformance.setRecordedByStaff(recordedByStaff); // 記録者を更新
+                existingPerformance.setSalesWeather(salesWeather); // 天気情報を更新
+                // 0件保存の場合、deletedフラグは常にfalseを維持 (または変更しない)
+                existingPerformance.setDeleted(false); 
+                salesPerformanceRepository.save(existingPerformance);
+            } else {
+                // 既存のレコードがない場合、新規登録
+                // 数量が0の場合でも新規レコードを作成
                 SalesPerformance newPerformance = new SalesPerformance();
                 newPerformance.setRecordDate(date);
                 newPerformance.setProduct(product);
-                newPerformance.setSalesCount(entry.getQuantity());
+                newPerformance.setSalesCount(newQuantity);
                 newPerformance.setRecordedByStaff(recordedByStaff);
                 newPerformance.setSalesWeather(salesWeather); 
-                newPerformance.setDeleted(false);
-                
+                newPerformance.setDeleted(false); // 新規作成時は常にfalse
                 salesPerformanceRepository.save(newPerformance);
             }
+            // 処理したものはマップから削除
+            existingActivePerformancesMap.remove(productName); 
         }
+
+
     }
 
     public Optional<SalesPerformance> findSalesPerformanceById(Integer id) {
@@ -143,7 +162,13 @@ public class SalesPerformanceService {
         return salesPerformanceRepository.findByIsDeletedFalse();
     }
 
+    /**
+     * 指定された日付の有効な（論理削除されていない）販売実績を取得します。
+     * @param date 検索対象日付
+     * @return その日付の販売実績のリスト
+     */
     public List<SalesPerformance> getSalesPerformanceByDate(LocalDate date) {
+        // 0件のデータも取得対象となるため、isDeletedFalseのままでOK
         return salesPerformanceRepository.findByRecordDateAndIsDeletedFalse(date);
     }
 
