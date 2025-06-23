@@ -18,8 +18,7 @@ public class OrderPredictionService {
     private final ObjectMapper objectMapper;
 
     public OrderPredictionService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8080").build(); // 開発用
-        // this.webClient = webClientBuilder.build(); // 本番用ただし、fetchPredictionDataFromExternalApiにフルパスを渡す。
+        this.webClient = webClientBuilder.build();
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule()); // LocalDate を処理できるように登録
     }
