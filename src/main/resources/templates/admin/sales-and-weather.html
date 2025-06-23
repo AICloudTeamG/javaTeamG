@@ -59,10 +59,11 @@
             </button>
         </div>
         <div class="calendar-nav">
-            <button onclick="changeWeek(-1)">◀ 前の週</button>
-            <span id="weekRange">2025/6/9 ~ 2025/6/15</span>
-            <button onclick="changeWeek(1)">次の週 ▶</button>
-        </div>
+    <button id="prev-week" onclick="changeWeek(-1)">◀ 前の週</button>
+    <span id="weekRange">2025/6/9 ~ 2025/6/15</span>
+    <button id="next-week" onclick="changeWeek(1)">次の週 ▶</button>
+</div>
+
         <div id="chart-container">
             <canvas id="salesChart"></canvas>
         </div>
