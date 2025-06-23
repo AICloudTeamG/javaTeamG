@@ -1,6 +1,7 @@
 package com.example.javaTeamG.controller;
 
 import com.example.javaTeamG.model.SalesInputForm;
+import com.example.javaTeamG.model.OrderPredictionData;
 import com.example.javaTeamG.model.Product;
 import com.example.javaTeamG.model.ProductSalesEntry;
 import com.example.javaTeamG.model.SalesPerformance;
@@ -71,36 +72,36 @@ public class SalesPerformanceController {
 
         SalesInputForm salesInputForm;
 
-            // 初回ロード時または正常なGETリクエスト時
-            salesInputForm = new SalesInputForm();
-            salesInputForm.setDate(targetDate);
-            salesInputForm.setRecorderId(employeeId); // ここでrecorderIdをセット
+        // 初回ロード時または正常なGETリクエスト時
+        salesInputForm = new SalesInputForm();
+        salesInputForm.setDate(targetDate);
+        salesInputForm.setRecorderId(employeeId); // ここでrecorderIdをセット
 
-            // SalesPerformanceServiceのgetSalesPerformanceByDateメソッドを呼び出す
-            List<SalesPerformance> existingSales = salesPerformanceService.getSalesPerformanceByDate(targetDate);
-            if (!existingSales.isEmpty()) {
-                List<ProductSalesEntry> entries = existingSales.stream()
-                        .map(sp -> {
-                            ProductSalesEntry entry = new ProductSalesEntry();
-                            // SalesPerformanceオブジェクトからProduct名とSalesCountを取得
-                            entry.setProductName(sp.getProduct().getName());
-                            entry.setQuantity(sp.getSalesCount());
-                            return entry;
-                        })
-                        .collect(Collectors.toList());
-                salesInputForm.setPerformances(entries);
-            } else {
-                List<Product> allProducts = productService.findAllProducts();
-                List<ProductSalesEntry> initialEntries = allProducts.stream()
-                        .map(product -> {
-                            ProductSalesEntry entry = new ProductSalesEntry();
-                            entry.setProductName(product.getName());
-                            entry.setQuantity(0);
-                            return entry;
-                        })
-                        .collect(Collectors.toList());
-                salesInputForm.setPerformances(initialEntries);
-            }
+        // SalesPerformanceServiceのgetSalesPerformanceByDateメソッドを呼び出す
+        List<SalesPerformance> existingSales = salesPerformanceService.getSalesPerformanceByDate(targetDate);
+        if (!existingSales.isEmpty()) {
+            List<ProductSalesEntry> entries = existingSales.stream()
+                    .map(sp -> {
+                        ProductSalesEntry entry = new ProductSalesEntry();
+                        // SalesPerformanceオブジェクトからProduct名とSalesCountを取得
+                        entry.setProductName(sp.getProduct().getName());
+                        entry.setQuantity(sp.getSalesCount());
+                        return entry;
+                    })
+                    .collect(Collectors.toList());
+            salesInputForm.setPerformances(entries);
+        } else {
+            List<Product> allProducts = productService.findAllProducts();
+            List<ProductSalesEntry> initialEntries = allProducts.stream()
+                    .map(product -> {
+                        ProductSalesEntry entry = new ProductSalesEntry();
+                        entry.setProductName(product.getName());
+                        entry.setQuantity(0);
+                        return entry;
+                    })
+                    .collect(Collectors.toList());
+            salesInputForm.setPerformances(initialEntries);
+        }
         // }
 
         model.addAttribute("salesInputForm", salesInputForm);
@@ -110,6 +111,11 @@ public class SalesPerformanceController {
         // SalesWeatherServiceのfindSalesWeatherByDateメソッドを呼び出す
         Optional<SalesWeather> weatherOptional = salesWeatherService.findSalesWeatherByDate(LocalDate.now());
         model.addAttribute("todayWeather", weatherOptional.orElse(null));
+
+        @SuppressWarnings("unchecked")
+        List<OrderPredictionData> forecastWeatherList = (List<OrderPredictionData>) session
+                .getAttribute("forecastWeatherList");
+        model.addAttribute("forecastWeatherList", forecastWeatherList);
 
         return "sales-input";
     }

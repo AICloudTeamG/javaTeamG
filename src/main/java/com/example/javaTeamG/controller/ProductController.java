@@ -1,5 +1,6 @@
 package com.example.javaTeamG.controller;
 
+import com.example.javaTeamG.model.OrderPredictionData;
 import com.example.javaTeamG.model.Product;
 import com.example.javaTeamG.service.AuthService;
 import com.example.javaTeamG.service.ProductService;
@@ -35,13 +36,19 @@ public class ProductController {
         List<Product> products = productService.findAllProducts();
         model.addAttribute("products", products);
         model.addAttribute("pageTitle", "商品管理");
+
+        @SuppressWarnings("unchecked")
+        List<OrderPredictionData> forecastWeatherList = (List<OrderPredictionData>) session
+                .getAttribute("forecastWeatherList");
+        model.addAttribute("forecastWeatherList", forecastWeatherList);
+
         return "admin/product-management";
     }
 
     @PostMapping("/create")
     public String createProduct(@Valid @ModelAttribute Product product,
-                                BindingResult bindingResult,
-                                HttpSession session, RedirectAttributes redirectAttributes) {
+            BindingResult bindingResult,
+            HttpSession session, RedirectAttributes redirectAttributes) {
         if (!authService.isAdmin(session)) {
             redirectAttributes.addFlashAttribute("errorMessage", "アクセス権限がありません。");
             return "redirect:/access-denied";
@@ -71,9 +78,9 @@ public class ProductController {
 
     @PostMapping("/edit/{id}")
     public String updateProduct(@PathVariable Integer id,
-                                @Valid @ModelAttribute Product product,
-                                BindingResult bindingResult,
-                                HttpSession session, RedirectAttributes redirectAttributes) {
+            @Valid @ModelAttribute Product product,
+            BindingResult bindingResult,
+            HttpSession session, RedirectAttributes redirectAttributes) {
         if (!authService.isAdmin(session)) {
             redirectAttributes.addFlashAttribute("errorMessage", "アクセス権限がありません。");
             return "redirect:/access-denied";
@@ -109,7 +116,8 @@ public class ProductController {
             Optional<Product> productOpt = productService.findProductById(id);
             if (productOpt.isPresent() && !productOpt.get().isDeleted()) {
                 productService.deleteProduct(id);
-                redirectAttributes.addFlashAttribute("successMessage", "商品「" + productOpt.get().getName() + "」が正常に削除されました。");
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "商品「" + productOpt.get().getName() + "」が正常に削除されました。");
             } else if (productOpt.isPresent() && productOpt.get().isDeleted()) {
                 redirectAttributes.addFlashAttribute("errorMessage", "商品は既に削除されています。");
             } else {
