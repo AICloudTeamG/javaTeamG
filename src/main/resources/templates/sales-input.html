@@ -128,16 +128,15 @@
         </div>
     </div>
 
-    <script th:inline="javascript">
+    <script>
         /**
          * 管理者が日付を変更した際に、その日付でページをリダイレクトする関数
          * @param {string} selectedDateString - 選択された日付の文字列 (YYYY-MM-DD形式)
          */
         function redirectToDate(selectedDateString) {
             if (selectedDateString) {
-                // ThymeleafのURL式をJavaScript内で直接使うのは避けるため、ベースURLとパラメータを結合
-                // Spring Bootアプリケーションのコンテキストパスがルートの場合、@{/sales/input} は /sales/input に解決されます。
-                const baseUrl = '[[@{/sales/input}]]'; // Thymeleafが評価して文字列として埋め込む
+                
+                const baseUrl = 'input'; 
                 window.location.href = baseUrl + '?date=' + selectedDateString;
             }
         }
