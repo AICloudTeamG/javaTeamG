@@ -124,7 +124,7 @@
 
                                 <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post"
                                     class="delete-form" onsubmit="return confirm('本当にこの商品を削除（無効化）しますか？');">
-                                    <button type="submit" class="btn action-btn">
+                                    <button type="submit" class="btn action-btn btn-delete">
                                         <i class="fas fa-trash-alt"></i> 削除
                                     </button>
                                 </form>
