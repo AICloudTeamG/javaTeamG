@@ -99,3 +99,10 @@ table.table thead
      font-size: 1.5rem;
      margin-bottom: 1.5rem;
  }
+
+ .btn-delete {
+    background-color: #c32136;
+}
+.btn-delete:hover {
+    background-color: #c32136;
+}
